@@ -64,7 +64,6 @@ class ViewController: UIViewController {
         if let filePath = Bundle.main.path(forResource: "config", ofType: "json"),
            let data = try? NSData(contentsOfFile: filePath) as Data {
             gameConfig = try? JSONDecoder().decode(GameModel.self, from: data)
-            
         }
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -120,13 +119,13 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onStart(_ sender: Any) {
-
-        creepEntities.forEach { creep in
-            var transform = creep.transform
-            transform.translation = SIMD3<Float>(x: 0.15, y: transform.translation.y, z: 0.25)
-            creep.move(to: transform, relativeTo: creep.anchor, duration: 5)
+        gameConfig?.levels[level].maps.forEach { map in
+            creepEntities.forEach { creep in
+                var transform = creep.transform
+                transform.translation = SIMD3<Float>(x: 0.15, y: transform.translation.y, z: 0.25)
+                creep.move(to: transform, relativeTo: creep.anchor, duration: 5)
+            }
         }
-
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
@@ -142,18 +141,18 @@ class ViewController: UIViewController {
     }
     
     func insertTerrain(anchor: AnchorEntity, map: MapModel) {
-        let rows = map.matrix.count
-        let columns = map.matrix.first!.count
+        let rows = map.matrix.count //6
+        let columns = map.matrix.first!.count //6
         for row in 0...rows {
             for column in 0...columns {
-                let rowDistance = Float(rows / 2) - 0.5
-                let columnDistance = Float(columns / 2) - 0.5
-                let x = Float(row % rows) - rowDistance
-                let z = Float(column / columns) - columnDistance
+                let rowDistance = (Float(rows / 2) - 0.5) * 0.1
+                let columnDistance = (Float(columns / 2) - 0.5) * 0.1
+                let x = Float(row) - rowDistance
+                let z = Float(column) - columnDistance
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
                 switch mapType {
-                case .neutral, .zipLineIn, .zipLineOut, .creepPath, .highCreepPath:
+                case .neutral, .zipLineIn, .zipLineOut, .lowCreepPath, .highCreepPath:
                     break
                 case .goal:
                     break
@@ -161,7 +160,7 @@ class ViewController: UIViewController {
                     let model = ModelEntity()
                     let terrain = terrainTemplate.clone(recursive: true)
                     model.addChild(terrain)
-                    terrain.position = [x * 0.1 , 0.02, z * 0.1]
+                    terrain.position = [x, 0.02, z]
                     terrain.generateCollisionShapes(recursive: true)
                     anchor.addChild(model)
                     terrainEntities.append(terrain)
@@ -170,7 +169,7 @@ class ViewController: UIViewController {
                     let model = ModelEntity()
                     let creep = creepTemplate.clone(recursive: true)
                     model.addChild(creep)
-                    creep.position = [x * 0.1 , 0.03, z * 0.1]
+                    creep.position = [x, 0.03, z]
                     creep.generateCollisionShapes(recursive: true)
                     anchor.addChild(model)
                     insertDebugInfo(on: creep)

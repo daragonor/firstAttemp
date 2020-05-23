@@ -9,18 +9,26 @@
 import Foundation
 import RealityKit
 
-
 enum MapLegend: CaseIterable {
-    case neutral, goal, tower, spawn, creepPath, highCreepPath, zipLineIn, zipLineOut
+    case neutral, goal, tower, spawn, lowCreepPath, highCreepPath, zipLineIn, zipLineOut
 }
-class GameModel: Codable {
+struct GameModel: Codable {
     var levels: [LevelModel]
 }
-class LevelModel: Codable {
+struct LevelModel: Codable {
     var difficulty: Int
     var maps: [MapModel]
 }
-class MapModel: Codable {
-    var creepPath: [[String]]
-    var matrix: [[Int]]
+typealias Position = (x: Int, z: Int)
+struct MapModel: Codable {
+    var allPaths: [[String]]
+    var matrix: [[Int]] = []
+    func creepPaths() -> [[Position]] {
+        return allPaths.map { path in
+            return path.map { stringPosition in
+                let position = stringPosition.split(separator: ",")
+                return Position(Int(String(position[0]))!, Int(String(position[1]))!)
+            }
+        }
+    }
 }
