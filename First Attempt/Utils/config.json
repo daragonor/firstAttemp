@@ -1,0 +1,42 @@
+{
+    "creeps": [
+        {
+            "fileName": "mech_drone",
+            "scalingFactor": 0.0001
+        },
+        {
+            "fileName": "turret_gun",
+            "scalingFactor": 0.0003
+        },
+        {
+            "fileName": "tower_placing",
+            "scalingFactor": 0.0001
+        },
+        {
+            "fileName": "placing_glyph",
+            "scalingFactor": 0.0001
+        }
+    ],
+    "levels": [
+        {
+            "difficulty": 5,
+            "maps": [
+                {
+                    "creepPath": [
+                        ["3,2", "3,5", "0,5"]
+                    ],
+                    "matrix": [
+                        [0, 0, 0, 0, 0, 1, 0, 0],
+                        [0, 0, 0, 0, 0, 4, 0, 0],
+                        [0, 0, 0, 0, 2, 4, 0, 0],
+                        [0, 0, 4, 4, 4, 4, 2, 0],
+                        [0, 0, 4, 0, 0, 4, 0, 0],
+                        [0, 0, 4, 0, 0, 4, 0, 0],
+                        [0, 0, 4, 0, 0, 4, 0, 0],
+                        [0, 0, 3, 0, 0, 0, 0, 0]
+                    ]
+                }
+            ]
+        }
+    ]
+}

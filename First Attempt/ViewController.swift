@@ -10,6 +10,7 @@ import UIKit
 import ARKit
 import RealityKit
 import MultipeerConnectivity
+import Combine
 
 struct PlaneEntiy {
     var entity: ModelEntity
@@ -20,6 +21,7 @@ struct PlaneEntiy {
 class ViewController: UIViewController {
     
     @IBOutlet var arView: ARView!
+    
     @IBOutlet weak var coinsLabel: UILabel!
     
     var config: ARWorldTrackingConfiguration!
@@ -34,24 +36,41 @@ class ViewController: UIViewController {
     
     var towerEntities = [Entity]()
     var creepEntities = [Entity]()
-    /// Terrain disposable anchors
     var planeEntities = [UUID: PlaneEntiy]()
     var terrainEntities = [Entity]()
     
+    var coins = 150
+    var level = 0
+    var subscriptions: [Cancellable] = []
     
+    var gameConfig: GameModel?
+    var usedMaps = [MapModel]()
     
-    let terrainTemplate = try! Entity.load(named: "stone_floor")
+    let terrainTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
     let towerTemplate = try! Entity.load(named: "turret_gun")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        UIApplication.shared.isIdleTimerDisabled = true
+        loadAnchorTemplates()
+        configureMultipeer()
+        
+        coinsLabel.text = "\(coins)"
+        _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            self.coins += 5
+            self.coinsLabel.text = "\(self.coins)"
+        }
+        if let filePath = Bundle.main.path(forResource: "config", ofType: "json"),
+           let data = try? NSData(contentsOfFile: filePath) as Data {
+            gameConfig = try? JSONDecoder().decode(GameModel.self, from: data)
+            
+        }
+    }
     override func viewDidAppear(_ animated: Bool) {
         
         super.viewDidAppear(animated)
-        UIApplication.shared.isIdleTimerDisabled = true
-        loadAnchorTemplates()
         loadAnchorConfiguration()
-        configureMultipeer()
-        coinsLabel.text = "\(150)"
     }
     
     func loadAnchorConfiguration() {
@@ -68,17 +87,20 @@ class ViewController: UIViewController {
     }
     
     func loadAnchorTemplates() {
-        //for robots 0.005
-        let terrainFactor: Float = 1
+        //Terrains
+        let terrainFactor: Float = 0.0001
         terrainTemplate.setScale(SIMD3(repeating: terrainFactor), relativeTo: nil)
         terrainTemplate.generateCollisionShapes(recursive: true)
+        ///Runess
         let runeFactor: Float = 0.0001
         runeTemplate.setScale(SIMD3(repeating: runeFactor), relativeTo: nil)
         runeTemplate.generateCollisionShapes(recursive: true)
-        let towerFactor: Float = 0.001
+        ///Towers
+        let towerFactor: Float = 0.0003
         towerTemplate.setScale(SIMD3(repeating: towerFactor), relativeTo: nil)
         towerTemplate.generateCollisionShapes(recursive: true)
-        let creepFactor: Float = 0.0005
+        ///Creeps
+        let creepFactor: Float = 0.0001
         creepTemplate.setScale(SIMD3(repeating: creepFactor), relativeTo: nil)
         creepTemplate.generateCollisionShapes(recursive: true)
         
@@ -87,8 +109,6 @@ class ViewController: UIViewController {
     func configureMultipeer() {
         sessionIDObservation = observe(\.arView.session.identifier, options: [.new]) { object, change in
             print("SessionID changed to: \(change.newValue!)")
-            // Tell all other peers about your ARSession's changed ID, so
-            // that they can keep track of which ARAnchors are yours.
             guard let multipeerSession = self.multipeerSession else { return }
             self.sendARSessionIDTo(peers: multipeerSession.connectedPeers)
         }
@@ -100,10 +120,13 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onStart(_ sender: Any) {
-        creepEntities[0].move(to: terrainEntities[30].transform, relativeTo: terrainEntities[30].anchor, duration: 5)
-        creepEntities[1].move(to: creepEntities[0].transformMatrix(relativeTo: nil), relativeTo: nil, duration: 5)
-        //        robotEntities[0].move(to: robotEntities.last!.transformMatrix(relativeTo: nil), relativeTo: nil, duration: 3)
-        //        robotEntities[1].move(to: robotEntities[0].transformMatrix(relativeTo: nil), relativeTo: nil, duration: 8)
+
+        creepEntities.forEach { creep in
+            var transform = creep.transform
+            transform.translation = SIMD3<Float>(x: 0.15, y: transform.translation.y, z: 0.25)
+            creep.move(to: transform, relativeTo: creep.anchor, duration: 5)
+        }
+
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
@@ -112,47 +135,92 @@ class ViewController: UIViewController {
             let anchor = entity.anchor as? AnchorEntity else { return }
         
         if anchor.name == "TerrainAnchorEntity" {
-            let position = SIMD3<Float>(entity.position.x, entity.position.y + 0.02, entity.position.z)
-            ///▿ SIMD3<Float>(0.019324303, 0.02, 0.0)
-            insertTower(at: position, anchor: anchor)
+            insertTower(on: entity, anchor: anchor)
         } else {
             arView.session.add(anchor: ARAnchor(name: "Terrain", transform: entity.transformMatrix(relativeTo: nil)))
         }
-        
-    }
-    func insertTerrain(anchor: AnchorEntity) {
-        for i in 0..<36 {
-            let terrain = terrainTemplate.clone(recursive: true)
-            let x = Float(i % 6) - 2.5
-            let z = Float(i / 6) - 2.5
-            terrain.position = [x * 0.1 , 0.02, z * 0.1]
-            terrain.generateCollisionShapes(recursive: true)
-            anchor.addChild(terrain)
-            terrainEntities.append(terrain)
-            
-            if i == 0 || i == 5 {
-                let creep = creepTemplate.clone(recursive: true)
-                creep.position = [x * 0.1 , 0.03, z * 0.1]
-                anchor.addChild(creep)
-                creepEntities.append(creep)
-                creep.playAnimation(creep.availableAnimations[0].repeat())
-                //                let _ = arView.scene.subscribe(to: CollisionEvents.Began.self, on: creep) {
-                //                    event in
-                //                    let creep = event.entityA
-                //                    let tower = event.entityB
-                //                    creep.move(to: tower.transformMatrix(relativeTo: nil), relativeTo: nil, duration: 1)
-                //                }
-            }
-        }
-    }
-    func insertTower(at position: SIMD3<Float>, anchor: AnchorEntity) {
-        let tower = towerTemplate.clone(recursive: true)
-        anchor.addChild(tower)
-        tower.position = position
-        towerEntities.append(tower)
-        tower.playAnimation(tower.availableAnimations[0].repeat())
     }
     
+    func insertTerrain(anchor: AnchorEntity, map: MapModel) {
+        let rows = map.matrix.count
+        let columns = map.matrix.first!.count
+        for row in 0...rows {
+            for column in 0...columns {
+                let rowDistance = Float(rows / 2) - 0.5
+                let columnDistance = Float(columns / 2) - 0.5
+                let x = Float(row % rows) - rowDistance
+                let z = Float(column / columns) - columnDistance
+                let mapCode = map.matrix[row][column]
+                let mapType = MapLegend.allCases[mapCode]
+                switch mapType {
+                case .neutral, .zipLineIn, .zipLineOut, .creepPath, .highCreepPath:
+                    break
+                case .goal:
+                    break
+                case .tower:
+                    let model = ModelEntity()
+                    let terrain = terrainTemplate.clone(recursive: true)
+                    model.addChild(terrain)
+                    terrain.position = [x * 0.1 , 0.02, z * 0.1]
+                    terrain.generateCollisionShapes(recursive: true)
+                    anchor.addChild(model)
+                    terrainEntities.append(terrain)
+                    insertDebugInfo(on: terrain)
+                case .spawn:
+                    let model = ModelEntity()
+                    let creep = creepTemplate.clone(recursive: true)
+                    model.addChild(creep)
+                    creep.position = [x * 0.1 , 0.03, z * 0.1]
+                    creep.generateCollisionShapes(recursive: true)
+                    anchor.addChild(model)
+                    insertDebugInfo(on: creep)
+                    creepEntities.append(creep)
+                    creep.playAnimation(creep.availableAnimations[0].repeat())
+                }
+            }
+        }
+        usedMaps.append(map)
+    }
+    
+    func insertTower(on referenceEntity: Entity, anchor: AnchorEntity) {
+        let model = ModelEntity()
+        let tower = towerTemplate.clone(recursive: true)
+        model.addChild(tower)
+        anchor.addChild(model)
+        let position = referenceEntity.transformMatrix(relativeTo: anchor).toTranslation()
+        tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
+        towerEntities.append(tower)
+        
+        let bounds = tower.visualBounds(relativeTo: model)
+        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
+        tower.playAnimation(tower.availableAnimations[0].repeat())
+
+        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
+            event in
+            let tower = event.entityA
+            let object = event.entityB
+            if self.creepEntities.contains(object) {
+                tower.playAnimation(tower.availableAnimations[0].repeat())
+            }
+        }
+        subscriptions.append(subscription)
+    }
+    func insertDebugInfo(on parentEntity: Entity) {
+        let model = parentEntity.parent
+        let (x, y, z) = (parentEntity.position.x, parentEntity.position.y, parentEntity.position.z)
+        let mesh = MeshResource.generateText(
+            "(X:\(String(format:"%.2f", x)), Y:\(String(format:"%.2f", y)), Z:\(String(format:"%.2f", z)))",
+            extrusionDepth: 0.1,
+            font: .systemFont(ofSize: 2),
+            containerFrame: .zero,
+            alignment: .left,
+            lineBreakMode: .byTruncatingTail)
+        let entity = Entity()
+        entity.components[ModelComponent] = ModelComponent.init(mesh: mesh, materials: [SimpleMaterial(color: .white, isMetallic: false)])
+        model?.addChild(entity)
+        entity.scale = SIMD3(repeating: 0.01)
+        entity.setPosition(SIMD3(x: x - entity.visualBounds(relativeTo: model).extents.x / 2, y: y + 0.05, z: z), relativeTo: model)
+    }
 }
 
 
@@ -167,22 +235,24 @@ extension ViewController: ARSessionDelegate {
                 let terrainAnchor = AnchorEntity(anchor: anchor)
                 terrainAnchor.name = "TerrainAnchorEntity"
                 arView.scene.addAnchor(terrainAnchor)
-                insertTerrain(anchor: terrainAnchor)
+                if let maps = gameConfig?.levels[0].maps, maps.count >= 1 {
+                    insertTerrain(anchor: terrainAnchor, map: gameConfig!.levels[level].maps.removeFirst())
+                }
                 
             } else {
                 guard let planeAnchor = anchor as? ARPlaneAnchor else { continue }
                 let model = ModelEntity()
-                let entity = runeTemplate.clone(recursive: true)
-                model.addChild(entity)
+                let glyph = runeTemplate.clone(recursive: true)
+                model.addChild(glyph)
                 
                 let anchorEntity = AnchorEntity(anchor: planeAnchor)
                 anchorEntity.addChild(model)
                 arView.scene.addAnchor(anchorEntity)
-                entity.playAnimation(entity.availableAnimations[0])
-                let entityBounds = entity.visualBounds(relativeTo: model)
+                glyph.playAnimation(glyph.availableAnimations[0].repeat())
+                let entityBounds = glyph.visualBounds(relativeTo: model)
                 model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: entityBounds.extents).offsetBy(translation: entityBounds.center)])
-                
                 arView.installGestures([.rotation, .translation] ,for: model)
+                insertDebugInfo(on: glyph)
             }
         }
     }
@@ -216,24 +286,6 @@ extension ViewController: ARSessionDelegate {
             if anchor.name == "Terrain" {
                 
             }
-            
-            //            let orientation = planeAnchor.transform.toQuaternion()
-            //            let rotatedCenter = orientation.act(planeAnchor.center)
-            //            let mesh = MeshResource.generatePlane(width: 0.5    , depth: 0.5, cornerRadius: 0.05)
-            //            planeEntity = ModelEntity(mesh: mesh, materials: [SimpleMaterial(color: anchor.sessionIdentifier!.toRandomColor(), isMetallic: true)])
-            ////            planeEntity.transform.translation = rotatedCenter
-            ////            planeEntity.transform.rotation = orientation
-            ////
-            ////            switch planeAnchor.alignment {
-            ////            case .horizontal:
-            ////                planeEntity.model?.mesh = MeshResource.generatePlane( width: planeAnchor.extent.x, depth: planeAnchor.extent.z)
-            ////            case .vertical:
-            ////                planeEntity.model?.mesh = MeshResource.generatePlane( width: planeAnchor.extent.x, depth: 1)
-            ////            @unknown default: return
-            ////            }
-            ////
-            ////            planeEntity.model?.materials = [SimpleMaterial(color: anchor.sessionIdentifier!.toRandomColor(),isMetallic: true)]
-            //            planeEntity.generateCollisionShapes(recursive: true)
         }
     }
     

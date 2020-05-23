@@ -9,7 +9,10 @@
 import ARKit
 
 extension float4x4 {
-    
+    /// Returns the translation components of the matrix
+    func toTranslation() -> SIMD3<Float> {
+      return [self[3,0], self[3,1], self[3,2]]
+    }
     /// Returns a quaternion representing the
     /// rotation component of the matrix
     func toQuaternion() -> simd_quatf {
