@@ -119,13 +119,12 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onStart(_ sender: Any) {
-        gameConfig?.levels[level].maps.forEach { map in
-            creepEntities.forEach { creep in
-                var transform = creep.transform
-                transform.translation = SIMD3<Float>(x: 0.15, y: transform.translation.y, z: 0.25)
-                creep.move(to: transform, relativeTo: creep.anchor, duration: 5)
-            }
+        creepEntities.forEach { creep in
+            var transform = creep.transform
+            transform.translation = SIMD3<Float>(x: 0.15, y: transform.translation.y, z: 0.25)
+            creep.move(to: transform, relativeTo: creep.anchor, duration: 5)
         }
+        
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
@@ -141,14 +140,14 @@ class ViewController: UIViewController {
     }
     
     func insertTerrain(anchor: AnchorEntity, map: MapModel) {
-        let rows = map.matrix.count //6
-        let columns = map.matrix.first!.count //6
-        for row in 0...rows {
-            for column in 0...columns {
-                let rowDistance = (Float(rows / 2) - 0.5) * 0.1
-                let columnDistance = (Float(columns / 2) - 0.5) * 0.1
-                let x = Float(row) - rowDistance
-                let z = Float(column) - columnDistance
+        let rows = map.matrix.count
+        let columns = map.matrix.first!.count
+        for row in 0..<rows {
+            for column in 0..<columns {
+                let rowDistance = Float(rows / 2) - 0.5
+                let columnDistance = Float(columns / 2) - 0.5
+                let x = (Float(row) - rowDistance ) * 0.1
+                let z = (Float(column) - columnDistance)
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
                 switch mapType {
@@ -255,29 +254,6 @@ extension ViewController: ARSessionDelegate {
             }
         }
     }
-    class GlyphEntity: Entity, HasModel, HasAnchoring, HasCollision {
-        
-        required init(color: UIColor) {
-            super.init()
-            self.components[ModelComponent] = ModelComponent(
-                mesh: .generateBox(size: 0.1),
-                materials: [SimpleMaterial(
-                    color: color,
-                    isMetallic: false)
-                ]
-            )
-        }
-        
-        convenience init(color: UIColor, position: SIMD3<Float>) {
-            self.init(color: color)
-            self.position = position
-        }
-        
-        required init() {
-            fatalError("init() has not been implemented")
-        }
-    }
-    
     func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
         for anchor in anchors {
             //            guard let planeAnchor = anchor as? ARPlaneAnchor,
