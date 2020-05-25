@@ -7,6 +7,41 @@
 //
 
 import ARKit
+import RealityKit
+
+extension Entity {
+    func insertDebugInfo() {
+        let model = self.parent
+        let (x, y, z) = (self.position.x, self.position.y, self.position.z)
+        let mesh = MeshResource.generateText(
+            "(X:\(String(format:"%.2f", x)), Y:\(String(format:"%.2f", y)), Z:\(String(format:"%.2f", z)))",
+            extrusionDepth: 0.1,
+            font: .systemFont(ofSize: 2),
+            containerFrame: .zero,
+            alignment: .left,
+            lineBreakMode: .byTruncatingTail)
+        let entity = Entity()
+        entity.components[ModelComponent] = ModelComponent.init(mesh: mesh, materials: [SimpleMaterial(color: .white, isMetallic: false)])
+        model?.addChild(entity)
+        entity.scale = SIMD3(repeating: 0.01)
+        entity.setPosition(SIMD3(x: x - entity.visualBounds(relativeTo: model).extents.x / 2, y: y + 0.05, z: z), relativeTo: model)
+    }
+    
+    func modelEmbedded(at position: SIMD3<Float>, animationIndex: Int? = nil, debugInfo: Bool = false) -> (model: ModelEntity, entity: Entity) {
+        let model = ModelEntity()
+        let entity = self.clone(recursive: true)
+        model.addChild(entity)
+        entity.position = position
+        entity.generateCollisionShapes(recursive: true)
+        if let index = animationIndex {
+            entity.playAnimation(entity.availableAnimations[index].repeat())
+        }
+        if debugInfo {
+            self.insertDebugInfo()
+        }
+        return (model, entity)
+    }
+}
 
 extension float4x4 {
     /// Returns the translation components of the matrix

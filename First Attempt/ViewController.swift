@@ -34,28 +34,30 @@ class ViewController: UIViewController {
     
     var sessionIDObservation: NSKeyValueObservation?
     
-    var towerEntities = [Entity]()
-    var creepEntities = [Entity]()
-    var planeEntities = [UUID: PlaneEntiy]()
-    var terrainEntities = [Entity]()
-    
     var coins = 150
     var level = 0
+    let gridDiameter: Float = 0.5
     var subscriptions: [Cancellable] = []
-    
+    ///Gotta delete this
+    var spawnPlace: Entity?
     var gameConfig: GameModel?
-    var usedMaps = [MapModel]()
-    
-    let terrainTemplate = try! Entity.load(named: "tower_placing")
+    var usedMaps = 0
+
+    let pathTemplate = try! Entity.load(named: "floor_asset")
+    let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
     let towerTemplate = try! Entity.load(named: "turret_gun")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
+    let portalTemplate = try! Entity.load(named: "magic_portal")
+    let spawnTemplate = try! Entity.load(named: "spawn_station")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
+        loadAnchorConfiguration()
         loadAnchorTemplates()
         configureMultipeer()
-        
+
         coinsLabel.text = "\(coins)"
         _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             self.coins += 5
@@ -65,11 +67,11 @@ class ViewController: UIViewController {
            let data = try? NSData(contentsOfFile: filePath) as Data {
             gameConfig = try? JSONDecoder().decode(GameModel.self, from: data)
         }
-    }
-    override func viewDidAppear(_ animated: Bool) {
         
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        loadAnchorConfiguration()
     }
     
     func loadAnchorConfiguration() {
@@ -87,22 +89,22 @@ class ViewController: UIViewController {
     
     func loadAnchorTemplates() {
         //Terrains
-        let terrainFactor: Float = 0.0001
-        terrainTemplate.setScale(SIMD3(repeating: terrainFactor), relativeTo: nil)
-        terrainTemplate.generateCollisionShapes(recursive: true)
+        placingTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
+        placingTemplate.generateCollisionShapes(recursive: true)
         ///Runess
-        let runeFactor: Float = 0.0001
-        runeTemplate.setScale(SIMD3(repeating: runeFactor), relativeTo: nil)
+        runeTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
         runeTemplate.generateCollisionShapes(recursive: true)
         ///Towers
-        let towerFactor: Float = 0.0003
-        towerTemplate.setScale(SIMD3(repeating: towerFactor), relativeTo: nil)
+        towerTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         towerTemplate.generateCollisionShapes(recursive: true)
         ///Creeps
-        let creepFactor: Float = 0.0001
-        creepTemplate.setScale(SIMD3(repeating: creepFactor), relativeTo: nil)
-        creepTemplate.generateCollisionShapes(recursive: true)
-        
+        creepTemplate.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
+        ///Floor
+        pathTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
+        ///Goal
+        portalTemplate.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
+        ///Spawn
+        spawnTemplate.setScale(SIMD3(repeating: 0.00007), relativeTo: nil)
     }
     
     func configureMultipeer() {
@@ -119,12 +121,37 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onStart(_ sender: Any) {
-        creepEntities.forEach { creep in
-            var transform = creep.transform
-            transform.translation = SIMD3<Float>(x: 0.15, y: transform.translation.y, z: 0.25)
-            creep.move(to: transform, relativeTo: creep.anchor, duration: 5)
+        if let maps = gameConfig?.levels[level].maps {
+            let path = maps[0].creepPathsCoordinates(diameter: gridDiameter)[0]
+            var counter = 0
+            var spawnPosition =  self.spawnPlace!.transform.translation
+            _ = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
+                guard counter < 5 else { timer.invalidate() ; return }
+                counter += 1
+                spawnPosition.y = 0.03
+                let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, animationIndex: 0, debugInfo: true)
+                self.spawnPlace!.anchor?.addChild(creep.model)
+                self.deployUnit(creep.entity, on: path)
+            }
         }
-        
+    }
+    
+    func deployUnit(_ entity: Entity, to index: Int = 0, on path: [SIMD3<Float>], baseHeight: Float? = nil) {
+        var transform = entity.transform
+        if index < path.count {
+            let coordinate = path[index]
+            let height = baseHeight ?? transform.translation.y
+            transform.translation = SIMD3<Float>(x: coordinate.x, y: height + coordinate.y, z: coordinate.z)
+            let animation = entity.move(to: transform, relativeTo: entity.anchor, duration: 3, timingFunction: .linear)
+            let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+            .filter { $0.playbackController == animation }
+            .sink(receiveValue: { event in
+                self.deployUnit(entity, to: index + 1, on: path, baseHeight: height)
+            })
+            subscriptions.append(subscription)
+        } else if index == path.count {
+            entity.removeFromParent()
+        }
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
@@ -144,80 +171,57 @@ class ViewController: UIViewController {
         let columns = map.matrix.first!.count
         for row in 0..<rows {
             for column in 0..<columns {
-                let rowDistance = Float(rows / 2) - 0.5
-                let columnDistance = Float(columns / 2) - 0.5
+                let rowDistance = Float(rows / 2) - gridDiameter
+                let columnDistance = Float(columns / 2) - gridDiameter
                 let x = (Float(row) - rowDistance ) * 0.1
-                let z = (Float(column) - columnDistance)
+                let z = (Float(column) - columnDistance) * 0.1
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
                 switch mapType {
-                case .neutral, .zipLineIn, .zipLineOut, .lowCreepPath, .highCreepPath:
+                case .neutral, .zipLineIn, .zipLineOut:
                     break
                 case .goal:
-                    break
-                case .tower:
-                    let model = ModelEntity()
-                    let terrain = terrainTemplate.clone(recursive: true)
-                    model.addChild(terrain)
-                    terrain.position = [x, 0.02, z]
-                    terrain.generateCollisionShapes(recursive: true)
-                    anchor.addChild(model)
-                    terrainEntities.append(terrain)
-                    insertDebugInfo(on: terrain)
+                    let portal = portalTemplate.modelEmbedded(at: [x, 0.02, z])
+                    portal.entity.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 1, 0])
+                    anchor.addChild(portal.model)
+                case .lowCreepPath:
+                    let floor = pathTemplate.modelEmbedded(at: [x, 0.02, z])
+                    anchor.addChild(floor.model)
+                case .highCreepPath:
+                    let floor = pathTemplate.modelEmbedded(at: [x, 0.12, z])
+                    anchor.addChild(floor.model)
+                case .towerPlacing:
+                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.02, z], debugInfo: true)
+                    anchor.addChild(towerPlacing.model)
                 case .spawn:
-                    let model = ModelEntity()
-                    let creep = creepTemplate.clone(recursive: true)
-                    model.addChild(creep)
-                    creep.position = [x, 0.03, z]
-                    creep.generateCollisionShapes(recursive: true)
-                    anchor.addChild(model)
-                    insertDebugInfo(on: creep)
-                    creepEntities.append(creep)
-                    creep.playAnimation(creep.availableAnimations[0].repeat())
+                    let station = spawnTemplate.modelEmbedded(at: [x, 0.02, z])
+                    spawnPlace = station.entity
+                    anchor.addChild(station.model)
                 }
             }
         }
-        usedMaps.append(map)
     }
-    
+
     func insertTower(on referenceEntity: Entity, anchor: AnchorEntity) {
+        let position = referenceEntity.transformMatrix(relativeTo: anchor).toTranslation()
+
         let model = ModelEntity()
         let tower = towerTemplate.clone(recursive: true)
         model.addChild(tower)
-        anchor.addChild(model)
-        let position = referenceEntity.transformMatrix(relativeTo: anchor).toTranslation()
         tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
-        towerEntities.append(tower)
+        anchor.addChild(model)
         
         let bounds = tower.visualBounds(relativeTo: model)
         tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
         tower.playAnimation(tower.availableAnimations[0].repeat())
 
-        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
-            event in
-            let tower = event.entityA
-            let object = event.entityB
-            if self.creepEntities.contains(object) {
-                tower.playAnimation(tower.availableAnimations[0].repeat())
-            }
-        }
-        subscriptions.append(subscription)
-    }
-    func insertDebugInfo(on parentEntity: Entity) {
-        let model = parentEntity.parent
-        let (x, y, z) = (parentEntity.position.x, parentEntity.position.y, parentEntity.position.z)
-        let mesh = MeshResource.generateText(
-            "(X:\(String(format:"%.2f", x)), Y:\(String(format:"%.2f", y)), Z:\(String(format:"%.2f", z)))",
-            extrusionDepth: 0.1,
-            font: .systemFont(ofSize: 2),
-            containerFrame: .zero,
-            alignment: .left,
-            lineBreakMode: .byTruncatingTail)
-        let entity = Entity()
-        entity.components[ModelComponent] = ModelComponent.init(mesh: mesh, materials: [SimpleMaterial(color: .white, isMetallic: false)])
-        model?.addChild(entity)
-        entity.scale = SIMD3(repeating: 0.01)
-        entity.setPosition(SIMD3(x: x - entity.visualBounds(relativeTo: model).extents.x / 2, y: y + 0.05, z: z), relativeTo: model)
+//        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
+//            event in
+//            let tower = event.entityA
+//            let object = event.entityB
+//
+//        }
+//        subscriptions.append(subscription)
     }
 }
 
@@ -233,8 +237,9 @@ extension ViewController: ARSessionDelegate {
                 let terrainAnchor = AnchorEntity(anchor: anchor)
                 terrainAnchor.name = "TerrainAnchorEntity"
                 arView.scene.addAnchor(terrainAnchor)
-                if let maps = gameConfig?.levels[0].maps, maps.count >= 1 {
-                    insertTerrain(anchor: terrainAnchor, map: gameConfig!.levels[level].maps.removeFirst())
+                if let maps = gameConfig?.levels[0].maps, usedMaps < maps.count {
+                    insertTerrain(anchor: terrainAnchor, map: maps[usedMaps])
+                    usedMaps += 1
                 }
                 
             } else {
@@ -250,7 +255,6 @@ extension ViewController: ARSessionDelegate {
                 let entityBounds = glyph.visualBounds(relativeTo: model)
                 model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: entityBounds.extents).offsetBy(translation: entityBounds.center)])
                 arView.installGestures([.rotation, .translation] ,for: model)
-                insertDebugInfo(on: glyph)
             }
         }
     }
