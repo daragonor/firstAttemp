@@ -24,6 +24,10 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var coinsLabel: UILabel!
     
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    var defensors = Defensor.getDefensors()
+    
     var config: ARWorldTrackingConfiguration!
     
     var multipeerSession: MultipeerSession?
@@ -52,6 +56,9 @@ class ViewController: UIViewController {
     let runeTemplate = try! Entity.load(named: "placing_glyph")
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        collectionView.dataSource = self
+        collectionView.isHidden = true
         UIApplication.shared.isIdleTimerDisabled = true
         loadAnchorTemplates()
         configureMultipeer()
@@ -130,6 +137,7 @@ class ViewController: UIViewController {
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
+        collectionView.isHidden = false
         let tapLocation = sender.location(in: arView)
         guard let entity = arView.entity(at: tapLocation),
             let anchor = entity.anchor as? AnchorEntity else { return }
@@ -312,5 +320,22 @@ extension ViewController: ARSessionDelegate {
             alertController.addAction(restartAction)
             self.present(alertController, animated: true, completion: nil)
         }
+    }
+}
+extension ViewController: UICollectionViewDataSource
+{
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return defensors.count
+    }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DefensorCollectionViewCell", for: indexPath) as! DefensorCollectionViewCell
+        let defensor = defensors[indexPath.item]
+        
+        cell.defensor = defensor
+        
+        return cell
     }
 }
