@@ -1,39 +1,59 @@
 {
-    "creeps": [
-        {
-            "fileName": "mech_drone",
-            "scalingFactor": 0.0001
+    "assets": {
+        "creeps": [
+            {
+                "fileName": "mech_drone",
+                "scalingFactor": 0.0002,
+                "lifePoints": 100
+            }
+        ],
+        "towers": [
+            {
+                "fileName": "turret_gun",
+                "scalingFactor": 0.0003,
+                "attackValue": 25,
+                "range": 30.0
+            }
+        ],
+        "placings": [
+            {
+                "fileName": "tower_placing",
+                "scalingFactor": 0.0001
+            }
+        ],
+        "paths": [
+            {
+                "fileName": "floor_asset",
+                "scalingFactor": 0.00035
+            }
+        ],
+        "goal": {
+            "fileName": "magic_portal",
+            "scalingFactor": 0.0005
         },
-        {
-            "fileName": "turret_gun",
-            "scalingFactor": 0.0003
+        "spawn": {
+            "fileName": "spawn_station",
+            "scalingFactor": 0.00007
         },
-        {
-            "fileName": "tower_placing",
-            "scalingFactor": 0.0001
-        },
-        {
+        "rune": {
             "fileName": "placing_glyph",
             "scalingFactor": 0.0001
         }
-    ],
+    },
     "levels": [
         {
             "difficulty": 5,
             "maps": [
                 {
-                    "allPaths": [
-                        ["3,2","3,3","3,4" ,"3,5", "0,5"]
-                    ],
                     "matrix": [
                         [0, 0, 0, 0, 0, 1, 0, 0],
-                        [0, 0, 0, 0, 0, 4, 0, 0],
-                        [0, 0, 0, 0, 2, 4, 0, 0],
-                        [0, 0, 4, 5, 5, 4, 0, 0],
-                        [0, 0, 4, 2, 0, 4, 0, 0],
-                        [0, 0, 4, 4, 4, 4, 4, 3],
-                        [0, 0, 4, 0, 0, 0, 0, 0],
-                        [0, 0, 3, 0, 0, 0, 0, 0]
+                        [0, 0, 0, 0, 0, 5, 0, 0],
+                        [0, 0, 0, 0, 2, 5, 0, 0],
+                        [0, 0, 5, 5, 5, 5, 0, 0],
+                        [0, 0, 5, 2, 0, 5, 0, 0],
+                        [0, 0, 5, 5, 5, 5, 5, 4],
+                        [0, 0, 5, 0, 0, 0, 0, 0],
+                        [0, 0, 4, 0, 0, 0, 0, 0]
                     ]
                 }
             ]

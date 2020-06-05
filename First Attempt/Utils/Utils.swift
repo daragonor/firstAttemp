@@ -27,15 +27,12 @@ extension Entity {
         entity.setPosition(SIMD3(x: x - entity.visualBounds(relativeTo: model).extents.x / 2, y: y + 0.05, z: z), relativeTo: model)
     }
     
-    func modelEmbedded(at position: SIMD3<Float>, animationIndex: Int? = nil, debugInfo: Bool = false) -> (model: ModelEntity, entity: Entity) {
+    func modelEmbedded(at position: SIMD3<Float>, debugInfo: Bool = false) -> (model: ModelEntity, entity: Entity) {
         let model = ModelEntity()
         let entity = self.clone(recursive: true)
         model.addChild(entity)
         entity.position = position
         entity.generateCollisionShapes(recursive: true)
-        if let index = animationIndex {
-            entity.playAnimation(entity.availableAnimations[index].repeat())
-        }
         if debugInfo {
             self.insertDebugInfo()
         }
