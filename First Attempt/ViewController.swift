@@ -40,6 +40,8 @@ class ViewController: UIViewController {
     }
     var spawnPlaces = [SpawnPlace]()
     var glyphModels = [ModelEntity]()
+    var terrainAnchors = [AnchorEntity]()
+    var creepIDs = [UInt64]()
     
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
@@ -80,7 +82,7 @@ class ViewController: UIViewController {
         config.environmentTexturing = .automatic
         
         arView.automaticallyConfigureSession = false
-        arView.debugOptions = [.showFeaturePoints]
+        arView.debugOptions = [.showPhysics]
         arView.session.delegate = self
         arView.session.run(config)
         arView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
@@ -109,9 +111,7 @@ class ViewController: UIViewController {
             guard let multipeerSession = self.multipeerSession else { return }
             self.sendARSessionIDTo(peers: multipeerSession.connectedPeers)
         }
-        
         setupCoachingOverlay()
-        
         multipeerSession = MultipeerSession(receivedDataHandler: receivedData, peerJoinedHandler:
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
     }
@@ -129,7 +129,11 @@ class ViewController: UIViewController {
                 counter += 1
                 spawnPosition.y = 0.03
                 let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, debugInfo: true)
+
+                self.creepIDs.append(creep.model.id)
                 spawn.entity.anchor?.addChild(creep.model)
+                let bounds = self.creepTemplate.visualBounds(relativeTo: creep.model)
+                creep.entity.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: [0.1,0.1,0.1]).offsetBy(translation: bounds.center)]))
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 self.deployUnit(creep.entity, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.0001)
             }
@@ -157,7 +161,10 @@ class ViewController: UIViewController {
         }
     }
     @IBAction func onUndo(_ sender: Any) {
-        //deleteTowersfromArray
+        if let lastMap = terrainAnchors.last {
+            lastMap.removeFromParent()
+            usedMaps -= 1
+        }
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
@@ -199,6 +206,7 @@ class ViewController: UIViewController {
                     anchor.addChild(floor.model)
                 case .lowerTower:
                     let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
+                    towerPlacing.model.generateCollisionShapes(recursive: true)
                     anchor.addChild(towerPlacing.model)
                 case .higherTower:
                     let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
@@ -221,17 +229,17 @@ class ViewController: UIViewController {
         tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
         anchor.addChild(model)
         
-//        let bounds = tower.visualBounds(relativeTo: model)
-//        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
+        let bounds = tower.visualBounds(relativeTo: model)
+        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents * 2).offsetBy(translation: bounds.center)]))
         tower.playAnimation(tower.availableAnimations[0].repeat())
 
-//        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
-//            event in
-//            let tower = event.entityA
-//            let object = event.entityB
-//
-//        }
-//        subscriptions.append(subscription)
+        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
+            event in
+            let tower = event.entityA
+            let object = event.entityB
+            
+        }
+        subscriptions.append(subscription)
     }
 }
 
@@ -247,6 +255,7 @@ extension ViewController: ARSessionDelegate {
                 let terrainAnchor = AnchorEntity(anchor: anchor)
                 terrainAnchor.name = "TerrainAnchorEntity"
                 arView.scene.addAnchor(terrainAnchor)
+                terrainAnchors.append(terrainAnchor)
                 let maps = gameConfig.levels[level].maps
                 if usedMaps < maps.count {
                     insertTerrain(anchor: terrainAnchor, map: maps[usedMaps])
