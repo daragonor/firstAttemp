@@ -32,7 +32,6 @@ extension Entity {
         let entity = self.clone(recursive: true)
         model.addChild(entity)
         entity.position = position
-        entity.generateCollisionShapes(recursive: true)
         if debugInfo {
             self.insertDebugInfo()
         }

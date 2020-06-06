@@ -35,8 +35,11 @@ class ViewController: UIViewController {
     var subscriptions: [Cancellable] = []
     var usedMaps = 0
     var coinsTimer: Timer?
+    var canStart: Bool {
+        return usedMaps == gameConfig.levels[level].maps.count
+    }
     var spawnPlaces = [SpawnPlace]()
-    var terrainTemplates = [AnchorEntity]()
+    var glyphModels = [ModelEntity]()
     
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
@@ -114,9 +117,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onStart(_ sender: Any) {
+        guard canStart else { return }
+        glyphModels.forEach { model in model.removeFromParent() }
         for spawn in spawnPlaces {
             let map = gameConfig.levels[level].maps[spawn.map]
-            let path = map.creepPathsCoordinates(at: spawn.position,diameter: gridDiameter)
+            let paths = map.creepPathsCoordinates(at: spawn.position,diameter: gridDiameter, aditionalRotationOffset: .pi)
             var counter = 0
             var spawnPosition =  spawn.entity.transform.translation
             _ = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
@@ -126,7 +131,7 @@ class ViewController: UIViewController {
                 let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, debugInfo: true)
                 spawn.entity.anchor?.addChild(creep.model)
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
-                self.deployUnit(creep.entity, on: path, setScale: 0.0001)
+                self.deployUnit(creep.entity, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.0001)
             }
         }
     }
@@ -134,10 +139,10 @@ class ViewController: UIViewController {
     func deployUnit(_ entity: Entity, to index: Int = 0, on path: [OrientedCoordinate], baseHeight: Float? = nil, setScale: Float? = nil) {
         var transform = entity.transform
         if index < path.count {
-            let coordinate = path[index]
+            let move = path[index]
             let height = baseHeight ?? transform.translation.y
-            transform.translation = SIMD3<Float>(x: coordinate.traslation.x, y: height + coordinate.traslation.y, z: coordinate.traslation.z)
-            transform.rotation = coordinate.direction.rotation
+            transform.translation = SIMD3<Float>(x: move.coordinate.x, y: height + move.coordinate.y, z: move.coordinate.z)
+            transform.rotation = move.rotation
             if let scale = setScale { transform.scale = SIMD3(repeating: scale) }
             let animation = entity.move(to: transform, relativeTo: entity.anchor, duration: 1, timingFunction: .linear)
             let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
@@ -256,6 +261,7 @@ extension ViewController: ARSessionDelegate {
                 let anchorEntity = AnchorEntity(anchor: planeAnchor)
                 anchorEntity.addChild(model)
                 arView.scene.addAnchor(anchorEntity)
+                glyphModels.append(model)
                 glyph.playAnimation(glyph.availableAnimations[0].repeat())
                 let entityBounds = glyph.visualBounds(relativeTo: model)
                 model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: entityBounds.extents).offsetBy(translation: entityBounds.center)])

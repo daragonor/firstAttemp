@@ -24,16 +24,22 @@ enum Direction: CaseIterable {
         case .right: return (1, 0)
         }
     }
-    var rotation: simd_quatf {
-        var angle: Float {
-            switch self {
-            case .up: return 0
-            case .down: return .pi
-            case .left: return -.pi/2
-            case .right: return .pi/2
-            }
+    var baseRotation: Float {
+        switch self {
+        case .up: return 0
+        case .right: return .pi/2
+        case .down: return .pi
+        case .left: return 3*(.pi)/2
         }
-        return simd_quatf(angle: angle, axis: [0, 1, 0])
+    }
+    func rotation(previous: Direction) -> Float {
+        switch (self, previous) {
+        case (.up, .right), (.right, .up): return .pi/4
+        case (.right, .down), (.down, .right): return 3*(.pi)/4
+        case (.down, .left), (.left, .down): return 5*(.pi)/4
+        case (.left, .up), (.up, .left): return 7*(.pi)/4
+        default: return 0.0
+        }
     }
 }
 
@@ -86,8 +92,8 @@ struct LevelModel: Codable {
 }
 
 typealias Position = (row: Int, column: Int)
-typealias OrientedPosition = (position: Position, rotation: Direction)
-typealias OrientedCoordinate = (traslation: SIMD3<Float>, direction: Direction)
+typealias OrientedPosition = (position: Position, direction: Direction)
+typealias OrientedCoordinate = (coordinate: SIMD3<Float>, rotation: simd_quatf)
 
 struct MapModel: Codable {
     var matrix: [[Int]]
@@ -114,12 +120,12 @@ struct MapModel: Codable {
             }
         }
         for spawn in spawns {
-            moveTo((spawn, .down), path: [])
+            moveTo((spawn, Direction.down), path: [])
         }
     }
     mutating func moveTo(_ orientedPosition: OrientedPosition, path: [OrientedPosition]) {
-        let current = orientedPosition.position
         var path = path
+        let current = orientedPosition.position
         path.append(orientedPosition)
         let mapType = MapLegend.allCases[matrix[current.row][current.column]]
         if [MapLegend.goal, .zipLineOut].contains(mapType) {
@@ -132,28 +138,36 @@ struct MapModel: Codable {
                     position.column >= 0 && position.column < columns &&
                     !path.contains(where: { previous, _ in return (previous.row == position.row && previous.column == position.column) }) &&
                     [MapLegend.lowerPath, .higherPath, .goal, .zipLineOut].contains(MapLegend.allCases[matrix[position.row][position.column]]) {
-                    moveTo((position, .right), path: path)
+                    
+                    moveTo((position, direction), path: path)
                 } 
             }
         }
     }
     
-    func creepPathsCoordinates(at position: Position, diameter: Float) -> [OrientedCoordinate] {
+    func creepPathsCoordinates(at position: Position, diameter: Float, aditionalRotationOffset: Float = 0) -> [[OrientedCoordinate]] {
         let (rowDistance, columnDistance) = (Float(rows / 2) - diameter, Float(columns / 2) - diameter)
-        let paths = allPaths.filter { path in
+        let pathsPerSpawn = allPaths.filter { path in
             return position == path.first!.position
         }
-        return paths[Int.random(in: 0..<paths.count)].map { (position, direction) in
-            let (row, column) = position
-            let x = (Float(row) - rowDistance ) * 0.1
-            var y: Float {
-                switch MapLegend.allCases[self.matrix[row][column]] {
-                case .higherPath, .higherTower: return 0.1
-                default: return 0.0
+        return pathsPerSpawn.map { path in
+            return path.enumerated().map { (index, move) in
+                let (row, column) = move.position
+                let x = (Float(row) - rowDistance ) * 0.1
+                var y: Float {
+                    switch MapLegend.allCases[self.matrix[row][column]] {
+                    case .higherPath, .higherTower: return 0.1
+                    default: return 0.0
+                    }
                 }
+                let z = (Float(column) - columnDistance) * 0.1
+
+                var rotation: Float {
+                    guard index + 1 < path.count, path[index + 1].direction != move.direction else { return move.direction.baseRotation}
+                    return path[index + 1].direction.rotation(previous: move.direction)
+                }
+                return ([x, y, z], simd_quatf(angle: rotation + aditionalRotationOffset, axis: [0, 1, 0]))
             }
-            let z = (Float(column) - columnDistance) * 0.1
-            return ([x, y, z], direction)
         }
     }
 }
