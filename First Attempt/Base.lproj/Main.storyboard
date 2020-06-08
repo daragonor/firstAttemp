@@ -20,16 +20,6 @@
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <gestureRecognizers/>
                             </arView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tO4-3O-dbf">
-                                <rect key="frame" x="30" y="779" width="354" height="53"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="53" id="gSD-fe-qq5"/>
-                                </constraints>
-                                <state key="normal" title="Start" image="paperplane" catalog="system"/>
-                                <connections>
-                                    <action selector="onStart:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Zfn-x5-ebq"/>
-                                </connections>
-                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zqz-mg-Tnc">
                                 <rect key="frame" x="74" y="60" width="72" height="40"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -101,77 +91,42 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="LMl-xX-dB5">
-                                <rect key="frame" x="20" y="128" width="374" height="130"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="130" id="BSM-iG-5zn"/>
-                                </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="m3L-KU-inh">
-                                    <size key="itemSize" width="128" height="128"/>
-                                    <size key="estimatedItemSize" width="128" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="DefensorCollectionViewCell" id="lec-zg-jT4" customClass="DefensorCollectionViewCell" customModule="First_Attempt" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1" width="128" height="128"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="yjX-JJ-CoQ">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="tank" translatesAutoresizingMaskIntoConstraints="NO" id="rfq-XM-aEk">
-                                                    <rect key="frame" x="29.5" y="8" width="69" height="69"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="69" id="Isk-ir-c0O"/>
-                                                        <constraint firstAttribute="width" constant="69" id="kik-XG-GdF"/>
-                                                    </constraints>
-                                                </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yiq-jf-gDq">
-                                                    <rect key="frame" x="43" y="85" width="42" height="20.5"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstItem="Yiq-jf-gDq" firstAttribute="top" secondItem="rfq-XM-aEk" secondAttribute="bottom" constant="8" id="8Un-vX-BEQ"/>
-                                                <constraint firstItem="rfq-XM-aEk" firstAttribute="centerX" secondItem="Yiq-jf-gDq" secondAttribute="centerX" id="T7l-2I-XfE"/>
-                                                <constraint firstItem="rfq-XM-aEk" firstAttribute="centerX" secondItem="yjX-JJ-CoQ" secondAttribute="centerX" id="qp5-Le-kzb"/>
-                                                <constraint firstItem="rfq-XM-aEk" firstAttribute="top" secondItem="yjX-JJ-CoQ" secondAttribute="topMargin" id="xnz-QM-1qa"/>
-                                            </constraints>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="25"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
-                                        </collectionViewCellContentView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="SCU-Lq-dW8">
+                                <rect key="frame" x="30" y="782" width="354" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YVX-Iv-AfP">
+                                        <rect key="frame" x="0.0" y="0.0" width="177" height="50"/>
+                                        <state key="normal" title="Undo" image="delete.left" catalog="system"/>
                                         <connections>
-                                            <outlet property="defensorImageView" destination="rfq-XM-aEk" id="z1J-zf-nIR"/>
-                                            <outlet property="defensorTitleLabel" destination="Yiq-jf-gDq" id="9Zc-i9-otz"/>
+                                            <action selector="onUndo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ooz-Rh-s3h"/>
                                         </connections>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tO4-3O-dbf">
+                                        <rect key="frame" x="177" y="0.0" width="177" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="gSD-fe-qq5"/>
+                                        </constraints>
+                                        <state key="normal" title="Start" image="paperplane" catalog="system"/>
+                                        <connections>
+                                            <action selector="onStart:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Zfn-x5-ebq"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="coy-Dq-66T" firstAttribute="trailing" secondItem="tO4-3O-dbf" secondAttribute="trailing" constant="30" id="4y2-zg-JH6"/>
-                            <constraint firstItem="LMl-xX-dB5" firstAttribute="leading" secondItem="coy-Dq-66T" secondAttribute="leading" constant="20" id="DL6-hY-LeW"/>
                             <constraint firstItem="HBu-wv-R4w" firstAttribute="top" secondItem="coy-Dq-66T" secondAttribute="top" constant="16" id="DuD-UC-isC"/>
                             <constraint firstItem="coy-Dq-66T" firstAttribute="trailing" secondItem="LMl-xX-dB5" secondAttribute="trailing" constant="20" id="Oq7-l6-rQd"/>
                             <constraint firstAttribute="bottom" secondItem="5Bl-IE-Y6f" secondAttribute="bottom" id="RJf-bv-oR1"/>
                             <constraint firstItem="Zqz-mg-Tnc" firstAttribute="leading" secondItem="e4j-Vq-e6a" secondAttribute="leading" constant="-4" id="afO-KY-4Sf"/>
                             <constraint firstItem="5Bl-IE-Y6f" firstAttribute="leading" secondItem="2cc-HS-gvE" secondAttribute="leading" id="bg6-gq-gFC"/>
                             <constraint firstItem="5Bl-IE-Y6f" firstAttribute="top" secondItem="2cc-HS-gvE" secondAttribute="top" id="c14-49-8Ul"/>
+                            <constraint firstItem="SCU-Lq-dW8" firstAttribute="leading" secondItem="coy-Dq-66T" secondAttribute="leading" constant="30" id="c9Y-aO-Xl6"/>
                             <constraint firstItem="HBu-wv-R4w" firstAttribute="leading" secondItem="coy-Dq-66T" secondAttribute="leading" constant="30" id="cZ0-D4-5dz"/>
-                            <constraint firstItem="LMl-xX-dB5" firstAttribute="top" secondItem="Zqz-mg-Tnc" secondAttribute="bottom" constant="28" id="g7d-iS-NoS"/>
-                            <constraint firstItem="tO4-3O-dbf" firstAttribute="leading" secondItem="coy-Dq-66T" secondAttribute="leading" constant="30" id="hs3-Nz-Df9"/>
-                            <constraint firstItem="coy-Dq-66T" firstAttribute="bottom" secondItem="tO4-3O-dbf" secondAttribute="bottom" constant="30" id="oQj-WM-2w9"/>
+                            <constraint firstItem="coy-Dq-66T" firstAttribute="bottom" secondItem="SCU-Lq-dW8" secondAttribute="bottom" constant="30" id="dBU-Kr-NSq"/>
                             <constraint firstItem="Zqz-mg-Tnc" firstAttribute="bottom" secondItem="e4j-Vq-e6a" secondAttribute="bottom" id="rR3-y6-LC8"/>
+                            <constraint firstItem="coy-Dq-66T" firstAttribute="trailing" secondItem="SCU-Lq-dW8" secondAttribute="trailing" constant="30" id="tL5-lH-8vr"/>
                             <constraint firstItem="Zqz-mg-Tnc" firstAttribute="top" secondItem="e4j-Vq-e6a" secondAttribute="top" id="uHq-Rp-meh"/>
                             <constraint firstItem="coy-Dq-66T" firstAttribute="trailing" secondItem="HBu-wv-R4w" secondAttribute="trailing" constant="30" id="v1R-nU-xPx"/>
                             <constraint firstAttribute="trailing" secondItem="5Bl-IE-Y6f" secondAttribute="trailing" id="vvV-nL-Wyz"/>
@@ -182,7 +137,7 @@
                     <connections>
                         <outlet property="arView" destination="5Bl-IE-Y6f" id="aF0-8d-kDq"/>
                         <outlet property="coinsLabel" destination="e4j-Vq-e6a" id="zjd-gD-YVl"/>
-                        <outlet property="collectionView" destination="LMl-xX-dB5" id="HrN-U1-H4t"/>
+                        <outlet property="lifePointsStack" destination="3Wn-iP-lQy" id="CQm-bi-ynL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -192,6 +147,7 @@
     </scenes>
     <resources>
         <image name="coin" width="696" height="793"/>
+        <image name="delete.left" catalog="system" width="128" height="104"/>
         <image name="heart" width="2400" height="2400"/>
         <image name="paperplane" catalog="system" width="128" height="121"/>
         <image name="tank" width="64" height="64"/>
