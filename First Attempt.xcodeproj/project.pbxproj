@@ -17,10 +17,10 @@
 		19363E61248602F200698A72 /* map_icon.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E60248602F200698A72 /* map_icon.usdz */; };
 		19363E652489AFA900698A72 /* mech_drone.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E642489AFA800698A72 /* mech_drone.usdz */; };
 		197D980E247B280800447567 /* magic_portal.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 197D980D247B280800447567 /* magic_portal.usdz */; };
-		197D9810247B29D200447567 /* floor_asset.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 197D980F247B29D100447567 /* floor_asset.usdz */; };
 		197D9812247B3F3D00447567 /* spawn_station.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 197D9811247B3F3C00447567 /* spawn_station.usdz */; };
 		19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C52454500D007F9198 /* MultipeerSession.swift */; };
 		19CA62C824545074007F9198 /* ViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */; };
+		19DEDFDC248E00810010AC79 /* main_path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19DEDFDB248E00800010AC79 /* main_path.usdz */; };
 		19E51B352478B37C00443998 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E51B342478B37C00443998 /* Map.swift */; };
 		19E51B372478B6F500443998 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 19E51B362478B6F500443998 /* config.json */; };
 		19FF8EFC2461EA6E00969996 /* turret_gun.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19FF8EFB2461EA6E00969996 /* turret_gun.usdz */; };
@@ -41,11 +41,11 @@
 		19363E60248602F200698A72 /* map_icon.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = map_icon.usdz; sourceTree = "<group>"; };
 		19363E642489AFA800698A72 /* mech_drone.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = mech_drone.usdz; sourceTree = "<group>"; };
 		197D980D247B280800447567 /* magic_portal.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = magic_portal.usdz; sourceTree = "<group>"; };
-		197D980F247B29D100447567 /* floor_asset.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = floor_asset.usdz; sourceTree = "<group>"; };
 		197D9811247B3F3C00447567 /* spawn_station.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawn_station.usdz; sourceTree = "<group>"; };
 		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
 		19CA62C52454500D007F9198 /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
 		19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
+		19DEDFDB248E00800010AC79 /* main_path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = main_path.usdz; sourceTree = "<group>"; };
 		19E51B342478B37C00443998 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		19E51B362478B6F500443998 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
 		19FF8EFB2461EA6E00969996 /* turret_gun.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_gun.usdz; sourceTree = "<group>"; };
@@ -112,13 +112,13 @@
 				1935BBB124290F9500C764C1 /* Main.storyboard */,
 				1935BBB424290F9800C764C1 /* Assets.xcassets */,
 				19363E60248602F200698A72 /* map_icon.usdz */,
-				197D980F247B29D100447567 /* floor_asset.usdz */,
 				19363E642489AFA800698A72 /* mech_drone.usdz */,
 				197D980D247B280800447567 /* magic_portal.usdz */,
 				197D9811247B3F3C00447567 /* spawn_station.usdz */,
 				19FF8EFF2462913200969996 /* placing_glyph.usdz */,
 				19FF8EFD24627EB000969996 /* tower_placing.usdz */,
 				19FF8EFB2461EA6E00969996 /* turret_gun.usdz */,
+				19DEDFDB248E00800010AC79 /* main_path.usdz */,
 				1935BBB624290F9800C764C1 /* LaunchScreen.storyboard */,
 				1935BBB924290F9800C764C1 /* Info.plist */,
 			);
@@ -202,12 +202,12 @@
 				19E51B372478B6F500443998 /* config.json in Resources */,
 				197D9812247B3F3D00447567 /* spawn_station.usdz in Resources */,
 				19FF8EFC2461EA6E00969996 /* turret_gun.usdz in Resources */,
-				197D9810247B29D200447567 /* floor_asset.usdz in Resources */,
 				19FF8F002462913200969996 /* placing_glyph.usdz in Resources */,
 				1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */,
 				1935BBB324290F9500C764C1 /* Main.storyboard in Resources */,
 				19FF8EFE24627EB000969996 /* tower_placing.usdz in Resources */,
 				197D980E247B280800447567 /* magic_portal.usdz in Resources */,
+				19DEDFDC248E00810010AC79 /* main_path.usdz in Resources */,
 				19363E61248602F200698A72 /* map_icon.usdz in Resources */,
 				19363E652489AFA900698A72 /* mech_drone.usdz in Resources */,
 			);

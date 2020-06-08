@@ -38,8 +38,12 @@ class ViewController: UIViewController {
     var canStart: Bool {
         return usedMaps == gameConfig.levels[level].maps.count
     }
+    
     var spawnPlaces = [SpawnPlace]()
-    var glyphModels = [ModelEntity]()
+    var glyphModels = [(model: ModelEntity, canShow: Int?)]()
+
+    var terrainAnchors = [AnchorEntity]()
+    var creepIDs = [UInt64]()
     
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
@@ -47,20 +51,13 @@ class ViewController: UIViewController {
         return try! JSONDecoder().decode(GameModel.self, from: data)
     }()
 
-    let pathTemplate = try! Entity.load(named: "floor_asset")
+    let pathTemplate = try! Entity.load(named: "main_path")
     let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
     let towerTemplate = try! Entity.load(named: "turret_gun")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
     let portalTemplate = try! Entity.load(named: "map_icon")
     let spawnTemplate = try! Entity.load(named: "spawn_station")
-    
-    // TEST
-    let lowerPathTemplate   = try! Entity.load(named: "floor_lowerPath")
-    let higherPathTemplate  = try! Entity.load(named: "floor_higherPath")
-    let lowerTowerTemplate  = try! Entity.load(named: "floor_lowerTower")
-    let higherTowerTemplate = try! Entity.load(named: "floor_higherTower")
-    let neutralTemplate     = try! Entity.load(named: "floor_neutral")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,7 +84,7 @@ class ViewController: UIViewController {
         config.environmentTexturing = .automatic
         
         arView.automaticallyConfigureSession = false
-        arView.debugOptions = [.showFeaturePoints]
+//        arView.debugOptions = [.showPhysics]
         arView.session.delegate = self
         arView.session.run(config)
         arView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
@@ -103,18 +100,11 @@ class ViewController: UIViewController {
         ///Creeps
         creepTemplate.setScale(SIMD3(repeating: 0.00001), relativeTo: nil)
         ///Floor
-        pathTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
+        pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
         ///Goal
         portalTemplate.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
         ///Spawn
         spawnTemplate.setScale(SIMD3(repeating: 0.00007), relativeTo: nil)
-        
-        // TEST
-        lowerPathTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
-        higherPathTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
-        lowerTowerTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
-        higherTowerTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
-        neutralTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
     }
     
     func configureMultipeer() {
@@ -123,16 +113,14 @@ class ViewController: UIViewController {
             guard let multipeerSession = self.multipeerSession else { return }
             self.sendARSessionIDTo(peers: multipeerSession.connectedPeers)
         }
-        
         setupCoachingOverlay()
-        
         multipeerSession = MultipeerSession(receivedDataHandler: receivedData, peerJoinedHandler:
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
     }
     
     @IBAction func onStart(_ sender: Any) {
         guard canStart else { return }
-        glyphModels.forEach { model in model.removeFromParent() }
+        glyphModels.forEach { glyph in glyph.model.removeFromParent() }
         for spawn in spawnPlaces {
             let map = gameConfig.levels[level].maps[spawn.map]
             let paths = map.creepPathsCoordinates(at: spawn.position,diameter: gridDiameter, aditionalRotationOffset: .pi)
@@ -143,7 +131,11 @@ class ViewController: UIViewController {
                 counter += 1
                 spawnPosition.y = 0.03
                 let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, debugInfo: true)
+
+                self.creepIDs.append(creep.model.id)
                 spawn.entity.anchor?.addChild(creep.model)
+                let bounds = self.creepTemplate.visualBounds(relativeTo: creep.model)
+                creep.entity.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: [0.1,0.1,0.1]).offsetBy(translation: bounds.center)]))
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 self.deployUnit(creep.entity, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.0001)
             }
@@ -171,7 +163,10 @@ class ViewController: UIViewController {
         }
     }
     @IBAction func onUndo(_ sender: Any) {
-        //deleteTowersfromArray
+        if let lastMap = terrainAnchors.last {
+            lastMap.removeFromParent()
+            usedMaps -= 1
+        }
     }
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
@@ -180,6 +175,7 @@ class ViewController: UIViewController {
             let anchor = entity.anchor as? AnchorEntity else { return }
         
         if anchor.name == "TerrainAnchorEntity" {
+            guard canStart else { return }
             insertTower(on: entity, anchor: anchor)
         } else {
             arView.session.add(anchor: ARAnchor(name: "Terrain", transform: entity.transformMatrix(relativeTo: nil)))
@@ -201,33 +197,27 @@ class ViewController: UIViewController {
                 case .zipLineIn, .zipLineOut:
                     break
                 case .neutral:
-                    let neutral = neutralTemplate.modelEmbedded(at: [x, 0.001, z])
-                    anchor.addChild(neutral.model)
+                    break
+//                    let neutral = neutralTemplate.modelEmbedded(at: [x, 0.001, z])
+//                    anchor.addChild(neutral.model)
                 case .goal:
                     let portal = portalTemplate.modelEmbedded(at: [x, 0.0, z])
                     portal.entity.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 1, 0])
                     anchor.addChild(portal.model)
                     portal.entity.playAnimation(portal.entity.availableAnimations.first!.repeat())
                 case .lowerPath:
-//                    let floor = pathTemplate.modelEmbedded(at: [x, 0.001, z])
-//                    anchor.addChild(floor.model)
-                    let lowerPath = lowerPathTemplate.modelEmbedded(at: [x, 0.001, z])
-                    anchor.addChild(lowerPath.model)
+                    let floor = pathTemplate.modelEmbedded(at: [x, 0.001, z])
+                    anchor.addChild(floor.model)
                 case .higherPath:
-//                    let floor = pathTemplate.modelEmbedded(at: [x, 0.101, z])
-//                    anchor.addChild(floor.model)
-                    let higherPath = higherPathTemplate.modelEmbedded(at: [x, 0.001, z])
-                    anchor.addChild(higherPath.model)
+                    let floor = pathTemplate.modelEmbedded(at: [x, 0.101, z])
+                    anchor.addChild(floor.model)
                 case .lowerTower:
-//                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
-//                    anchor.addChild(towerPlacing.model)
-                    let lowerTower = lowerTowerTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
-                    anchor.addChild(lowerTower.model)
+                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
+                    towerPlacing.model.generateCollisionShapes(recursive: true)
+                    anchor.addChild(towerPlacing.model)
                 case .higherTower:
-//                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
-//                    anchor.addChild(towerPlacing.model)
-                    let higherTower = higherTowerTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
-                    anchor.addChild(higherTower.model)
+                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
+                    anchor.addChild(towerPlacing.model)
                 case .spawn:
                     let station = spawnTemplate.modelEmbedded(at: [x, 0.0, z])
                     spawnPlaces.append((station.entity, (row, column), usedMaps))
@@ -245,18 +235,25 @@ class ViewController: UIViewController {
         model.addChild(tower)
         tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
         anchor.addChild(model)
-        
-//        let bounds = tower.visualBounds(relativeTo: model)
-//        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
+        ///Tower range
+        let box = MeshResource.generatePlane(width: 0.2, depth: 0.2, cornerRadius: 0.1)
+        let material = SimpleMaterial(color: UIColor.red.withAlphaComponent(0.2), isMetallic: true)
+        let rangeEntity = ModelEntity(mesh: box, materials: [material])
+        anchor.addChild(rangeEntity)
+        rangeEntity.position = tower.position
+        rangeEntity.position.y = 0.01
+        ///Tower range  finish
+        let bounds = tower.visualBounds(relativeTo: model)
+        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents * 2).offsetBy(translation: bounds.center)]))
         tower.playAnimation(tower.availableAnimations[0].repeat())
-
-//        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
-//            event in
-//            let tower = event.entityA
-//            let object = event.entityB
-//
-//        }
-//        subscriptions.append(subscription)
+        
+        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
+            event in
+            let tower = event.entityA
+            let object = event.entityB
+            
+        }
+        subscriptions.append(subscription)
     }
 }
 
@@ -272,6 +269,7 @@ extension ViewController: ARSessionDelegate {
                 let terrainAnchor = AnchorEntity(anchor: anchor)
                 terrainAnchor.name = "TerrainAnchorEntity"
                 arView.scene.addAnchor(terrainAnchor)
+                terrainAnchors.append(terrainAnchor)
                 let maps = gameConfig.levels[level].maps
                 if usedMaps < maps.count {
                     insertTerrain(anchor: terrainAnchor, map: maps[usedMaps])
@@ -286,7 +284,7 @@ extension ViewController: ARSessionDelegate {
                 let anchorEntity = AnchorEntity(anchor: planeAnchor)
                 anchorEntity.addChild(model)
                 arView.scene.addAnchor(anchorEntity)
-                glyphModels.append(model)
+                glyphModels.append((model,nil))
                 glyph.playAnimation(glyph.availableAnimations[0].repeat())
                 let entityBounds = glyph.visualBounds(relativeTo: model)
                 model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: entityBounds.extents).offsetBy(translation: entityBounds.center)])
