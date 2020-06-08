@@ -84,7 +84,6 @@ class ViewController: UIViewController {
         config.environmentTexturing = .automatic
         
         arView.automaticallyConfigureSession = false
-//        arView.debugOptions = [.showPhysics]
         arView.session.delegate = self
         arView.session.run(config)
         arView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
@@ -166,6 +165,10 @@ class ViewController: UIViewController {
         if let lastMap = terrainAnchors.last {
             lastMap.removeFromParent()
             usedMaps -= 1
+            for (index, glyph) in glyphModels.enumerated() {
+                glyph.model.isEnabled = glyph.canShow ?? 0 == usedMaps
+                glyphModels[index].canShow = nil
+            }
         }
     }
     
@@ -175,14 +178,19 @@ class ViewController: UIViewController {
             let anchor = entity.anchor as? AnchorEntity else { return }
         
         if anchor.name == "TerrainAnchorEntity" {
-            guard canStart else { return }
             insertTower(on: entity, anchor: anchor)
         } else {
+            for (index, glyph) in glyphModels.enumerated() {
+                if entity.id == glyph.model.id {
+                    entity.isEnabled = false
+                    glyphModels[index].canShow = usedMaps
+                }
+            }
             arView.session.add(anchor: ARAnchor(name: "Terrain", transform: entity.transformMatrix(relativeTo: nil)))
         }
     }
     
-    func insertTerrain(anchor: AnchorEntity, map: MapModel) {
+    func insertMap(anchor: AnchorEntity, map: MapModel) {
         let rows = map.matrix.count
         let columns = map.matrix.first!.count
         for row in 0..<rows {
@@ -272,7 +280,7 @@ extension ViewController: ARSessionDelegate {
                 terrainAnchors.append(terrainAnchor)
                 let maps = gameConfig.levels[level].maps
                 if usedMaps < maps.count {
-                    insertTerrain(anchor: terrainAnchor, map: maps[usedMaps])
+                    insertMap(anchor: terrainAnchor, map: maps[usedMaps])
                     usedMaps += 1
                 }
                 
