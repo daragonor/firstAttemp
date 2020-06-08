@@ -55,6 +55,13 @@ class ViewController: UIViewController {
     let portalTemplate = try! Entity.load(named: "map_icon")
     let spawnTemplate = try! Entity.load(named: "spawn_station")
     
+    // TEST
+    let lowerPathTemplate   = try! Entity.load(named: "floor_lowerPath")
+    let higherPathTemplate  = try! Entity.load(named: "floor_higherPath")
+    let lowerTowerTemplate  = try! Entity.load(named: "floor_lowerTower")
+    let higherTowerTemplate = try! Entity.load(named: "floor_higherTower")
+    let neutralTemplate     = try! Entity.load(named: "floor_neutral")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
@@ -101,6 +108,13 @@ class ViewController: UIViewController {
         portalTemplate.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
         ///Spawn
         spawnTemplate.setScale(SIMD3(repeating: 0.00007), relativeTo: nil)
+        
+        // TEST
+        lowerPathTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
+        higherPathTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
+        lowerTowerTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
+        higherTowerTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
+        neutralTemplate.setScale(SIMD3(repeating: 0.00035), relativeTo: nil)
     }
     
     func configureMultipeer() {
@@ -184,25 +198,36 @@ class ViewController: UIViewController {
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
                 switch mapType {
-                case .neutral, .zipLineIn, .zipLineOut:
+                case .zipLineIn, .zipLineOut:
                     break
+                case .neutral:
+                    let neutral = neutralTemplate.modelEmbedded(at: [x, 0.001, z])
+                    anchor.addChild(neutral.model)
                 case .goal:
                     let portal = portalTemplate.modelEmbedded(at: [x, 0.0, z])
                     portal.entity.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 1, 0])
                     anchor.addChild(portal.model)
                     portal.entity.playAnimation(portal.entity.availableAnimations.first!.repeat())
                 case .lowerPath:
-                    let floor = pathTemplate.modelEmbedded(at: [x, 0.001, z])
-                    anchor.addChild(floor.model)
+//                    let floor = pathTemplate.modelEmbedded(at: [x, 0.001, z])
+//                    anchor.addChild(floor.model)
+                    let lowerPath = lowerPathTemplate.modelEmbedded(at: [x, 0.001, z])
+                    anchor.addChild(lowerPath.model)
                 case .higherPath:
-                    let floor = pathTemplate.modelEmbedded(at: [x, 0.101, z])
-                    anchor.addChild(floor.model)
+//                    let floor = pathTemplate.modelEmbedded(at: [x, 0.101, z])
+//                    anchor.addChild(floor.model)
+                    let higherPath = higherPathTemplate.modelEmbedded(at: [x, 0.001, z])
+                    anchor.addChild(higherPath.model)
                 case .lowerTower:
-                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
-                    anchor.addChild(towerPlacing.model)
+//                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
+//                    anchor.addChild(towerPlacing.model)
+                    let lowerTower = lowerTowerTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
+                    anchor.addChild(lowerTower.model)
                 case .higherTower:
-                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
-                    anchor.addChild(towerPlacing.model)
+//                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
+//                    anchor.addChild(towerPlacing.model)
+                    let higherTower = higherTowerTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
+                    anchor.addChild(higherTower.model)
                 case .spawn:
                     let station = spawnTemplate.modelEmbedded(at: [x, 0.0, z])
                     spawnPlaces.append((station.entity, (row, column), usedMaps))
