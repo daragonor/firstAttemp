@@ -38,6 +38,7 @@ class ViewController: UIViewController {
     var canStart: Bool {
         return usedMaps == gameConfig.levels[level].maps.count
     }
+    
     var spawnPlaces = [SpawnPlace]()
     var glyphModels = [ModelEntity]()
     var terrainAnchors = [AnchorEntity]()
@@ -82,7 +83,7 @@ class ViewController: UIViewController {
         config.environmentTexturing = .automatic
         
         arView.automaticallyConfigureSession = false
-        arView.debugOptions = [.showPhysics]
+//        arView.debugOptions = [.showPhysics]
         arView.session.delegate = self
         arView.session.run(config)
         arView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
@@ -173,6 +174,7 @@ class ViewController: UIViewController {
             let anchor = entity.anchor as? AnchorEntity else { return }
         
         if anchor.name == "TerrainAnchorEntity" {
+            guard canStart else { return }
             insertTower(on: entity, anchor: anchor)
         } else {
             arView.session.add(anchor: ARAnchor(name: "Terrain", transform: entity.transformMatrix(relativeTo: nil)))
@@ -228,11 +230,18 @@ class ViewController: UIViewController {
         model.addChild(tower)
         tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
         anchor.addChild(model)
-        
+        ///Tower range
+        let box = MeshResource.generatePlane(width: 0.2, depth: 0.2, cornerRadius: 0.1)
+        let material = SimpleMaterial(color: UIColor.red.withAlphaComponent(0.2), isMetallic: true)
+        let rangeEntity = ModelEntity(mesh: box, materials: [material])
+        anchor.addChild(rangeEntity)
+        rangeEntity.position = tower.position
+        rangeEntity.position.y = 0.01
+        ///Tower range  finish
         let bounds = tower.visualBounds(relativeTo: model)
         tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents * 2).offsetBy(translation: bounds.center)]))
         tower.playAnimation(tower.availableAnimations[0].repeat())
-
+        
         let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
             event in
             let tower = event.entityA
