@@ -138,7 +138,6 @@ struct MapModel: Codable {
                     position.column >= 0 && position.column < columns &&
                     !path.contains(where: { previous, _ in return (previous.row == position.row && previous.column == position.column) }) &&
                     [MapLegend.lowerPath, .higherPath, .goal, .zipLineOut].contains(MapLegend.allCases[matrix[position.row][position.column]]) {
-                    
                     moveTo((position, direction), path: path)
                 } 
             }
