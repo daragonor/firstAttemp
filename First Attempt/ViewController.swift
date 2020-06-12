@@ -85,7 +85,7 @@ class ViewController: UIViewController {
         config.planeDetection = [.horizontal, .vertical]
         config.isCollaborationEnabled = true
         config.environmentTexturing = .automatic
-        
+        arView.debugOptions = [.showPhysics]
         arView.automaticallyConfigureSession = false
         arView.session.delegate = self
         arView.session.run(config)
@@ -100,7 +100,8 @@ class ViewController: UIViewController {
         ///Towers
         towerTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Creeps
-        creepTemplate.setScale(SIMD3(repeating: 0.0001/*01*/), relativeTo: nil)
+        //0.00001
+        creepTemplate.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
         ///Path
         pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
         pathUpwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
@@ -141,7 +142,7 @@ class ViewController: UIViewController {
                 let bounds = self.creepTemplate.visualBounds(relativeTo: creep.model)
                 creep.entity.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: [0.1,0.1,0.1]).offsetBy(translation: bounds.center)]))
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
-                self.deployUnit(creep.entity, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.0001)
+                self.deployUnit(creep.entity, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.0002)
             }
         }
     }
