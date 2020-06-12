@@ -51,8 +51,11 @@ class ViewController: UIViewController {
         return try! JSONDecoder().decode(GameModel.self, from: data)
     }()
 
-    let pathTemplate = try! Entity.load(named: "main_path")
-    let placingTemplate = try! Entity.load(named: "tower_placing")
+    let pathTemplate = try! Entity.load(named: "creep_path")
+    let pathDownwardsTemplate = try! Entity.load(named: "creep_path_downwards")
+    let pathUpwardsTemplate = try! Entity.load(named: "creep_path_upwards")
+
+    let placingTemplate = try! Entity.load(named: "tower_placing_2")
     let creepTemplate = try! Entity.load(named: "mech_drone")
     let towerTemplate = try! Entity.load(named: "turret_gun")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
@@ -90,16 +93,18 @@ class ViewController: UIViewController {
     }
     
     func loadAnchorTemplates() {
-        //Terrains
-        placingTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
-        ///Runess
+        ///Tower Placing
+        placingTemplate.setScale(SIMD3(repeating: 0.000027/*0.0001*/), relativeTo: nil)
+        ///Runes
         runeTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
         ///Towers
         towerTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Creeps
-        creepTemplate.setScale(SIMD3(repeating: 0.00001), relativeTo: nil)
-        ///Floor
+        creepTemplate.setScale(SIMD3(repeating: 0.0001/*01*/), relativeTo: nil)
+        ///Path
         pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
+        pathUpwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
+        pathDownwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
         ///Goal
         portalTemplate.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
         ///Spawn
@@ -146,16 +151,17 @@ class ViewController: UIViewController {
         if index < path.count {
             let move = path[index]
             let height = baseHeight ?? transform.translation.y
-            transform.translation = SIMD3<Float>(x: move.coordinate.x, y: height + move.coordinate.y, z: move.coordinate.z)
+            transform.translation = move.coordinate
+            transform.translation.y += height
             transform.rotation = move.rotation
             if let scale = setScale { transform.scale = SIMD3(repeating: scale) }
             let animation = entity.move(to: transform, relativeTo: entity.anchor, duration: 1, timingFunction: .linear)
-            let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
-            .filter { $0.playbackController == animation }
-            .sink(receiveValue: { event in
-                self.deployUnit(entity, to: index + 1, on: path, baseHeight: height)
-            })
-            subscriptions.append(subscription)
+            ///arView.scene.subscribe(to:on:completion:)
+            subscriptions.append(arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+                .filter { $0.playbackController == animation }
+                .sink(receiveValue: { event in
+                    self.deployUnit(entity, to: index + 1, on: path, baseHeight: height)
+                }))
         } else if index == path.count {
             entity.parent?.removeFromParent()
             lifePointsStack.arrangedSubviews.last?.removeFromSuperview()
@@ -202,32 +208,54 @@ class ViewController: UIViewController {
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
                 switch mapType {
-                case .zipLineIn, .zipLineOut:
+                case .zipLineIn, .zipLineOut, .neutral:
                     break
-                case .neutral:
-                    break
-//                    let neutral = neutralTemplate.modelEmbedded(at: [x, 0.001, z])
-//                    anchor.addChild(neutral.model)
                 case .goal:
-                    let portal = portalTemplate.modelEmbedded(at: [x, 0.0, z])
+                    let portal = portalTemplate.modelEmbedded(at: [x, 0.05, z])
                     portal.entity.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 1, 0])
                     anchor.addChild(portal.model)
                     portal.entity.playAnimation(portal.entity.availableAnimations.first!.repeat())
                 case .lowerPath:
-                    let floor = pathTemplate.modelEmbedded(at: [x, 0.001, z])
+                    var floor: (model: ModelEntity, entity: Entity) {
+                        for direction in Direction.allCases {
+                            let (nextRow, nextColumn) = (row + direction.offset.row, column + direction.offset.column)
+                            if nextRow >= 0 && nextRow < rows,
+                                nextColumn >= 0 && nextColumn < columns {
+                                if  MapLegend.allCases[map.matrix[nextRow][nextColumn]] == .higherPath {
+                                    let floor = pathUpwardsTemplate.modelEmbedded(at: [x, 0.001, z])
+                                    floor.entity.transform.rotation = simd_quatf(angle: direction.baseRotation, axis: [0, 1, 0])
+                                    return floor
+                                }
+                            }
+                        }
+                        return pathTemplate.modelEmbedded(at: [x, 0.001, z])
+                    }
                     anchor.addChild(floor.model)
                 case .higherPath:
-                    let floor = pathTemplate.modelEmbedded(at: [x, 0.101, z])
+                    var floor: (model: ModelEntity, entity: Entity) {
+                        for direction in Direction.allCases {
+                            let (nextRow, nextColumn) = (row + direction.offset.row, column + direction.offset.column)
+                            if nextRow >= 0 && nextRow < rows,
+                                nextColumn >= 0 && nextColumn < columns {
+                                if  MapLegend.allCases[map.matrix[nextRow][nextColumn]] == .lowerPath {
+                                    let floor = pathDownwardsTemplate.modelEmbedded(at: [x, 0.101, z])
+                                    floor.entity.transform.rotation = simd_quatf(angle: direction.baseRotation + .pi, axis: [0, 1, 0])
+                                    return floor
+                                }
+                            }
+                        }
+                        return pathTemplate.modelEmbedded(at: [x, 0.101, z])
+                    }
                     anchor.addChild(floor.model)
                 case .lowerTower:
-                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.0, z], debugInfo: true)
+                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.003, z], debugInfo: true)
                     towerPlacing.model.generateCollisionShapes(recursive: true)
                     anchor.addChild(towerPlacing.model)
                 case .higherTower:
-                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.1, z], debugInfo: true)
+                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.103, z], debugInfo: true)
                     anchor.addChild(towerPlacing.model)
                 case .spawn:
-                    let station = spawnTemplate.modelEmbedded(at: [x, 0.0, z])
+                    let station = spawnTemplate.modelEmbedded(at: [x, 0.001, z])
                     spawnPlaces.append((station.entity, (row, column), usedMaps))
                     anchor.addChild(station.model)
                 }
@@ -255,13 +283,11 @@ class ViewController: UIViewController {
         tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents * 2).offsetBy(translation: bounds.center)]))
         tower.playAnimation(tower.availableAnimations[0].repeat())
         
-        let subscription = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
             event in
             let tower = event.entityA
             let object = event.entityB
-            
-        }
-        subscriptions.append(subscription)
+        })
     }
 }
 
