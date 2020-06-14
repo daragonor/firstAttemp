@@ -69,7 +69,7 @@ class ViewController: UIViewController {
 
     let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
-    let lifeCreepTemplate = try! Entity.load(named: "")
+    let lifeCreepTemplate = try! Entity.load(named: "mech_drone")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
     let portalTemplate = try! Entity.load(named: "map_icon")
     let spawnTemplate = try! Entity.load(named: "spawn_station")
@@ -174,8 +174,9 @@ class ViewController: UIViewController {
 //                creep.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 lifeCreep.entity.playAnimation(lifeCreep.entity.availableAnimations[0].repeat())
-                self.deployUnit(creep, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.00015)
-                self.deployUnit(lifeCreep, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.00015)
+                let randomPathIndx = Int.random(in: 0..<paths.count)
+                self.deployUnit(creep, on: paths[randomPathIndx], setScale: 0.00015)
+                self.deployUnit(lifeCreep, on: paths[randomPathIndx], setScale: 0.00015)
             }
         }
     }
