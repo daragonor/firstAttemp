@@ -12,15 +12,26 @@ import RealityKit
 import MultipeerConnectivity
 import Combine
 
+typealias EmbeddedModel = (model: ModelEntity, entity: Entity)
 
 class ViewController: UIViewController {
+    let towerTemplate = try! Entity.load(named: "turret_gun")
+
+    enum TowerType: CaseIterable {
+        case turret, rocket, fighters
+    }
+    enum TowerStates: CaseIterable {
+        case empty, phase1, phase2
+    }
     
     typealias SpawnPlace = (entity: Entity, position: Position, map: Int)
-
     @IBOutlet var arView: ARView!
     
     @IBOutlet weak var coinsLabel: UILabel!
     @IBOutlet weak var lifePointsStack: UIStackView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    var defensors = Defensor.getDefensors()
     
     var config: ARWorldTrackingConfiguration!
     
@@ -41,9 +52,10 @@ class ViewController: UIViewController {
     
     var spawnPlaces = [SpawnPlace]()
     var glyphModels = [(model: ModelEntity, canShow: Int?)]()
-
     var terrainAnchors = [AnchorEntity]()
     var creepIDs = [UInt64]()
+    var selectedPlacing: Entity?
+    var placings = [(EmbeddedModel,TowerStates)]()
     
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
@@ -55,9 +67,8 @@ class ViewController: UIViewController {
     let pathDownwardsTemplate = try! Entity.load(named: "creep_path_downwards")
     let pathUpwardsTemplate = try! Entity.load(named: "creep_path_upwards")
 
-    let placingTemplate = try! Entity.load(named: "tower_placing_2")
+    let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
-    let towerTemplate = try! Entity.load(named: "turret_gun")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
     let portalTemplate = try! Entity.load(named: "map_icon")
     let spawnTemplate = try! Entity.load(named: "spawn_station")
@@ -67,6 +78,7 @@ class ViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         loadAnchorConfiguration()
         loadAnchorTemplates()
+        loadActionStrip()
         configureMultipeer()
 
         coinsLabel.text = "\(coins)"
@@ -80,12 +92,24 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
     }
     
+    func loadActionStrip() {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
+        layout.scrollDirection = .horizontal
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.isHidden = true
+        collectionView.collectionViewLayout = layout
+        collectionView.showsHorizontalScrollIndicator = false
+    }
     func loadAnchorConfiguration() {
         config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal, .vertical]
         config.isCollaborationEnabled = true
         config.environmentTexturing = .automatic
-        
+//        arView.debugOptions = [.showPhysics]
         arView.automaticallyConfigureSession = false
         arView.session.delegate = self
         arView.session.run(config)
@@ -94,13 +118,14 @@ class ViewController: UIViewController {
     
     func loadAnchorTemplates() {
         ///Tower Placing
-        placingTemplate.setScale(SIMD3(repeating: 0.000027/*0.0001*/), relativeTo: nil)
+        placingTemplate.setScale(SIMD3(repeating: 0.025), relativeTo: nil)
         ///Runes
         runeTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
         ///Towers
         towerTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Creeps
-        creepTemplate.setScale(SIMD3(repeating: 0.0001/*01*/), relativeTo: nil)
+        //0.00001
+        creepTemplate.setScale(SIMD3(repeating: 0.000015), relativeTo: nil)
         ///Path
         pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
         pathUpwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
@@ -135,19 +160,19 @@ class ViewController: UIViewController {
                 counter += 1
                 spawnPosition.y = 0.03
                 let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, debugInfo: true)
-
                 self.creepIDs.append(creep.model.id)
                 spawn.entity.anchor?.addChild(creep.model)
-                let bounds = self.creepTemplate.visualBounds(relativeTo: creep.model)
-                creep.entity.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: [0.1,0.1,0.1]).offsetBy(translation: bounds.center)]))
+                creep.model.generateCollisionShapes(recursive: true)
+//                let bounds = creep.entity.visualBounds(relativeTo: creep.model)
+//                creep.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
-                self.deployUnit(creep.entity, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.0001)
+                self.deployUnit(creep, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.00015)
             }
         }
     }
     
-    func deployUnit(_ entity: Entity, to index: Int = 0, on path: [OrientedCoordinate], baseHeight: Float? = nil, setScale: Float? = nil) {
-        var transform = entity.transform
+    func deployUnit(_ creep: EmbeddedModel, to index: Int = 0, on path: [OrientedCoordinate], baseHeight: Float? = nil, setScale: Float? = nil) {
+        var transform = creep.entity.transform
         if index < path.count {
             let move = path[index]
             let height = baseHeight ?? transform.translation.y
@@ -155,15 +180,15 @@ class ViewController: UIViewController {
             transform.translation.y += height
             transform.rotation = move.rotation
             if let scale = setScale { transform.scale = SIMD3(repeating: scale) }
-            let animation = entity.move(to: transform, relativeTo: entity.anchor, duration: 1, timingFunction: .linear)
+            let animation = creep.entity.move(to: transform, relativeTo: creep.entity.anchor, duration: 1, timingFunction: .linear)
             ///arView.scene.subscribe(to:on:completion:)
             subscriptions.append(arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                 .filter { $0.playbackController == animation }
                 .sink(receiveValue: { event in
-                    self.deployUnit(entity, to: index + 1, on: path, baseHeight: height)
+                    self.deployUnit(creep, to: index + 1, on: path, baseHeight: height)
                 }))
         } else if index == path.count {
-            entity.parent?.removeFromParent()
+            creep.model.removeFromParent()
             lifePointsStack.arrangedSubviews.last?.removeFromSuperview()
         }
     }
@@ -184,7 +209,8 @@ class ViewController: UIViewController {
             let anchor = entity.anchor as? AnchorEntity else { return }
         
         if anchor.name == "TerrainAnchorEntity" {
-            insertTower(on: entity, anchor: anchor)
+            collectionView.isHidden = false
+            selectedPlacing = entity
         } else {
             for (index, glyph) in glyphModels.enumerated() {
                 if entity.id == glyph.model.id {
@@ -250,9 +276,12 @@ class ViewController: UIViewController {
                 case .lowerTower:
                     let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.003, z], debugInfo: true)
                     towerPlacing.model.generateCollisionShapes(recursive: true)
+                    placings.append((towerPlacing, .empty))
                     anchor.addChild(towerPlacing.model)
                 case .higherTower:
                     let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.103, z], debugInfo: true)
+                    towerPlacing.model.generateCollisionShapes(recursive: true)
+                    placings.append((towerPlacing, .empty))
                     anchor.addChild(towerPlacing.model)
                 case .spawn:
                     let station = spawnTemplate.modelEmbedded(at: [x, 0.001, z])
@@ -263,30 +292,34 @@ class ViewController: UIViewController {
         }
     }
 
-    func insertTower(on referenceEntity: Entity, anchor: AnchorEntity) {
+    func insertTower(template: Entity, range: Float, cost: Int) {
+        guard let referenceEntity = selectedPlacing,
+            let anchor = referenceEntity.anchor as? AnchorEntity,
+            cost <= coins else { return }
+        coins -= cost
         let position = referenceEntity.transformMatrix(relativeTo: anchor).toTranslation()
-
         let model = ModelEntity()
-        let tower = towerTemplate.clone(recursive: true)
+        let tower = template.clone(recursive: true)
         model.addChild(tower)
         tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
         anchor.addChild(model)
         ///Tower range
-        let box = MeshResource.generatePlane(width: 0.2, depth: 0.2, cornerRadius: 0.1)
+        let box = MeshResource.generatePlane(width: range, depth: range, cornerRadius: range/2)
         let material = SimpleMaterial(color: UIColor.red.withAlphaComponent(0.2), isMetallic: true)
-        let rangeEntity = ModelEntity(mesh: box, materials: [material])
-        anchor.addChild(rangeEntity)
-        rangeEntity.position = tower.position
-        rangeEntity.position.y = 0.01
-        ///Tower range  finish
-        let bounds = tower.visualBounds(relativeTo: model)
-        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents * 2).offsetBy(translation: bounds.center)]))
-        tower.playAnimation(tower.availableAnimations[0].repeat())
-        
-        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower) {
+        let rangeModel = ModelEntity(mesh: box, materials: [material])
+        anchor.addChild(rangeModel)
+        rangeModel.generateCollisionShapes(recursive: true)
+        rangeModel.position = tower.position
+        rangeModel.position.y += 0.05
+        ///Tower collision
+//        let bounds = rangeEntity.visualBounds(relativeTo: model)
+//        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
+//        tower.playAnimation(tower.availableAnimations[0].repeat())
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: rangeModel) {
             event in
-            let tower = event.entityA
-            let object = event.entityB
+//            let range = event.entityA
+//            let object = event.entityB
+                tower.playAnimation(tower.availableAnimations[0].repeat())
         })
     }
 }
@@ -359,5 +392,43 @@ extension ViewController: ARSessionDelegate {
             alertController.addAction(restartAction)
             self.present(alertController, animated: true, completion: nil)
         }
+    }
+}
+extension ViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        switch TowerType.allCases[indexPath.row] {
+        case .turret: insertTower(template: towerTemplate, range: 0.25, cost: 50)
+        case .rocket: insertTower(template: portalTemplate, range: 0.3, cost: 100)
+        case .fighters: insertTower(template: creepTemplate, range: 0.1, cost: 150)
+        }
+        selectedPlacing = nil
+        collectionView.isHidden = true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.size.height, height: collectionView.frame.size.height)
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return defensors.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DefensorCollectionViewCell", for: indexPath) as! DefensorCollectionViewCell
+        let defensor = defensors[indexPath.item]
+        
+        cell.defensor = defensor
+        
+        return cell
     }
 }
