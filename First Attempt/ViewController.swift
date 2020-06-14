@@ -69,6 +69,7 @@ class ViewController: UIViewController {
 
     let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
+    let lifeCreepTemplate = try! Entity.load(named: "")
     let runeTemplate = try! Entity.load(named: "placing_glyph")
     let portalTemplate = try! Entity.load(named: "map_icon")
     let spawnTemplate = try! Entity.load(named: "spawn_station")
@@ -126,6 +127,7 @@ class ViewController: UIViewController {
         ///Creeps
         //0.00001
         creepTemplate.setScale(SIMD3(repeating: 0.000015), relativeTo: nil)
+        lifeCreepTemplate.setScale(SIMD3(repeating: 0.000015), relativeTo: nil)
         ///Path
         pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
         pathUpwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
@@ -160,13 +162,20 @@ class ViewController: UIViewController {
                 counter += 1
                 spawnPosition.y = 0.03
                 let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, debugInfo: true)
+                var lifeCreepPosition = spawnPosition
+                lifeCreepPosition.y = 0.13
+                let lifeCreep = self.lifeCreepTemplate.modelEmbedded(at: lifeCreepPosition, debugInfo: true)
+                spawnPosition.y = 0.03
                 self.creepIDs.append(creep.model.id)
                 spawn.entity.anchor?.addChild(creep.model)
+                spawn.entity.anchor?.addChild(lifeCreep.model)
                 creep.model.generateCollisionShapes(recursive: true)
 //                let bounds = creep.entity.visualBounds(relativeTo: creep.model)
 //                creep.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
+                lifeCreep.entity.playAnimation(lifeCreep.entity.availableAnimations[0].repeat())
                 self.deployUnit(creep, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.00015)
+                self.deployUnit(lifeCreep, on: paths[Int.random(in: 0..<paths.count)], setScale: 0.00015)
             }
         }
     }
