@@ -11,34 +11,50 @@ import RealityKit
 import GameplayKit
 
 enum MapLegend: CaseIterable {
-    case neutral, goal, lowerTower, higherTower, spawn, lowerPath, higherPath, zipLineIn, zipLineOut
+    case neutral, goal, lowerPlacing, higherPlacing, spawn, lowerPath, higherPath, zipLineIn, zipLineOut
 }
 
 enum Direction: CaseIterable {
     case up, down, left, right
+    case upright, downright, downleft, upleft
+    static var baseMoves: [Direction] {
+        return [.up, .down, .left, .right]
+    }
+    
     var offset: Position {
         switch self {
         case .up: return (0, 1)
         case .down: return (0, -1)
         case .left: return (-1, 0)
         case .right: return (1, 0)
+        case .upright: return (1, 1)
+        case .downright: return (1, -1)
+        case .downleft: return (-1, -1)
+        case .upleft : return (-1, 1)
         }
     }
-    var baseRotation: Float {
+    var angle: Float {
         switch self {
         case .up: return 0
         case .right: return .pi/2
         case .down: return .pi
         case .left: return 3*(.pi)/2
+        case .upright: return .pi/4
+        case .downright: return 3*(.pi)/4
+        case .downleft: return 5*(.pi)/4
+        case .upleft : return 7*(.pi)/4
         }
     }
-    func rotation(previous: Direction) -> Float {
+    func rotation(offset: Float = 0) -> simd_quatf {
+        return simd_quatf(angle: self.angle + offset, axis: [0, 1, 0])
+    }
+    func blendDirection(previous: Direction) -> Direction {
         switch (self, previous) {
-        case (.up, .right), (.right, .up): return .pi/4
-        case (.right, .down), (.down, .right): return 3*(.pi)/4
-        case (.down, .left), (.left, .down): return 5*(.pi)/4
-        case (.left, .up), (.up, .left): return 7*(.pi)/4
-        default: return 0.0
+        case (.up, .right), (.right, .up): return .upright
+        case (.right, .down), (.down, .right): return .downright
+        case (.down, .left), (.left, .down): return .downleft
+        case (.left, .up), (.up, .left): return .upleft
+        default: return .down
         }
     }
 }
@@ -93,7 +109,7 @@ struct LevelModel: Codable {
 
 typealias Position = (row: Int, column: Int)
 typealias OrientedPosition = (position: Position, direction: Direction)
-typealias OrientedCoordinate = (coordinate: SIMD3<Float>, rotation: simd_quatf)
+typealias OrientedCoordinate = (coordinate: SIMD3<Float>, rotation: simd_quatf, position: Position)
 
 struct MapModel: Codable {
     var matrix: [[Int]]
@@ -132,12 +148,15 @@ struct MapModel: Codable {
             allPaths.append(path)
             return
         } else {
-            for direction in Direction.allCases {
+            for direction in Direction.baseMoves {
                 let position = Position(current.row + direction.offset.row, current.column + direction.offset.column)
                 if position.row >= 0 && position.row < rows &&
                     position.column >= 0 && position.column < columns &&
                     !path.contains(where: { previous, _ in return (previous.row == position.row && previous.column == position.column) }) &&
                     [MapLegend.lowerPath, .higherPath, .goal, .zipLineOut].contains(MapLegend.allCases[matrix[position.row][position.column]]) {
+                    if let lastMove = path.last, lastMove.direction != direction {
+                        path[path.count - 1].direction = direction.blendDirection(previous: lastMove.direction)
+                    }
                     moveTo((position, direction), path: path)
                 } 
             }
@@ -155,17 +174,13 @@ struct MapModel: Codable {
                 let x = (Float(row) - rowDistance ) * 0.1
                 var y: Float {
                     switch MapLegend.allCases[self.matrix[row][column]] {
-                    case .higherPath, .higherTower: return 0.1
+                    case .higherPath, .higherPlacing: return 0.1
                     default: return 0.0
                     }
                 }
                 let z = (Float(column) - columnDistance) * 0.1
-
-                var rotation: Float {
-                    guard index + 1 < path.count, path[index + 1].direction != move.direction else { return move.direction.baseRotation}
-                    return path[index + 1].direction.rotation(previous: move.direction)
-                }
-                return ([x, y, z], simd_quatf(angle: rotation + aditionalRotationOffset, axis: [0, 1, 0]))
+                let rotation = move.direction.rotation(offset: aditionalRotationOffset)
+                return ([x, y, z], rotation, move.position)
             }
         }
     }

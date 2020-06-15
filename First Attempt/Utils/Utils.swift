@@ -10,31 +10,11 @@ import ARKit
 import RealityKit
 
 extension Entity {
-    func insertDebugInfo() {
-        let model = self.parent
-        let (x, y, z) = (self.position.x, self.position.y, self.position.z)
-        let mesh = MeshResource.generateText(
-            "(X:\(String(format:"%.2f", x)), Y:\(String(format:"%.2f", y)), Z:\(String(format:"%.2f", z)))",
-            extrusionDepth: 0.1,
-            font: .systemFont(ofSize: 2),
-            containerFrame: .zero,
-            alignment: .left,
-            lineBreakMode: .byTruncatingTail)
-        let entity = Entity()
-        entity.components[ModelComponent] = ModelComponent.init(mesh: mesh, materials: [SimpleMaterial(color: .white, isMetallic: false)])
-        model?.addChild(entity)
-        entity.scale = SIMD3(repeating: 0.01)
-        entity.setPosition(SIMD3(x: x - entity.visualBounds(relativeTo: model).extents.x / 2, y: y + 0.05, z: z), relativeTo: model)
-    }
-    
-    func modelEmbedded(at position: SIMD3<Float>, debugInfo: Bool = false) -> EmbeddedModel {
+    func modelEmbedded(at position: SIMD3<Float>) -> EmbeddedModel {
         let model = ModelEntity()
         let entity = self.clone(recursive: true)
         model.addChild(entity)
-        entity.position = position
-        if debugInfo {
-            self.insertDebugInfo()
-        }
+        model.position = position
         return (model, entity)
     }
 }
