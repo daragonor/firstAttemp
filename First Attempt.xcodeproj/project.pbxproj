@@ -140,20 +140,15 @@
 		19B61AF52491F9DB00980B59 /* 3DModels */ = {
 			isa = PBXGroup;
 			children = (
+				19E2F56D2497591000879050 /* paths */,
+				19E2F56C249758FB00879050 /* towers */,
 				19E2F5692497464300879050 /* neutral */,
-				19E2F5612496FC6300879050 /* bullet.usdz */,
-				19E2F5592496E5D400879050 /* futuristic_gun.usdz */,
 				19E2F5572496D40900879050 /* scifi_portal.usdz */,
 				19E2F5552496D2DC00879050 /* spawn_port.usdz */,
 				19363E60248602F200698A72 /* map_icon.usdz */,
 				19363E642489AFA800698A72 /* mech_drone.usdz */,
 				197D9811247B3F3C00447567 /* spawn_station.usdz */,
 				19FF8EFF2462913200969996 /* placing_glyph.usdz */,
-				19FF8EFB2461EA6E00969996 /* turret_gun.usdz */,
-				19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */,
-				19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */,
-				19B61AFE2494B35E00980B59 /* tower_placing.usdz */,
-				19DEDFDB248E00800010AC79 /* creep_path.usdz */,
 			);
 			path = 3DModels;
 			sourceTree = "<group>";
@@ -166,6 +161,27 @@
 				19E2F56A249746A700879050 /* neutral_barrel.usdz */,
 			);
 			path = neutral;
+			sourceTree = "<group>";
+		};
+		19E2F56C249758FB00879050 /* towers */ = {
+			isa = PBXGroup;
+			children = (
+				19E2F5612496FC6300879050 /* bullet.usdz */,
+				19FF8EFB2461EA6E00969996 /* turret_gun.usdz */,
+				19E2F5592496E5D400879050 /* futuristic_gun.usdz */,
+				19B61AFE2494B35E00980B59 /* tower_placing.usdz */,
+			);
+			path = towers;
+			sourceTree = "<group>";
+		};
+		19E2F56D2497591000879050 /* paths */ = {
+			isa = PBXGroup;
+			children = (
+				19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */,
+				19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */,
+				19DEDFDB248E00800010AC79 /* creep_path.usdz */,
+			);
+			path = paths;
 			sourceTree = "<group>";
 		};
 		7013098FE4898254999337E4 /* Pods */ = {
