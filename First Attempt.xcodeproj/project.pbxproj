@@ -17,6 +17,10 @@
 		19363E61248602F200698A72 /* map_icon.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E60248602F200698A72 /* map_icon.usdz */; };
 		19363E652489AFA900698A72 /* mech_drone.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E642489AFA800698A72 /* mech_drone.usdz */; };
 		197D9812247B3F3D00447567 /* spawn_station.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 197D9811247B3F3C00447567 /* spawn_station.usdz */; };
+		19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055B2498984F00C70054 /* hud_placing.usdz */; };
+		19A205602498993700C70054 /* hud.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055F2498993700C70054 /* hud.usdz */; };
+		19A205622498999700C70054 /* here.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205612498999700C70054 /* here.usdz */; };
+		19A205642498B4FF00C70054 /* gate.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205632498B4FE00C70054 /* gate.usdz */; };
 		19B61AF72493AEBD00980B59 /* DefensorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B61AF62493AEBD00980B59 /* DefensorCollectionViewCell.swift */; };
 		19B61AFF2494B35E00980B59 /* tower_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19B61AFE2494B35E00980B59 /* tower_placing.usdz */; };
 		19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C52454500D007F9198 /* MultipeerSession.swift */; };
@@ -50,6 +54,10 @@
 		19363E60248602F200698A72 /* map_icon.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = map_icon.usdz; sourceTree = "<group>"; };
 		19363E642489AFA800698A72 /* mech_drone.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = mech_drone.usdz; sourceTree = "<group>"; };
 		197D9811247B3F3C00447567 /* spawn_station.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawn_station.usdz; sourceTree = "<group>"; };
+		19A2055B2498984F00C70054 /* hud_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud_placing.usdz; sourceTree = "<group>"; };
+		19A2055F2498993700C70054 /* hud.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud.usdz; sourceTree = "<group>"; };
+		19A205612498999700C70054 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
+		19A205632498B4FE00C70054 /* gate.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = gate.usdz; sourceTree = "<group>"; };
 		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
 		19B61AF62493AEBD00980B59 /* DefensorCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefensorCollectionViewCell.swift; sourceTree = "<group>"; };
 		19B61AFE2494B35E00980B59 /* tower_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = tower_placing.usdz; sourceTree = "<group>"; };
@@ -143,6 +151,7 @@
 				19E2F56D2497591000879050 /* paths */,
 				19E2F56C249758FB00879050 /* towers */,
 				19E2F5692497464300879050 /* neutral */,
+				19A205632498B4FE00C70054 /* gate.usdz */,
 				19E2F5572496D40900879050 /* scifi_portal.usdz */,
 				19E2F5552496D2DC00879050 /* spawn_port.usdz */,
 				19363E60248602F200698A72 /* map_icon.usdz */,
@@ -159,6 +168,9 @@
 				19E2F565249741C700879050 /* neutral_floor_1x1.usdz */,
 				19E2F5672497463600879050 /* neutral_tank.usdz */,
 				19E2F56A249746A700879050 /* neutral_barrel.usdz */,
+				19A2055F2498993700C70054 /* hud.usdz */,
+				19A205612498999700C70054 /* here.usdz */,
+				19A2055B2498984F00C70054 /* hud_placing.usdz */,
 			);
 			path = neutral;
 			sourceTree = "<group>";
@@ -260,6 +272,7 @@
 				19E2F5562496D2DC00879050 /* spawn_port.usdz in Resources */,
 				1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */,
 				19E51B372478B6F500443998 /* config.json in Resources */,
+				19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */,
 				197D9812247B3F3D00447567 /* spawn_station.usdz in Resources */,
 				19B61AFF2494B35E00980B59 /* tower_placing.usdz in Resources */,
 				19E2F5682497463600879050 /* neutral_tank.usdz in Resources */,
@@ -270,9 +283,12 @@
 				1935BBB324290F9500C764C1 /* Main.storyboard in Resources */,
 				19E2F5582496D40900879050 /* scifi_portal.usdz in Resources */,
 				19E2F5642496FFC000879050 /* creep_path_upwards.usdz in Resources */,
+				19A205642498B4FF00C70054 /* gate.usdz in Resources */,
 				19E2F55A2496E5D400879050 /* futuristic_gun.usdz in Resources */,
 				19DEDFDC248E00810010AC79 /* creep_path.usdz in Resources */,
+				19A205622498999700C70054 /* here.usdz in Resources */,
 				19E2F56B249746A700879050 /* neutral_barrel.usdz in Resources */,
+				19A205602498993700C70054 /* hud.usdz in Resources */,
 				19E2F566249741C800879050 /* neutral_floor_1x1.usdz in Resources */,
 				19363E61248602F200698A72 /* map_icon.usdz in Resources */,
 				19E2F5602496FA2700879050 /* creep_path_downwards.usdz in Resources */,

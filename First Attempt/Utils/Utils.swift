@@ -10,7 +10,7 @@ import ARKit
 import RealityKit
 
 extension Entity {
-    func modelEmbedded(at position: SIMD3<Float>) -> EmbeddedModel {
+    func embeddedModel(at position: SIMD3<Float>) -> EmbeddedModel {
         let model = ModelEntity()
         let entity = self.clone(recursive: true)
         model.addChild(entity)
