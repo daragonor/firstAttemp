@@ -15,43 +15,45 @@ import Combine
 typealias EmbeddedModel = (model: ModelEntity, entity: Entity)
 
 class ViewController: UIViewController {
-    
-    enum TowerType: CaseIterable {
-        case turret, rocketLauncher, headquarters
-        var cost: Int {
+    enum StripOptions {
+        case upgrade, sell, turret, rocketlauncher, barracks, moveRight, moveLeft, rotateRight, rotateLeft
+        var iconImage: UIImage {
             switch self {
-            case .turret: return 150
-            case .rocketLauncher: return 200
-            case .headquarters: return 300
+            case .upgrade: return #imageLiteral(resourceName: "upgrade")
+            case .sell: return #imageLiteral(resourceName: "coins")
+            case .turret: return #imageLiteral(resourceName: "turret")
+            case .rocketlauncher: return #imageLiteral(resourceName: "missile-swarm")
+            case .barracks: return #imageLiteral(resourceName: "cryo-chamber")
+            case .moveRight: return #imageLiteral(resourceName: "plain-arrow-roght")
+            case .moveLeft: return #imageLiteral(resourceName: "plain-arrow-left")
+            case .rotateRight: return #imageLiteral(resourceName: "clockwise-rotation")
+            case .rotateLeft: return #imageLiteral(resourceName: "anticlockwise-rotation")
             }
         }
-        var range: Float {
-            switch self {
-            case .turret: return 3
-            case .rocketLauncher: return 6
-            case .headquarters: return 3
-            }
-        }
-        var capacity: Int {
-            switch self {
-            case .turret: return 1
-            case .rocketLauncher: return 2
-            case .headquarters: return 1
-            }
-        }
-        
     }
-    enum TowerStates: CaseIterable {
-        case empty, phase1, phase2
+    enum ActionStrip {
+        case placing, map, tower
+        static func options(tower: TowerType) -> [StripOptions] {
+            switch tower {
+            case .turret, .rocketLauncher: return [.upgrade, .sell]
+            case .barracks: return [.upgrade, .sell, .moveLeft, .moveRight]
+            }
+        }
+        var options: [StripOptions] {
+            switch self {
+            case .map: return[.rotateLeft, .rotateRight]
+            case .placing: return [.turret, .rocketlauncher, .barracks]
+            default: return []
+            }
+        }
     }
     
     @IBOutlet var arView: ARView!
     
     @IBOutlet weak var coinsLabel: UILabel!
     @IBOutlet weak var lifePointsStack: UIStackView!
-    @IBOutlet weak var collectionView: UICollectionView!
-    
-    var defensors = Defensor.getDefensors()
+//    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var tableView: UITableView!
     
     var config: ARWorldTrackingConfiguration!
     
@@ -71,7 +73,7 @@ class ViewController: UIViewController {
     }
     
     typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
-    typealias PlacingBundle = (model: ModelEntity, position: Position, type: TowerType?, accesory: ModelEntity?)
+    typealias PlacingBundle = (model: ModelEntity, position: Position, type: TowerType?, accesory: Entity?)
     typealias TowerBundle = (model: ModelEntity, type:TowerType, attackingCount: Int)
     var spawnPlaces = [SpawnBundle]()
     var glyphModels = [(model: ModelEntity, canShow: Int?)]()
@@ -80,6 +82,7 @@ class ViewController: UIViewController {
     var placings = [PlacingBundle]()
     var towers = [TowerBundle]()
     var selectedPlacing: PlacingBundle?
+    var actionStrip = [StripOptions]()
     
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
@@ -90,8 +93,10 @@ class ViewController: UIViewController {
     let pathTemplate = try! Entity.load(named: "creep_path")
     let pathDownwardsTemplate = try! Entity.load(named: "creep_path_downwards")
     let pathUpwardsTemplate = try! Entity.load(named: "creep_path_upwards")
-    let turretTemplate = try! Entity.load(named: "turret_gun")
-    let rocketLauncherTemplate = try! Entity.load(named: "futuristic_gun")
+    let turretTemplate = try! Entity.load(named: "turret")
+    let rocketLauncherTemplate = try! Entity.load(named: "rocket_launcher")
+    let barracksTemplate = try! Entity.load(named: "barracks")
+
     let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
     let runeTemplate = try! Entity.load(named: "here")
@@ -127,12 +132,10 @@ class ViewController: UIViewController {
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         layout.scrollDirection = .vertical
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.isHidden = true
-        collectionView.transform = CGAffineTransform(rotationAngle: -(CGFloat)(Double.pi))
-        collectionView.collectionViewLayout = layout
-        collectionView.showsVerticalScrollIndicator = false
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.transform = CGAffineTransform(rotationAngle: -(CGFloat)(Double.pi))
+        tableView.showsVerticalScrollIndicator = false
     }
     func loadAnchorConfiguration() {
         config = ARWorldTrackingConfiguration()
@@ -152,9 +155,10 @@ class ViewController: UIViewController {
         ///Runes
         runeTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Towers
-        turretTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+        turretTemplate.setScale(SIMD3(repeating: 0.00017), relativeTo: nil)
         rocketLauncherTemplate.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
-        ///Creeps
+        barracksTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
+        ///Creep
         creepTemplate.setScale(SIMD3(repeating: 0.00001), relativeTo: nil)
         ///Path
         pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
@@ -182,6 +186,13 @@ class ViewController: UIViewController {
         setupCoachingOverlay()
         multipeerSession = MultipeerSession(receivedDataHandler: receivedData, peerJoinedHandler:
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
+    }
+    
+    func reloadActionStrip(with options: [StripOptions]) {
+        if actionStrip != options {
+            actionStrip = options
+            tableView.reloadSections([0], with: .fade)
+        }
     }
     
     @IBAction func onStart(_ sender: Any) {
@@ -248,13 +259,15 @@ class ViewController: UIViewController {
         guard let entity = entities.first else { return }
         
         if let placing = placings.first(where: { model, _, _, _ in entities.contains(where: {$0.id == model.id}) }) {
-            collectionView.isHidden = false
+            var options = ActionStrip.placing.options == actionStrip ? [] : ActionStrip.placing.options
             selectedPlacing = placing
-            placings.forEach { model, _, _, accesory in
-                if let accesory = accesory, model.id == placing.model.id, !accesory.isEnabled {
-                    accesory.isEnabled = true
-                } else { accesory?.isEnabled = false }
+            placings.forEach { model, _, type, accesory in
+                if let accesory = accesory, model.id == placing.model.id, let type = type {
+                    options = ActionStrip.options(tower: type) == actionStrip ? [] : ActionStrip.options(tower: type)
+                    accesory.isEnabled.toggle()
+                }
             }
+            reloadActionStrip(with: options)
         } else {
             for (index, glyph) in glyphModels.enumerated() {
                 if entity.id == glyph.model.id {
@@ -362,12 +375,11 @@ class ViewController: UIViewController {
         coins -= towerType.cost
         let placingIndex = placings.enumerated().first( where: { index, placing in placing.model.id == selectedPlacing.model.id })!.0
         placings[placingIndex].type = towerType
-        let placingPosition = selectedPlacing.model.transformMatrix(relativeTo: anchor).toTranslation()
         let tower: EmbeddedModel = {
              switch towerType{
-            case .turret: return turretTemplate.embeddedModel(at: placingPosition)
-            case .rocketLauncher: return rocketLauncherTemplate.embeddedModel(at: placingPosition)
-            case .headquarters: return turretTemplate.embeddedModel(at: placingPosition)
+            case .turret: return turretTemplate.embeddedModel(at: selectedPlacing.model.position)
+            case .rocketLauncher: return rocketLauncherTemplate.embeddedModel(at: selectedPlacing.model.position)
+            case .barracks: return barracksTemplate.embeddedModel(at: selectedPlacing.model.position)
             }
         }()
         tower.model.position.y += 0.003
@@ -375,15 +387,18 @@ class ViewController: UIViewController {
         towers.append((tower.model, towerType, 0))
         ///Tower range
         let diameter = 2.0 * gridDiameter * Float(towerType.range) * 0.1
-        let range = rangeTemplate.embeddedModel(at: tower.model.position)
-        let rangeBounds = range.model.visualBounds(relativeTo: anchor)
+//        let range = rangeTemplate.embeddedModel(at: tower.model.position)
+        let range = rangeTemplate.clone(recursive: true)
+        tower.model.addChild(range)
+        let rangeBounds = range.visualBounds(relativeTo: anchor)
         let scaleDiameter = diameter / rangeBounds.extents.x * 0.01
         let scaleHeight = 0.03 / rangeBounds.extents.y * 0.01
-        range.entity.setScale([scaleDiameter, scaleHeight, scaleDiameter], relativeTo: nil)
-        anchor.addChild(range.model)
-        range.entity.playAnimation(range.entity.availableAnimations[0].repeat())
-        range.model.position.y += 0.04
-        placings[placingIndex].accesory = range.model
+        range.setScale([scaleDiameter, scaleHeight, scaleDiameter], relativeTo: nil)
+//        anchor.addChild(range.model)
+        
+        range.playAnimation(range.availableAnimations[0].repeat())
+        range.position.y += 0.04
+        placings[placingIndex].accesory = range
         ///Set range
         tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.05, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.05, 0))]))
         subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower.model) {
@@ -393,7 +408,7 @@ class ViewController: UIViewController {
             switch towerType {
             case .turret:
                 tower.model.setOrientation(simd_quatf(angle: 0, axis: [0, 1, 0]), relativeTo: creep)
-                let bullet = self.bulletTemplate.embeddedModel(at: placingPosition)
+                let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
                 bullet.model.transform.translation.y += 0.01
                 anchor.addChild(bullet.model)
                 var bulletTransform = bullet.model.transform
@@ -405,7 +420,7 @@ class ViewController: UIViewController {
                         bullet.model.removeFromParent()
                     }))
             case .rocketLauncher:
-                let bullet = self.bulletTemplate.embeddedModel(at: placingPosition)
+                let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
                 bullet.model.transform.translation.y += 0.01
                 anchor.addChild(bullet.model)
                 var bulletTransform = bullet.model.transform
@@ -416,7 +431,7 @@ class ViewController: UIViewController {
                     .sink(receiveValue: { event in
                         bullet.model.removeFromParent()
                     }))
-            case .headquarters: break
+            case .barracks: break
             }
             
         })
@@ -460,8 +475,7 @@ extension ViewController: ARSessionDelegate {
     }
     func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
         for anchor in anchors {
-            //            guard let planeAnchor = anchor as? ARPlaneAnchor,
-            //                var planeEntity = planeEntities[planeAnchor.identifier]?.entity else { continue }
+
             if anchor.name == "Terrain" {
                 
             }
@@ -493,35 +507,23 @@ extension ViewController: ARSessionDelegate {
         }
     }
 }
-extension ViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         insertTower(towerType: TowerType.allCases[indexPath.row])
         selectedPlacing = nil
-        collectionView.isHidden = true
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return actionStrip.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.size.width, height: collectionView.frame.size.width)
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return defensors.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DefensorCollectionViewCell", for: indexPath) as! DefensorCollectionViewCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Action Strip Cell", for: indexPath)
+        let imageView = cell.contentView.viewWithTag(10) as? UIImageView
+        imageView?.image = actionStrip[indexPath.row].iconImage
+        imageView?.layer.cornerRadius = 30.0
+        imageView?.layer.masksToBounds = true
         cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
-        let defensor = defensors[indexPath.item]
-        cell.defensor = defensor
         return cell
     }
 }

@@ -10,6 +10,35 @@ import Foundation
 import RealityKit
 import GameplayKit
 
+enum TowerType: CaseIterable {
+    case turret, rocketLauncher, barracks
+    var cost: Int {
+        switch self {
+        case .turret: return 150
+        case .rocketLauncher: return 200
+        case .barracks: return 300
+        }
+    }
+    var range: Float {
+        switch self {
+        case .turret: return 3
+        case .rocketLauncher: return 6
+        case .barracks: return 3
+        }
+    }
+    var capacity: Int {
+        switch self {
+        case .turret: return 1
+        case .rocketLauncher: return 2
+        case .barracks: return 1
+        }
+    }
+    
+}
+enum TowerStates: CaseIterable {
+    case empty, phase1, phase2
+}
+
 enum MapLegend: CaseIterable {
     case neutral, goal, lowerPlacing, higherPlacing, spawn, lowerPath, higherPath, zipLineIn, zipLineOut
 }
@@ -72,7 +101,6 @@ enum PathAssets: CaseIterable {
 }
 
 struct GameModel: Codable {
-    var assets: AssetsModel
     var levels: [LevelModel]
 }
 
