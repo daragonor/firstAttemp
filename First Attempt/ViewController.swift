@@ -63,7 +63,7 @@ class ViewController: UIViewController {
     var sessionIDObservation: NSKeyValueObservation?
     
     let gridDiameter: Float = 0.5
-    var coins = 450
+    var coins = 600
     var level = 0
     var subscriptions: [Cancellable] = []
     var usedMaps = 0
@@ -74,7 +74,7 @@ class ViewController: UIViewController {
     
     typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
     typealias PlacingBundle = (model: ModelEntity, position: Position, type: TowerType?, accesory: Entity?)
-    typealias TowerBundle = (model: ModelEntity, type:TowerType, attackingCount: Int)
+    typealias TowerBundle = (model: ModelEntity, type: TowerType, enemiesIDs: [UInt64])
     var spawnPlaces = [SpawnBundle]()
     var glyphModels = [(model: ModelEntity, canShow: Int?)]()
     var terrainAnchors = [AnchorEntity]()
@@ -156,7 +156,7 @@ class ViewController: UIViewController {
         runeTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Towers
         turretTemplate.setScale(SIMD3(repeating: 0.00017), relativeTo: nil)
-        rocketLauncherTemplate.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
+        rocketLauncherTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         barracksTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
         ///Creep
         creepTemplate.setScale(SIMD3(repeating: 0.00001), relativeTo: nil)
@@ -263,9 +263,10 @@ class ViewController: UIViewController {
             selectedPlacing = placing
             placings.forEach { model, _, type, accesory in
                 if let accesory = accesory, model.id == placing.model.id, let type = type {
-                    options = ActionStrip.options(tower: type) == actionStrip ? [] : ActionStrip.options(tower: type)
                     accesory.isEnabled.toggle()
-                }
+                    options = accesory.isEnabled ? ActionStrip.options(tower: type) : []
+                    selectedPlacing = accesory.isEnabled ? selectedPlacing : nil
+                } else { accesory?.isEnabled = false }
             }
             reloadActionStrip(with: options)
         } else {
@@ -384,53 +385,65 @@ class ViewController: UIViewController {
         }()
         tower.model.position.y += 0.003
         anchor.addChild(tower.model)
-        towers.append((tower.model, towerType, 0))
+        var priorityList = [UInt64]()
+        towers.append((tower.model, towerType, priorityList))
+        reloadActionStrip(with: ActionStrip.options(tower: towerType))
         ///Tower range
-        let diameter = 2.0 * gridDiameter * Float(towerType.range) * 0.1
-//        let range = rangeTemplate.embeddedModel(at: tower.model.position)
+        let diameter = 2.0 * gridDiameter * towerType.range * 0.1
         let range = rangeTemplate.clone(recursive: true)
         tower.model.addChild(range)
         let rangeBounds = range.visualBounds(relativeTo: anchor)
         let scaleDiameter = diameter / rangeBounds.extents.x * 0.01
         let scaleHeight = 0.03 / rangeBounds.extents.y * 0.01
         range.setScale([scaleDiameter, scaleHeight, scaleDiameter], relativeTo: nil)
-//        anchor.addChild(range.model)
-        
         range.playAnimation(range.availableAnimations[0].repeat())
         range.position.y += 0.04
+        if towerType == .barracks { range.position.z += diameter }
         placings[placingIndex].accesory = range
         ///Set range
-        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.05, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.05, 0))]))
+        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.03, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.05, 0))]))
+        
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Ended.self, on: tower.model) {
+            event in
+            guard let creep = event.entityB as? ModelEntity, self.creepIDs.contains(creep.id) else { return }
+            switch towerType {
+            case .turret:
+                priorityList.removeAll(where: { id in id == creep.id })
+            case .rocketLauncher: break
+            case .barracks: break
+            }
+        })
+        
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Updated.self, on: tower.model) {
+            event in
+            guard let enemyID = priorityList.first, let creep = event.entityB as? ModelEntity, creep.id == enemyID else { return }
+            switch towerType {
+            case .turret:
+                tower.model.setOrientation(simd_quatf(angle: 0 + .pi, axis: [0, 1, 0]), relativeTo: creep)
+            case .rocketLauncher: break
+            case .barracks: break
+            }
+        })
+        
         subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower.model) {
             event in
             guard let creep = event.entityB as? ModelEntity, self.creepIDs.contains(creep.id) else { return }
 //            tower.entity.playAnimation(tower.entity.availableAnimations[0].repeat())
             switch towerType {
             case .turret:
-                tower.model.setOrientation(simd_quatf(angle: 0, axis: [0, 1, 0]), relativeTo: creep)
+                priorityList.append(creep.id)
                 let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
                 bullet.model.transform.translation.y += 0.01
                 anchor.addChild(bullet.model)
                 var bulletTransform = bullet.model.transform
                 bulletTransform.translation = creep.transformMatrix(relativeTo: anchor).toTranslation()
-                let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.2, timingFunction: .linear)
+                let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.3, timingFunction: .linear)
                 self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                     .filter { $0.playbackController == animation }
                     .sink(receiveValue: { event in
                         bullet.model.removeFromParent()
                     }))
-            case .rocketLauncher:
-                let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
-                bullet.model.transform.translation.y += 0.01
-                anchor.addChild(bullet.model)
-                var bulletTransform = bullet.model.transform
-                bulletTransform.translation = creep.transformMatrix(relativeTo: anchor).toTranslation()
-                let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.2, timingFunction: .linear)
-                self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
-                    .filter { $0.playbackController == animation }
-                    .sink(receiveValue: { event in
-                        bullet.model.removeFromParent()
-                    }))
+            case .rocketLauncher: break
             case .barracks: break
             }
             
@@ -511,7 +524,6 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         insertTower(towerType: TowerType.allCases[indexPath.row])
-        selectedPlacing = nil
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return actionStrip.count

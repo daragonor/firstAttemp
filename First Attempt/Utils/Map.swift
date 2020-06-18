@@ -21,9 +21,9 @@ enum TowerType: CaseIterable {
     }
     var range: Float {
         switch self {
-        case .turret: return 3
-        case .rocketLauncher: return 6
-        case .barracks: return 3
+        case .turret: return 3.0
+        case .rocketLauncher: return 6.0
+        case .barracks: return 1.0
         }
     }
     var capacity: Int {
