@@ -9,7 +9,14 @@
 import Foundation
 import RealityKit
 import GameplayKit
-
+enum CreepType: CaseIterable {
+    case common
+    var lifepoints: Int {
+        switch self {
+        case .common: return 100
+        }
+    }
+}
 enum TowerType: CaseIterable {
     case turret, rocketLauncher, barracks
     var cost: Int {
@@ -33,7 +40,13 @@ enum TowerType: CaseIterable {
         case .barracks: return 1
         }
     }
-    
+    var attack: Int {
+        switch self {
+        case .turret: return 50
+        case .rocketLauncher: return 80
+        case .barracks: return 20
+        }
+    }
 }
 enum TowerStates: CaseIterable {
     case empty, phase1, phase2

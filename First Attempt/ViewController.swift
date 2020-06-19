@@ -86,10 +86,12 @@ class ViewController: UIViewController {
     typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
     typealias PlacingBundle = (model: ModelEntity, position: Position, type: TowerType?, accesory: Entity?)
     typealias TowerBundle = (model: ModelEntity, type: TowerType, enemiesIDs: [UInt64])
+    typealias CreepBundle = (id: UInt64, type: CreepType, hp: Int)
     var spawnPlaces = [SpawnBundle]()
     var glyphModels = [(model: ModelEntity, canShow: Int?)]()
     var terrainAnchors = [AnchorEntity]()
-    var creepIDs = [UInt64]()
+    
+    var creeps = [CreepBundle]()
     var placings = [PlacingBundle]()
     var towers = [TowerBundle]()
     var selectedPlacing: PlacingBundle?
@@ -219,7 +221,8 @@ class ViewController: UIViewController {
                 counter += 1
                 spawnPosition.y = 0.03
                 let creep = self.creepTemplate.embeddedModel(at: spawnPosition)
-                self.creepIDs.append(creep.model.id)
+                let creepType = CreepType.common
+                self.creeps.append((creep.model.id, creepType, creepType.lifepoints))
                 let bounds = creep.entity.visualBounds(relativeTo: creep.model)
                 creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
                 spawn.model.anchor?.addChild(creep.model)
@@ -412,11 +415,11 @@ class ViewController: UIViewController {
         if towerType == .barracks { range.position.z += diameter }
         placings[placingIndex].accesory = range
         ///Set range
-        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.03, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.05, 0))], mode: .trigger, filter: CollisionFilter.init(group: Filter.towers.group, mask: Filter.creeps.group)))
+        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.02, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.02, 0))], mode: .trigger, filter: CollisionFilter.init(group: Filter.towers.group, mask: Filter.creeps.group)))
         
         subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Ended.self, on: tower.model) {
             event in
-            guard let creep = event.entityB as? ModelEntity, self.creepIDs.contains(creep.id) else { return }
+            guard let creep = event.entityB as? ModelEntity else { return }
             switch towerType {
             case .turret:
                 priorityList.removeAll(where: { id in id == creep.id })
@@ -430,7 +433,10 @@ class ViewController: UIViewController {
             guard let enemyID = priorityList.first, let creep = event.entityB as? ModelEntity, creep.id == enemyID else { return }
             switch towerType {
             case .turret:
-                tower.model.setOrientation(simd_quatf(angle: 0, axis: [0, 1, 0]), relativeTo: creep)
+                let angle = atan2(event.position.z - tower.model.position.z, event.position.x - tower.model.position.x)
+                let orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
+//                let orientation = simd_quatf(from: selectedPlacing.model.position, to: event.position)
+                tower.model.setOrientation(orientation, relativeTo: nil)
             case .rocketLauncher: break
             case .barracks: break
             }
@@ -442,21 +448,32 @@ class ViewController: UIViewController {
             switch towerType {
             case .turret:
                 priorityList.append(creep.id)
-                let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
-                bullet.model.transform.translation.y += 0.01
-                anchor.addChild(bullet.model)
-                var bulletTransform = bullet.model.transform
-                bulletTransform.translation = creep.transformMatrix(relativeTo: anchor).toTranslation()
-                let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.3, timingFunction: .linear)
-                self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
-                    .filter { $0.playbackController == animation }
-                    .sink(receiveValue: { event in
-                        bullet.model.removeFromParent()
-                    }))
+                _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                    guard priorityList.contains(creep.id) else { timer.invalidate() ; return }
+                    guard let id = priorityList.first, id == creep.id else { return }
+                    let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
+                    bullet.model.transform.translation.y += 0.015
+                    anchor.addChild(bullet.model)
+                    var bulletTransform = bullet.model.transform
+                    bulletTransform.translation = creep.transformMatrix(relativeTo: anchor).toTranslation()
+                    let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.4, timingFunction: .easeOut)
+                    self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+                        .filter { $0.playbackController == animation }
+                        .sink(receiveValue: { event in
+                            bullet.model.removeFromParent()
+                            if let index = self.creeps.firstIndex(where: {$0.id == creep.id}) {
+                                self.creeps[index].hp -= towerType.attack
+                                //Add lifebar reduction here
+                                if self.creeps[index].hp < 0 {
+                                    priorityList.removeAll(where: { id in id == creep.id })
+                                    creep.removeFromParent()
+                                }
+                            }
+                        }))
+                }
             case .rocketLauncher: break
             case .barracks: break
             }
-            
         })
     }
 }
