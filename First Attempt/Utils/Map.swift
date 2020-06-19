@@ -83,7 +83,7 @@ enum Direction: CaseIterable {
         case (.right, .down), (.down, .right): return .downright
         case (.down, .left), (.left, .down): return .downleft
         case (.left, .up), (.up, .left): return .upleft
-        default: return .down
+        default: return previous
         }
     }
 }
@@ -173,7 +173,13 @@ struct MapModel: Codable {
         path.append(orientedPosition)
         let mapType = MapLegend.allCases[matrix[current.row][current.column]]
         if [MapLegend.goal, .zipLineOut].contains(mapType) {
-            allPaths.append(path)
+            allPaths.append(path.enumerated().map { index, move in
+                var move = move
+                if index + 1 < path.count {
+                    move.direction = path[index + 1].direction.blendDirection(previous: move.direction)
+                }
+                return move
+            })
             return
         } else {
             for direction in Direction.baseMoves {
@@ -182,9 +188,6 @@ struct MapModel: Codable {
                     position.column >= 0 && position.column < columns &&
                     !path.contains(where: { previous, _ in return (previous.row == position.row && previous.column == position.column) }) &&
                     [MapLegend.lowerPath, .higherPath, .goal, .zipLineOut].contains(MapLegend.allCases[matrix[position.row][position.column]]) {
-                    if let lastMove = path.last, lastMove.direction != direction {
-                        path[path.count - 1].direction = direction.blendDirection(previous: lastMove.direction)
-                    }
                     moveTo((position, direction), path: path)
                 } 
             }

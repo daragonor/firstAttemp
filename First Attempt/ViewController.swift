@@ -48,6 +48,17 @@ class ViewController: UIViewController {
         }
     }
     
+    enum Filter {
+        case placings, towers, creeps
+        var group: CollisionGroup {
+            switch self {
+            case .placings: return CollisionGroup.init(rawValue: 0)
+            case .towers: return CollisionGroup.init(rawValue: 1)
+            case .creeps: return CollisionGroup.init(rawValue: 2)
+            }
+        }
+    }
+    
     @IBOutlet var arView: ARView!
     
     @IBOutlet weak var coinsLabel: UILabel!
@@ -142,7 +153,7 @@ class ViewController: UIViewController {
         config.planeDetection = [.horizontal, .vertical]
         config.isCollaborationEnabled = true
         config.environmentTexturing = .automatic
-//                arView.debugOptions = [.showPhysics]
+        arView.renderOptions.insert(.disableMotionBlur)
         arView.automaticallyConfigureSession = false
         arView.session.delegate = self
         arView.session.run(config)
@@ -210,7 +221,7 @@ class ViewController: UIViewController {
                 let creep = self.creepTemplate.embeddedModel(at: spawnPosition)
                 self.creepIDs.append(creep.model.id)
                 let bounds = creep.entity.visualBounds(relativeTo: creep.model)
-                creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
+                creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
                 spawn.model.anchor?.addChild(creep.model)
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 self.deployUnit(creep, on: paths[Int.random(in: 0..<paths.count)], setScale: 10)
@@ -401,7 +412,7 @@ class ViewController: UIViewController {
         if towerType == .barracks { range.position.z += diameter }
         placings[placingIndex].accesory = range
         ///Set range
-        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.03, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.05, 0))]))
+        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.03, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.05, 0))], mode: .trigger, filter: CollisionFilter.init(group: Filter.towers.group, mask: Filter.creeps.group)))
         
         subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Ended.self, on: tower.model) {
             event in
@@ -419,7 +430,7 @@ class ViewController: UIViewController {
             guard let enemyID = priorityList.first, let creep = event.entityB as? ModelEntity, creep.id == enemyID else { return }
             switch towerType {
             case .turret:
-                tower.model.setOrientation(simd_quatf(angle: 0 + .pi, axis: [0, 1, 0]), relativeTo: creep)
+                tower.model.setOrientation(simd_quatf(angle: 0, axis: [0, 1, 0]), relativeTo: creep)
             case .rocketLauncher: break
             case .barracks: break
             }
@@ -427,8 +438,7 @@ class ViewController: UIViewController {
         
         subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower.model) {
             event in
-            guard let creep = event.entityB as? ModelEntity, self.creepIDs.contains(creep.id) else { return }
-//            tower.entity.playAnimation(tower.entity.availableAnimations[0].repeat())
+            guard let creep = event.entityB as? ModelEntity else { return }
             switch towerType {
             case .turret:
                 priorityList.append(creep.id)
