@@ -16,14 +16,31 @@ enum CreepType: CaseIterable {
         case .common: return 100
         }
     }
+    var reward: Int {
+        switch self {
+        case .common: return 10
+        }
+    }
+}
+enum TowerLevel: CaseIterable {
+    case lvl1, lvl2
 }
 enum TowerType: CaseIterable {
     case turret, rocketLauncher, barracks
-    var cost: Int {
-        switch self {
-        case .turret: return 150
-        case .rocketLauncher: return 200
-        case .barracks: return 300
+    func cost(lvl: TowerLevel) -> Int {
+        switch lvl {
+        case .lvl1:
+                    switch self {
+            case .turret: return 150
+            case .rocketLauncher: return 200
+            case .barracks: return 300
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 250
+            case .rocketLauncher: return 400
+            case .barracks: return 500
+            }
         }
     }
     var range: Float {
@@ -33,23 +50,55 @@ enum TowerType: CaseIterable {
         case .barracks: return 1.0
         }
     }
-    var capacity: Int {
-        switch self {
-        case .turret: return 1
-        case .rocketLauncher: return 2
-        case .barracks: return 1
+    
+    func capacity(lvl: TowerLevel) -> Int {
+        switch lvl {
+        case .lvl1:
+            switch self {
+            case .turret: return 1
+            case .rocketLauncher: return 2
+            case .barracks: return 1
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 1
+            case .rocketLauncher: return 4
+            case .barracks: return 2
+            }
         }
     }
-    var attack: Int {
-        switch self {
-        case .turret: return 50
-        case .rocketLauncher: return 80
-        case .barracks: return 20
+    func cadence(lvl: TowerLevel) -> Float {
+        switch lvl {
+        case .lvl1:
+            switch self {
+            case .turret: return 1.0
+            case .rocketLauncher: return 2.5
+            case .barracks: return 5.0
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 0.75
+            case .rocketLauncher: return 1.75
+            case .barracks: return 2.5
+            }
         }
     }
-}
-enum TowerStates: CaseIterable {
-    case empty, phase1, phase2
+    func attack(lvl: TowerLevel) -> Int {
+        switch lvl {
+        case .lvl1:
+            switch self {
+            case .turret: return 50
+            case .rocketLauncher: return 80
+            case .barracks: return 20
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 50
+            case .rocketLauncher: return 80
+            case .barracks: return 20
+            }
+        }
+    }
 }
 
 enum MapLegend: CaseIterable {
