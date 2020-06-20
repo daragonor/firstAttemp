@@ -32,19 +32,21 @@ class ViewController: UIViewController {
         }
     }
     enum ActionStrip {
-        case placing, map, tower
-        static func options(tower: TowerType) -> [StripOptions] {
-            switch tower {
-            case .turret, .rocketLauncher: return [.upgrade, .sell]
-            case .barracks: return [.upgrade, .sell, .moveLeft, .moveRight]
-            }
-        }
-        var options: [StripOptions] {
+        case none, placing, map, tower
+        func options(for type: Any? = nil) -> ActionStripBundle {
+            var options = [StripOptions]()
             switch self {
-            case .map: return[.rotateLeft, .rotateRight]
-            case .placing: return [.turret, .rocketlauncher, .barracks]
-            default: return []
+            case .map: options = [.rotateLeft, .rotateRight]
+            case .placing: options = [.turret, .rocketlauncher, .barracks]
+            case .tower:
+                guard let tower = type as? TowerType else { options = []; break}
+                switch tower {
+                case .turret, .rocketLauncher: options = [.upgrade, .sell]
+                case .barracks: options = [.upgrade, .sell, .moveLeft, .moveRight]
+                }
+            case .none: options = []
             }
+            return (self, options)
         }
     }
     
@@ -63,7 +65,6 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var coinsLabel: UILabel!
     @IBOutlet weak var lifePointsStack: UIStackView!
-//    @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     
     var config: ARWorldTrackingConfiguration!
@@ -84,19 +85,20 @@ class ViewController: UIViewController {
     }
     
     typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
-    typealias PlacingBundle = (model: ModelEntity, position: Position, type: TowerType?, accesory: Entity?)
+    typealias PlacingBundle = (model: ModelEntity, position: Position, towerId: UInt64?, accesory: Entity?)
     typealias TowerBundle = (model: ModelEntity, type: TowerType, enemiesIDs: [UInt64])
     typealias CreepBundle = (id: UInt64, type: CreepType, hp: Int)
+    typealias ActionStripBundle = (action: ActionStrip, options: [StripOptions])
     var spawnPlaces = [SpawnBundle]()
     var glyphModels = [(model: ModelEntity, canShow: Int?)]()
-    var terrainAnchors = [AnchorEntity]()
-    
     var creeps = [CreepBundle]()
     var placings = [PlacingBundle]()
     var towers = [TowerBundle]()
-    var selectedPlacing: PlacingBundle?
-    var actionStrip = [StripOptions]()
     
+    var selectedPlacing: PlacingBundle?
+    var strip: ActionStripBundle = (.none, [])
+    var terrainAnchors = [AnchorEntity]()
+
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
         let data = try! NSData(contentsOfFile: filePath) as Data
@@ -106,8 +108,10 @@ class ViewController: UIViewController {
     let pathTemplate = try! Entity.load(named: "creep_path")
     let pathDownwardsTemplate = try! Entity.load(named: "creep_path_downwards")
     let pathUpwardsTemplate = try! Entity.load(named: "creep_path_upwards")
-    let turretTemplate = try! Entity.load(named: "turret")
-    let rocketLauncherTemplate = try! Entity.load(named: "rocket_launcher")
+    let turretLvl1Template = try! Entity.load(named: "turret_lvl1")
+    let turretLvl2Template = try! Entity.load(named: "turret_lvl2")
+    let rocketLauncherLvl1Template = try! Entity.load(named: "rocket_launcher_lvl1")
+    let rocketLauncherLvl2Template = try! Entity.load(named: "rocket_launcher_lvl2")
     let barracksTemplate = try! Entity.load(named: "barracks")
 
     let placingTemplate = try! Entity.load(named: "tower_placing")
@@ -116,10 +120,10 @@ class ViewController: UIViewController {
     let portalTemplate = try! Entity.load(named: "gate")
     let spawnTemplate = try! Entity.load(named: "spawn_port")
     let bulletTemplate = try! Entity.load(named: "bullet")
-    let neutralFloorTemplate = try! Entity.load(named: "neutral_floor_1x1")
-    let neutralTankTemplate = try! Entity.load(named: "neutral_tank")
-    let neutralBarrelTemplate = try! Entity.load(named: "neutral_barrel")
-    let rangeTemplate = try! Entity.load(named: "hud")
+//    let neutralFloorTemplate = try! Entity.load(named: "neutral_floor_1x1")
+//    let neutralTankTemplate = try! Entity.load(named: "neutral_tank")
+//    let neutralBarrelTemplate = try! Entity.load(named: "neutral_barrel")
+    let rangeTemplate = try! Entity.load(named: "circle_effect")
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
@@ -168,8 +172,10 @@ class ViewController: UIViewController {
         ///Runes
         runeTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Towers
-        turretTemplate.setScale(SIMD3(repeating: 0.00017), relativeTo: nil)
-        rocketLauncherTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+        turretLvl1Template.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
+        turretLvl2Template.setScale(SIMD3(repeating: 0.00017), relativeTo: nil)
+        rocketLauncherLvl1Template.setScale(SIMD3(repeating: 0.006), relativeTo: nil)
+        rocketLauncherLvl2Template.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         barracksTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
         ///Creep
         creepTemplate.setScale(SIMD3(repeating: 0.00001), relativeTo: nil)
@@ -178,9 +184,9 @@ class ViewController: UIViewController {
         pathUpwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
         pathDownwardsTemplate.setScale(SIMD3(repeating: 0.125), relativeTo: nil)
         ///Neutral
-        neutralFloorTemplate.setScale(SIMD3(repeating: 0.1), relativeTo: nil)
-        neutralTankTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
-        neutralBarrelTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+//        neutralFloorTemplate.setScale(SIMD3(repeating: 0.1), relativeTo: nil)
+//        neutralTankTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+//        neutralBarrelTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Goal
         portalTemplate.setScale(SIMD3(repeating: 0.0006), relativeTo: nil)
         ///Spawn
@@ -201,9 +207,9 @@ class ViewController: UIViewController {
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
     }
     
-    func reloadActionStrip(with options: [StripOptions]) {
-        if actionStrip != options {
-            actionStrip = options
+    func reloadActionStrip(with newStrip: ActionStripBundle) {
+        if strip.options != newStrip.options {
+            strip = newStrip
             tableView.reloadSections([0], with: .fade)
         }
     }
@@ -272,17 +278,18 @@ class ViewController: UIViewController {
         let entities = arView.entities(at: tapLocation)
         guard let entity = entities.first else { return }
         
-        if let placing = placings.first(where: { model, _, _, _ in entities.contains(where: {$0.id == model.id}) }) {
-            var options = ActionStrip.placing.options == actionStrip ? [] : ActionStrip.placing.options
-            selectedPlacing = placing
-            placings.forEach { model, _, type, accesory in
-                if let accesory = accesory, model.id == placing.model.id, let type = type {
+        if let tappedPlacing = placings.first(where: { model, _, _, _ in entities.contains(where: {$0.id == model.id}) }) {
+            var newStrip: ActionStripBundle = strip.action == .placing ? ActionStrip.none.options() :  ActionStrip.placing.options()
+            selectedPlacing = tappedPlacing
+            placings.forEach { model, _, towerId, accesory in
+                if let accesory = accesory, model.id == tappedPlacing.model.id,
+                    let towerId = towerId, let type = towers.first(where: { model, _, _ in model.id == towerId })?.type {
                     accesory.isEnabled.toggle()
-                    options = accesory.isEnabled ? ActionStrip.options(tower: type) : []
+                    newStrip = accesory.isEnabled ? ActionStrip.tower.options(for: type) : ActionStrip.none.options()
                     selectedPlacing = accesory.isEnabled ? selectedPlacing : nil
                 } else { accesory?.isEnabled = false }
             }
-            reloadActionStrip(with: options)
+            reloadActionStrip(with: newStrip)
         } else {
             for (index, glyph) in glyphModels.enumerated() {
                 if entity.id == glyph.model.id {
@@ -305,23 +312,23 @@ class ViewController: UIViewController {
                 let z = (Float(column) - columnDistance) * 0.1
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
-                let floor = neutralFloorTemplate.embeddedModel(at: [x, 0.005, z])
-                anchor.addChild(floor.model)
+//                let floor = neutralFloorTemplate.embeddedModel(at: [x, 0.005, z])
+//                anchor.addChild(floor.model)
                 switch mapType {
-                case .neutral:
-                    let chance = Int.random(in: 1...10)
-                    let rotation = Direction.baseMoves[Int.random(in: 0...3)].rotation()
-                    switch chance {
-                    case 7...8:
-                        let floor = neutralTankTemplate.embeddedModel(at: [x, 0.003, z])
-                        floor.model.transform.rotation = rotation
-                        anchor.addChild(floor.model)
-                    case 10:
-                        let floor = neutralBarrelTemplate.embeddedModel(at: [x, 0.003, z])
-                        floor.model.transform.rotation = rotation
-                        anchor.addChild(floor.model)
-                    default: break
-                    }
+                case .neutral: break
+//                    let chance = Int.random(in: 1...10)
+//                    let rotation = Direction.baseMoves[Int.random(in: 0...3)].rotation()
+//                    switch chance {
+//                    case 7...8:
+//                        let floor = neutralTankTemplate.embeddedModel(at: [x, 0.003, z])
+//                        floor.model.transform.rotation = rotation
+//                        anchor.addChild(floor.model)
+//                    case 10:
+//                        let floor = neutralBarrelTemplate.embeddedModel(at: [x, 0.003, z])
+//                        floor.model.transform.rotation = rotation
+//                        anchor.addChild(floor.model)
+//                    default: break
+//                    }
                 case .zipLineIn, .zipLineOut:
                     break
                 case .goal:
@@ -389,28 +396,29 @@ class ViewController: UIViewController {
             towerType.cost <= coins else { return }
         coins -= towerType.cost
         let placingIndex = placings.enumerated().first( where: { index, placing in placing.model.id == selectedPlacing.model.id })!.0
-        placings[placingIndex].type = towerType
+        let placingPosition = selectedPlacing.model.position
         let tower: EmbeddedModel = {
              switch towerType{
-            case .turret: return turretTemplate.embeddedModel(at: selectedPlacing.model.position)
-            case .rocketLauncher: return rocketLauncherTemplate.embeddedModel(at: selectedPlacing.model.position)
-            case .barracks: return barracksTemplate.embeddedModel(at: selectedPlacing.model.position)
+            case .turret: return turretLvl1Template.embeddedModel(at: placingPosition)
+            case .rocketLauncher: return rocketLauncherLvl1Template.embeddedModel(at: placingPosition)
+            case .barracks: return barracksTemplate.embeddedModel(at: placingPosition)
             }
         }()
+        placings[placingIndex].towerId = tower.model.id
         tower.model.position.y += 0.003
         anchor.addChild(tower.model)
         var priorityList = [UInt64]()
         towers.append((tower.model, towerType, priorityList))
-        reloadActionStrip(with: ActionStrip.options(tower: towerType))
+        reloadActionStrip(with: ActionStrip.tower.options(for: towerType))
         ///Tower range
         let diameter = 2.0 * gridDiameter * towerType.range * 0.1
         let range = rangeTemplate.clone(recursive: true)
         tower.model.addChild(range)
         let rangeBounds = range.visualBounds(relativeTo: anchor)
-        let scaleDiameter = diameter / rangeBounds.extents.x * 0.01
-        let scaleHeight = 0.03 / rangeBounds.extents.y * 0.01
-        range.setScale([scaleDiameter, scaleHeight, scaleDiameter], relativeTo: nil)
-        range.playAnimation(range.availableAnimations[0].repeat())
+        let rangeScale = diameter / rangeBounds.extents.x
+//        let scaleHeight = 0.03 / rangeBounds.extents.y
+        range.setScale([rangeScale, rangeScale, rangeScale], relativeTo: nil)
+//        range.playAnimation(range.availableAnimations[0].repeat())
         range.position.y += 0.04
         if towerType == .barracks { range.position.z += diameter }
         placings[placingIndex].accesory = range
@@ -433,7 +441,7 @@ class ViewController: UIViewController {
             guard let enemyID = priorityList.first, let creep = event.entityB as? ModelEntity, creep.id == enemyID else { return }
             switch towerType {
             case .turret:
-                let angle = atan2(event.position.z - tower.model.position.z, event.position.x - tower.model.position.x)
+                let angle = atan2(event.position.z - placingPosition.z, event.position.x - placingPosition.x)
                 let orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
 //                let orientation = simd_quatf(from: selectedPlacing.model.position, to: event.position)
                 tower.model.setOrientation(orientation, relativeTo: nil)
@@ -451,7 +459,7 @@ class ViewController: UIViewController {
                 _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                     guard priorityList.contains(creep.id) else { timer.invalidate() ; return }
                     guard let id = priorityList.first, id == creep.id else { return }
-                    let bullet = self.bulletTemplate.embeddedModel(at: selectedPlacing.model.position)
+                    let bullet = self.bulletTemplate.embeddedModel(at: placingPosition)
                     bullet.model.transform.translation.y += 0.015
                     anchor.addChild(bullet.model)
                     var bulletTransform = bullet.model.transform
@@ -469,7 +477,8 @@ class ViewController: UIViewController {
                                     creep.removeFromParent()
                                 }
                             }
-                        }))
+                        })
+                    )
                 }
             case .rocketLauncher: break
             case .barracks: break
@@ -550,16 +559,39 @@ extension ViewController: ARSessionDelegate {
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        insertTower(towerType: TowerType.allCases[indexPath.row])
+        switch strip.action {
+        case .none: break
+        case .map: break
+        case .placing:
+            insertTower(towerType: TowerType.allCases[indexPath.row])
+        case .tower:
+            guard let towerID = selectedPlacing?.towerId, let tower = towers.first(where: { model, _, _ in model.id == towerID}) else { break }
+            switch strip.options[indexPath.row] {
+            case .upgrade:
+                if tower.model.children.count > 1 {
+                    switch tower.type {
+                    case .turret:
+                        tower.model.children[0] = turretLvl2Template.clone(recursive: true)
+                    case .rocketLauncher:
+                        tower.model.children[0] = rocketLauncherLvl2Template.clone(recursive: true)
+                    case .barracks: break
+                    }
+                }
+            case .sell:
+                tower.model.removeFromParent()
+            default: break
+            }
+        }
     }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return actionStrip.count
+        return strip.options.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Action Strip Cell", for: indexPath)
         let imageView = cell.contentView.viewWithTag(10) as? UIImageView
-        imageView?.image = actionStrip[indexPath.row].iconImage
+        imageView?.image = strip.options[indexPath.row].iconImage
         imageView?.layer.cornerRadius = 30.0
         imageView?.layer.masksToBounds = true
         cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))

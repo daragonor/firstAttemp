@@ -15,9 +15,12 @@
 		1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB424290F9800C764C1 /* Assets.xcassets */; };
 		1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB624290F9800C764C1 /* LaunchScreen.storyboard */; };
 		19363E652489AFA900698A72 /* mech_drone.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E642489AFA800698A72 /* mech_drone.usdz */; };
-		196F25E02499DF350027CF3C /* rocket_launcher.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 196F25DF2499DF350027CF3C /* rocket_launcher.usdz */; };
+		195C803D249DA9FD0075C4B7 /* turret_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */; };
+		195C803F249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */; };
+		195C8041249DDB370075C4B7 /* circle_effect.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C8040249DDB370075C4B7 /* circle_effect.usdz */; };
+		196F25E02499DF350027CF3C /* rocket_launcher_lvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 196F25DF2499DF350027CF3C /* rocket_launcher_lvl2.usdz */; };
 		19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055B2498984F00C70054 /* hud_placing.usdz */; };
-		19A205602498993700C70054 /* hud.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055F2498993700C70054 /* hud.usdz */; };
+		19A205602498993700C70054 /* selectionRing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055F2498993700C70054 /* selectionRing.usdz */; };
 		19A205622498999700C70054 /* here.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205612498999700C70054 /* here.usdz */; };
 		19A205642498B4FF00C70054 /* gate.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205632498B4FE00C70054 /* gate.usdz */; };
 		19B366E82499D5E30009D62D /* barracks.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19B366E72499D5E30009D62D /* barracks.usdz */; };
@@ -26,7 +29,7 @@
 		19CA62C824545074007F9198 /* ViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */; };
 		19DEDFDC248E00810010AC79 /* creep_path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19DEDFDB248E00800010AC79 /* creep_path.usdz */; };
 		19E2F5562496D2DC00879050 /* spawn_port.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5552496D2DC00879050 /* spawn_port.usdz */; };
-		19E2F55A2496E5D400879050 /* turret.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5592496E5D400879050 /* turret.usdz */; };
+		19E2F55A2496E5D400879050 /* turret_lvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5592496E5D400879050 /* turret_lvl2.usdz */; };
 		19E2F5602496FA2700879050 /* creep_path_downwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */; };
 		19E2F5622496FC6300879050 /* bullet.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5612496FC6300879050 /* bullet.usdz */; };
 		19E2F5642496FFC000879050 /* creep_path_upwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */; };
@@ -48,9 +51,12 @@
 		1935BBB724290F9800C764C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1935BBB924290F9800C764C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		19363E642489AFA800698A72 /* mech_drone.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = mech_drone.usdz; sourceTree = "<group>"; };
-		196F25DF2499DF350027CF3C /* rocket_launcher.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher.usdz; sourceTree = "<group>"; };
+		195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl1.usdz; sourceTree = "<group>"; };
+		195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl1.usdz; sourceTree = "<group>"; };
+		195C8040249DDB370075C4B7 /* circle_effect.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = circle_effect.usdz; sourceTree = "<group>"; };
+		196F25DF2499DF350027CF3C /* rocket_launcher_lvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl2.usdz; sourceTree = "<group>"; };
 		19A2055B2498984F00C70054 /* hud_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud_placing.usdz; sourceTree = "<group>"; };
-		19A2055F2498993700C70054 /* hud.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud.usdz; sourceTree = "<group>"; };
+		19A2055F2498993700C70054 /* selectionRing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = selectionRing.usdz; sourceTree = "<group>"; };
 		19A205612498999700C70054 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
 		19A205632498B4FE00C70054 /* gate.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = gate.usdz; sourceTree = "<group>"; };
 		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
@@ -60,7 +66,7 @@
 		19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
 		19DEDFDB248E00800010AC79 /* creep_path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path.usdz; sourceTree = "<group>"; };
 		19E2F5552496D2DC00879050 /* spawn_port.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawn_port.usdz; sourceTree = "<group>"; };
-		19E2F5592496E5D400879050 /* turret.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret.usdz; sourceTree = "<group>"; };
+		19E2F5592496E5D400879050 /* turret_lvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl2.usdz; sourceTree = "<group>"; };
 		19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path_downwards.usdz; sourceTree = "<group>"; };
 		19E2F5612496FC6300879050 /* bullet.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = bullet.usdz; sourceTree = "<group>"; };
 		19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path_upwards.usdz; sourceTree = "<group>"; };
@@ -169,10 +175,13 @@
 		19E2F56C249758FB00879050 /* towers */ = {
 			isa = PBXGroup;
 			children = (
-				19A2055F2498993700C70054 /* hud.usdz */,
+				19A2055F2498993700C70054 /* selectionRing.usdz */,
+				195C8040249DDB370075C4B7 /* circle_effect.usdz */,
 				19E2F5612496FC6300879050 /* bullet.usdz */,
-				19E2F5592496E5D400879050 /* turret.usdz */,
-				196F25DF2499DF350027CF3C /* rocket_launcher.usdz */,
+				19E2F5592496E5D400879050 /* turret_lvl2.usdz */,
+				195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */,
+				196F25DF2499DF350027CF3C /* rocket_launcher_lvl2.usdz */,
+				195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */,
 				19B366E72499D5E30009D62D /* barracks.usdz */,
 				19B61AFE2494B35E00980B59 /* tower_placing.usdz */,
 			);
@@ -272,16 +281,19 @@
 				19B61AFF2494B35E00980B59 /* tower_placing.usdz in Resources */,
 				19E2F5682497463600879050 /* neutral_tank.usdz in Resources */,
 				19E2F5622496FC6300879050 /* bullet.usdz in Resources */,
-				196F25E02499DF350027CF3C /* rocket_launcher.usdz in Resources */,
+				196F25E02499DF350027CF3C /* rocket_launcher_lvl2.usdz in Resources */,
 				1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */,
+				195C803F249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz in Resources */,
+				195C803D249DA9FD0075C4B7 /* turret_lvl1.usdz in Resources */,
 				1935BBB324290F9500C764C1 /* Main.storyboard in Resources */,
+				195C8041249DDB370075C4B7 /* circle_effect.usdz in Resources */,
 				19E2F5642496FFC000879050 /* creep_path_upwards.usdz in Resources */,
 				19A205642498B4FF00C70054 /* gate.usdz in Resources */,
-				19E2F55A2496E5D400879050 /* turret.usdz in Resources */,
+				19E2F55A2496E5D400879050 /* turret_lvl2.usdz in Resources */,
 				19DEDFDC248E00810010AC79 /* creep_path.usdz in Resources */,
 				19A205622498999700C70054 /* here.usdz in Resources */,
 				19E2F56B249746A700879050 /* neutral_barrel.usdz in Resources */,
-				19A205602498993700C70054 /* hud.usdz in Resources */,
+				19A205602498993700C70054 /* selectionRing.usdz in Resources */,
 				19B366E82499D5E30009D62D /* barracks.usdz in Resources */,
 				19E2F566249741C800879050 /* neutral_floor_1x1.usdz in Resources */,
 				19E2F5602496FA2700879050 /* creep_path_downwards.usdz in Resources */,
