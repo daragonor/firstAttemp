@@ -77,8 +77,8 @@ enum TowerType: CaseIterable {
             }
         case .lvl2:
             switch self {
-            case .turret: return 0.75
-            case .rocketLauncher: return 1.75
+            case .turret: return 0.2
+            case .rocketLauncher: return 0.2
             case .barracks: return 2.5
             }
         }

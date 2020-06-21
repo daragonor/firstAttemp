@@ -17,6 +17,7 @@ typealias EmbeddedModel = (model: ModelEntity, entity: Entity)
 class ViewController: UIViewController {
     enum StripOptions {
         case upgrade, sell, turret, rocketlauncher, barracks, moveRight, moveLeft, rotateRight, rotateLeft
+
         var iconImage: UIImage {
             switch self {
             case .upgrade: return #imageLiteral(resourceName: "upgrade")
@@ -75,7 +76,7 @@ class ViewController: UIViewController {
     var sessionIDObservation: NSKeyValueObservation?
     
     let gridDiameter: Float = 0.5
-    var coins = 600
+    var coins = 2000
     var level = 0
     var subscriptions: [Cancellable] = []
     var usedMaps = 0
@@ -277,19 +278,23 @@ class ViewController: UIViewController {
         let tapLocation = sender.location(in: arView)
         let entities = arView.entities(at: tapLocation)
         guard let entity = entities.first else { return }
-        
         if let tappedPlacing = placings.first(where: { model, _, _ in entities.contains(where: {$0.id == model.id}) }) {
-            var newStrip: ActionStripBundle = strip.action == .placing ? ActionStrip.none.options() :  ActionStrip.placing.options()
-            selectedPlacing = tappedPlacing
-            placings.forEach { model, _, towerId in
-                guard let towerId = towerId, let tower = towers.first(where: { $0.model.id == towerId }) else { return }
-                if model.id == tappedPlacing.model.id {
-                    tower.accesory.isEnabled.toggle()
-                    newStrip = tower.accesory.isEnabled ? ActionStrip.tower.options(for: tower.type) : ActionStrip.none.options()
-                    selectedPlacing = tower.accesory.isEnabled ? selectedPlacing : nil
-                } else { tower.accesory.isEnabled = false }
+            
+            if tappedPlacing.model.id == selectedPlacing?.model.id {
+                selectedPlacing = nil
+                towers.forEach { $0.accesory.isEnabled = false }
+                reloadActionStrip(with: ActionStrip.none.options())
+            } else {
+                selectedPlacing = tappedPlacing
+                towers.forEach { $0.accesory.isEnabled = false }
+                if let tappedTowerId = tappedPlacing.towerId {
+                    guard let towerBundle = towers.first(where: { $0.model.id == tappedTowerId }) else { return }
+                    towerBundle.accesory.isEnabled = true
+                    reloadActionStrip(with: ActionStrip.tower.options(for: towerBundle.type))
+                } else {
+                    reloadActionStrip(with: ActionStrip.placing.options())
+                }
             }
-            reloadActionStrip(with: newStrip)
         } else {
             for (index, glyph) in glyphModels.enumerated() {
                 if entity.id == glyph.model.id {
@@ -391,10 +396,9 @@ class ViewController: UIViewController {
     }
     
     func insertTower(towerType: TowerType, lvl: TowerLevel) {
-        guard var placing = selectedPlacing, let anchor = placing.model.anchor as? AnchorEntity else { return }
+        guard let placingPosition = selectedPlacing?.model.position, let anchor = selectedPlacing?.model.anchor as? AnchorEntity else { return }
+        
         coins -= towerType.cost(lvl: lvl)
-        let placingIndex = placings.enumerated().first( where: { index, placing in placing.model.id == placing.model.id })!.0
-        let placingPosition = placing.model.position
         let tower: EmbeddedModel = {
             switch lvl {
             case .lvl1:
@@ -411,8 +415,12 @@ class ViewController: UIViewController {
                 }
             }
         }()
-        placings[placingIndex].towerId = tower.model.id
-        selectedPlacing?.towerId = tower.model.id
+        placings.enumerated().forEach { index, placing in
+            if placing.model.id == selectedPlacing?.model.id {
+                placings[index].towerId = tower.model.id
+                selectedPlacing?.towerId = tower.model.id
+            }
+        }
         tower.model.position.y += 0.003
         anchor.addChild(tower.model)
         var priorityList = [UInt64]()
@@ -473,8 +481,8 @@ class ViewController: UIViewController {
                         bullet.model.transform.translation.y += 0.015
                         anchor.addChild(bullet.model)
                         var bulletTransform = bullet.model.transform
-                        bulletTransform.translation = creep.transformMatrix(relativeTo: anchor).toTranslation()
-                        let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.4, timingFunction: .easeOut)
+                        bulletTransform.translation = creep.position
+                        let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.3, timingFunction: .linear)
                         self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                             .filter { $0.playbackController == animation }
                             .sink(receiveValue: { event in
@@ -603,9 +611,21 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Action Strip Cell", for: indexPath)
         let imageView = cell.contentView.viewWithTag(10) as? UIImageView
-        imageView?.image = strip.options[indexPath.row].iconImage
-        imageView?.layer.cornerRadius = 30.0
-        imageView?.layer.masksToBounds = true
+        let label = cell.contentView.viewWithTag(11) as? UILabel
+        let option = strip.options[indexPath.row]
+        imageView?.image = option.iconImage
+//        label?.text = {
+//            switch strip.options[indexPath.row] {
+//            case .upgrade: return selectedPlacing?
+//            case .sell: return text
+//            case .turret: return text
+//            case .rocketlauncher: return text
+//            case .barracks: return text
+//            case .moveRight, .moveLeft, .rotateRight, .rotateLeft: return nil
+//            }
+//        }()
+        cell.contentView.layer.cornerRadius = 30.0
+        cell.contentView.layer.masksToBounds = true
         cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
         return cell
     }
