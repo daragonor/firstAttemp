@@ -15,23 +15,57 @@ import Combine
 typealias EmbeddedModel = (model: ModelEntity, entity: Entity)
 
 class ViewController: UIViewController {
-    let towerTemplate = try! Entity.load(named: "turret_gun")
-
-    enum TowerType: CaseIterable {
-        case turret, rocket, fighters
+    enum StripOptions {
+        case upgrade, sell, turret, rocketlauncher, barracks, moveRight, moveLeft, rotateRight, rotateLeft
+        var iconImage: UIImage {
+            switch self {
+            case .upgrade: return #imageLiteral(resourceName: "upgrade")
+            case .sell: return #imageLiteral(resourceName: "coins")
+            case .turret: return #imageLiteral(resourceName: "turret")
+            case .rocketlauncher: return #imageLiteral(resourceName: "missile-swarm")
+            case .barracks: return #imageLiteral(resourceName: "cryo-chamber")
+            case .moveRight: return #imageLiteral(resourceName: "plain-arrow-roght")
+            case .moveLeft: return #imageLiteral(resourceName: "plain-arrow-left")
+            case .rotateRight: return #imageLiteral(resourceName: "clockwise-rotation")
+            case .rotateLeft: return #imageLiteral(resourceName: "anticlockwise-rotation")
+            }
+        }
     }
-    enum TowerStates: CaseIterable {
-        case empty, phase1, phase2
+    enum ActionStrip {
+        case none, placing, map, tower
+        func options(for type: Any? = nil) -> ActionStripBundle {
+            var options = [StripOptions]()
+            switch self {
+            case .map: options = [.rotateLeft, .rotateRight]
+            case .placing: options = [.turret, .rocketlauncher, .barracks]
+            case .tower:
+                guard let tower = type as? TowerType else { options = []; break}
+                switch tower {
+                case .turret, .rocketLauncher: options = [.upgrade, .sell]
+                case .barracks: options = [.upgrade, .sell, .moveLeft, .moveRight]
+                }
+            case .none: options = []
+            }
+            return (self, options)
+        }
     }
     
-    typealias SpawnPlace = (entity: Entity, position: Position, map: Int)
+    enum Filter {
+        case placings, towers, creeps
+        var group: CollisionGroup {
+            switch self {
+            case .placings: return CollisionGroup.init(rawValue: 0)
+            case .towers: return CollisionGroup.init(rawValue: 1)
+            case .creeps: return CollisionGroup.init(rawValue: 2)
+            }
+        }
+    }
+    
     @IBOutlet var arView: ARView!
     
     @IBOutlet weak var coinsLabel: UILabel!
     @IBOutlet weak var lifePointsStack: UIStackView!
-    @IBOutlet weak var collectionView: UICollectionView!
-    
-    var defensors = Defensor.getDefensors()
+    @IBOutlet weak var tableView: UITableView!
     
     var config: ARWorldTrackingConfiguration!
     
@@ -41,7 +75,7 @@ class ViewController: UIViewController {
     var sessionIDObservation: NSKeyValueObservation?
     
     let gridDiameter: Float = 0.5
-    var coins = 150
+    var coins = 600
     var level = 0
     var subscriptions: [Cancellable] = []
     var usedMaps = 0
@@ -50,30 +84,49 @@ class ViewController: UIViewController {
         return usedMaps == gameConfig.levels[level].maps.count
     }
     
-    var spawnPlaces = [SpawnPlace]()
+    typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
+    typealias PlacingBundle = (model: ModelEntity, position: Position, towerId: UInt64?)
+    typealias TowerBundle = (model: ModelEntity, type: TowerType, lvl: TowerLevel, accesory: Entity, enemiesIds: [UInt64])
+    typealias CreepBundle = (id: UInt64, type: CreepType, hp: Int)
+    typealias ActionStripBundle = (action: ActionStrip, options: [StripOptions])
+    var spawnPlaces = [SpawnBundle]()
     var glyphModels = [(model: ModelEntity, canShow: Int?)]()
-    var terrainAnchors = [AnchorEntity]()
-    var creepIDs = [UInt64]()
-    var selectedPlacing: Entity?
-    var placings = [(EmbeddedModel,TowerStates)]()
+    var creeps = [CreepBundle]()
+    var placings = [PlacingBundle]()
+    var towers = [TowerBundle]()
     
+    var selectedPlacing: PlacingBundle?
+    var strip: ActionStripBundle = (.none, [])
+    var terrainAnchors = [AnchorEntity]()
+
     lazy var gameConfig: GameModel = {
         let filePath = Bundle.main.path(forResource: "config", ofType: "json")!
         let data = try! NSData(contentsOfFile: filePath) as Data
         return try! JSONDecoder().decode(GameModel.self, from: data)
     }()
-
+    
     let pathTemplate = try! Entity.load(named: "creep_path")
     let pathDownwardsTemplate = try! Entity.load(named: "creep_path_downwards")
     let pathUpwardsTemplate = try! Entity.load(named: "creep_path_upwards")
+    let turretLvl1Template = try! Entity.load(named: "turret_lvl1")
+    let turretLvl2Template = try! Entity.load(named: "turret_lvl2")
+    let rocketLauncherLvl1Template = try! Entity.load(named: "rocket_launcher_lvl1")
+    let rocketLauncherLvl2Template = try! Entity.load(named: "rocket_launcher_lvl2")
+    let barracksTemplate = try! Entity.load(named: "barracks")
 
     let placingTemplate = try! Entity.load(named: "tower_placing")
     let creepTemplate = try! Entity.load(named: "mech_drone")
+
     let lifeCreepTemplate = try! Entity.load(named: "lifebar")
-    let runeTemplate = try! Entity.load(named: "placing_glyph")
-    let portalTemplate = try! Entity.load(named: "map_icon")
-    let spawnTemplate = try! Entity.load(named: "spawn_station")
-    
+
+    let runeTemplate = try! Entity.load(named: "here")
+    let portalTemplate = try! Entity.load(named: "gate")
+    let spawnTemplate = try! Entity.load(named: "spawn_port")
+    let bulletTemplate = try! Entity.load(named: "bullet")
+//    let neutralFloorTemplate = try! Entity.load(named: "neutral_floor_1x1")
+//    let neutralTankTemplate = try! Entity.load(named: "neutral_tank")
+//    let neutralBarrelTemplate = try! Entity.load(named: "neutral_barrel")
+    let rangeTemplate = try! Entity.load(named: "circle_effect")
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
@@ -81,7 +134,7 @@ class ViewController: UIViewController {
         loadAnchorTemplates()
         loadActionStrip()
         configureMultipeer()
-
+        
         coinsLabel.text = "\(coins)"
         coinsTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             self.coins += 5
@@ -98,19 +151,18 @@ class ViewController: UIViewController {
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
-        layout.scrollDirection = .horizontal
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.isHidden = true
-        collectionView.collectionViewLayout = layout
-        collectionView.showsHorizontalScrollIndicator = false
+        layout.scrollDirection = .vertical
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.transform = CGAffineTransform(rotationAngle: -(CGFloat)(Double.pi))
+        tableView.showsVerticalScrollIndicator = false
     }
     func loadAnchorConfiguration() {
         config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal, .vertical]
         config.isCollaborationEnabled = true
         config.environmentTexturing = .automatic
-//        arView.debugOptions = [.showPhysics]
+        arView.renderOptions.insert(.disableMotionBlur)
         arView.automaticallyConfigureSession = false
         arView.session.delegate = self
         arView.session.run(config)
@@ -121,22 +173,32 @@ class ViewController: UIViewController {
         ///Tower Placing
         placingTemplate.setScale(SIMD3(repeating: 0.025), relativeTo: nil)
         ///Runes
-        runeTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
-        ///Towers
-        towerTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
-        ///Creeps
-        //0.00001
-        creepTemplate.setScale(SIMD3(repeating: 0.000015), relativeTo: nil)
+        runeTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+
         //lifeBar
         lifeCreepTemplate.setScale(SIMD3(repeating: 0.000115), relativeTo: nil)
+        turretLvl1Template.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
+        turretLvl2Template.setScale(SIMD3(repeating: 0.00017), relativeTo: nil)
+        rocketLauncherLvl1Template.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
+        rocketLauncherLvl2Template.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+        barracksTemplate.setScale(SIMD3(repeating: 0.0001), relativeTo: nil)
+        ///Creep
+        creepTemplate.setScale(SIMD3(repeating: 0.00001), relativeTo: nil)
         ///Path
         pathTemplate.setScale(SIMD3(repeating: 0.000027), relativeTo: nil)
         pathUpwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
-        pathDownwardsTemplate.setScale(SIMD3(repeating: 0.0125), relativeTo: nil)
+        pathDownwardsTemplate.setScale(SIMD3(repeating: 0.125), relativeTo: nil)
+        ///Neutral
+//        neutralFloorTemplate.setScale(SIMD3(repeating: 0.1), relativeTo: nil)
+//        neutralTankTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
+//        neutralBarrelTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
         ///Goal
-        portalTemplate.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
+        portalTemplate.setScale(SIMD3(repeating: 0.0006), relativeTo: nil)
         ///Spawn
-        spawnTemplate.setScale(SIMD3(repeating: 0.00007), relativeTo: nil)
+        spawnTemplate.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
+        ///Bullet
+        bulletTemplate.setScale(SIMD3(repeating: 0.002), relativeTo: nil)
+        ///Range
     }
     
     func configureMultipeer() {
@@ -150,6 +212,13 @@ class ViewController: UIViewController {
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
     }
     
+    func reloadActionStrip(with newStrip: ActionStripBundle) {
+        if strip.options != newStrip.options {
+            strip = newStrip
+            tableView.reloadSections([0], with: .fade)
+        }
+    }
+    
     @IBAction func onStart(_ sender: Any) {
         guard canStart else { return }
         glyphModels.forEach { glyph in glyph.model.removeFromParent() }
@@ -157,44 +226,48 @@ class ViewController: UIViewController {
             let map = gameConfig.levels[level].maps[spawn.map]
             let paths = map.creepPathsCoordinates(at: spawn.position,diameter: gridDiameter, aditionalRotationOffset: .pi)
             var counter = 0
-            var spawnPosition =  spawn.entity.transform.translation
-            _ = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
-                guard counter < 5 else { timer.invalidate() ; return }
+            var spawnPosition =  spawn.model.transform.translation
+            _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                guard counter < 3 else { timer.invalidate() ; return }
                 counter += 1
                 spawnPosition.y = 0.03
-                let creep = self.creepTemplate.modelEmbedded(at: spawnPosition, debugInfo: true)
+
+                let creep = self.creepTemplate.embeddedModel(at: spawnPosition)
                 var lifeCreepPosition = spawnPosition
                 lifeCreepPosition.y = 0.13
-                let lifeCreep = self.lifeCreepTemplate.modelEmbedded(at: lifeCreepPosition, debugInfo: true)
-                spawnPosition.y = 0.03
-                self.creepIDs.append(creep.model.id)
-                spawn.entity.anchor?.addChild(creep.model)
-                spawn.entity.anchor?.addChild(lifeCreep.model)
-                creep.model.generateCollisionShapes(recursive: true)
-//                let bounds = creep.entity.visualBounds(relativeTo: creep.model)
-//                creep.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
+                let lifeCreep = self.lifeCreepTemplate.embeddedModel(at: lifeCreepPosition)
+                let creepType = CreepType.common
+                self.creeps.append((creep.model.id, creepType, creepType.lifepoints))
+                let bounds = creep.entity.visualBounds(relativeTo: creep.model)
+                creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
+                spawn.model.anchor?.addChild(creep.model)
+                spawn.model.anchor?.addChild(lifeCreep.model)
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 if lifeCreep.entity.availableAnimations.count > 0 {
                     lifeCreep.entity.playAnimation(lifeCreep.entity.availableAnimations[0].repeat())
                 }
                 let randomPathIndx = Int.random(in: 0..<paths.count)
-                self.deployUnit(creep, on: paths[randomPathIndx], setScale: 0.00015)
+
                 self.deployUnit(lifeCreep, on: paths[randomPathIndx], setScale: 0.00015)
+                self.deployUnit(creep, on: paths[Int.random(in: 0..<paths.count)], setScale: 10)
             }
         }
     }
     
     func deployUnit(_ creep: EmbeddedModel, to index: Int = 0, on path: [OrientedCoordinate], baseHeight: Float? = nil, setScale: Float? = nil) {
-        var transform = creep.entity.transform
+        
+        var unitTransform = creep.model.transform
         if index < path.count {
             let move = path[index]
-            let height = baseHeight ?? transform.translation.y
-            transform.translation = move.coordinate
-            transform.translation.y += height
-            transform.rotation = move.rotation
-            if let scale = setScale { transform.scale = SIMD3(repeating: scale) }
-            let animation = creep.entity.move(to: transform, relativeTo: creep.entity.anchor, duration: 1, timingFunction: .linear)
-            ///arView.scene.subscribe(to:on:completion:)
+            ///Set new move
+            let height = baseHeight ?? unitTransform.translation.y
+            unitTransform.translation = move.coordinate
+            unitTransform.translation.y += height
+            unitTransform.rotation = move.rotation
+            if let scale = setScale { unitTransform.scale = SIMD3(repeating: scale) }
+            ///Start moving
+            let animation = creep.model.move(to: unitTransform, relativeTo: creep.model.anchor, duration: 2, timingFunction: .linear)
+            //arView.scene.subscribe(to:on:completion:)
             subscriptions.append(arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                 .filter { $0.playbackController == animation }
                 .sink(receiveValue: { event in
@@ -218,12 +291,21 @@ class ViewController: UIViewController {
     
     @objc func onTap(_ sender: UITapGestureRecognizer) {
         let tapLocation = sender.location(in: arView)
-        guard let entity = arView.entity(at: tapLocation),
-            let anchor = entity.anchor as? AnchorEntity else { return }
+        let entities = arView.entities(at: tapLocation)
+        guard let entity = entities.first else { return }
         
-        if anchor.name == "TerrainAnchorEntity" {
-            collectionView.isHidden = false
-            selectedPlacing = entity
+        if let tappedPlacing = placings.first(where: { model, _, _ in entities.contains(where: {$0.id == model.id}) }) {
+            var newStrip: ActionStripBundle = strip.action == .placing ? ActionStrip.none.options() :  ActionStrip.placing.options()
+            selectedPlacing = tappedPlacing
+            placings.forEach { model, _, towerId in
+                guard let towerId = towerId, let tower = towers.first(where: { $0.model.id == towerId }) else { return }
+                if model.id == tappedPlacing.model.id {
+                    tower.accesory.isEnabled.toggle()
+                    newStrip = tower.accesory.isEnabled ? ActionStrip.tower.options(for: tower.type) : ActionStrip.none.options()
+                    selectedPlacing = tower.accesory.isEnabled ? selectedPlacing : nil
+                } else { tower.accesory.isEnabled = false }
+            }
+            reloadActionStrip(with: newStrip)
         } else {
             for (index, glyph) in glyphModels.enumerated() {
                 if entity.id == glyph.model.id {
@@ -246,93 +328,187 @@ class ViewController: UIViewController {
                 let z = (Float(column) - columnDistance) * 0.1
                 let mapCode = map.matrix[row][column]
                 let mapType = MapLegend.allCases[mapCode]
+//                let floor = neutralFloorTemplate.embeddedModel(at: [x, 0.005, z])
+//                anchor.addChild(floor.model)
                 switch mapType {
-                case .zipLineIn, .zipLineOut, .neutral:
+                case .neutral: break
+//                    let chance = Int.random(in: 1...10)
+//                    let rotation = Direction.baseMoves[Int.random(in: 0...3)].rotation()
+//                    switch chance {
+//                    case 7...8:
+//                        let floor = neutralTankTemplate.embeddedModel(at: [x, 0.003, z])
+//                        floor.model.transform.rotation = rotation
+//                        anchor.addChild(floor.model)
+//                    case 10:
+//                        let floor = neutralBarrelTemplate.embeddedModel(at: [x, 0.003, z])
+//                        floor.model.transform.rotation = rotation
+//                        anchor.addChild(floor.model)
+//                    default: break
+//                    }
+                case .zipLineIn, .zipLineOut:
                     break
                 case .goal:
-                    let portal = portalTemplate.modelEmbedded(at: [x, 0.05, z])
-                    portal.entity.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 1, 0])
+                    let portal = portalTemplate.embeddedModel(at: [x, 0.03, z])
                     anchor.addChild(portal.model)
-                    portal.entity.playAnimation(portal.entity.availableAnimations.first!.repeat())
+                    portal.model.orientation = Direction.right.rotation()
+                    portal.entity.playAnimation(portal.entity.availableAnimations[0].repeat())
+                    fallthrough
                 case .lowerPath:
-                    var floor: (model: ModelEntity, entity: Entity) {
+                    var floor: EmbeddedModel {
                         for direction in Direction.allCases {
                             let (nextRow, nextColumn) = (row + direction.offset.row, column + direction.offset.column)
                             if nextRow >= 0 && nextRow < rows,
                                 nextColumn >= 0 && nextColumn < columns {
                                 if  MapLegend.allCases[map.matrix[nextRow][nextColumn]] == .higherPath {
-                                    let floor = pathUpwardsTemplate.modelEmbedded(at: [x, 0.001, z])
-                                    floor.entity.transform.rotation = simd_quatf(angle: direction.baseRotation, axis: [0, 1, 0])
+                                    let floor = pathUpwardsTemplate.embeddedModel(at: [x, 0.001, z])
+                                    floor.entity.transform.rotation = simd_quatf(angle: direction.angle, axis: [0, 1, 0])
                                     return floor
                                 }
                             }
                         }
-                        return pathTemplate.modelEmbedded(at: [x, 0.001, z])
+                        return pathTemplate.embeddedModel(at: [x, 0.001, z])
                     }
                     anchor.addChild(floor.model)
                 case .higherPath:
-                    var floor: (model: ModelEntity, entity: Entity) {
-                        for direction in Direction.allCases {
+                    var floor: EmbeddedModel {
+                        for direction in Direction.baseMoves {
                             let (nextRow, nextColumn) = (row + direction.offset.row, column + direction.offset.column)
                             if nextRow >= 0 && nextRow < rows,
                                 nextColumn >= 0 && nextColumn < columns {
                                 if  MapLegend.allCases[map.matrix[nextRow][nextColumn]] == .lowerPath {
-                                    let floor = pathDownwardsTemplate.modelEmbedded(at: [x, 0.101, z])
-                                    floor.entity.transform.rotation = simd_quatf(angle: direction.baseRotation + .pi, axis: [0, 1, 0])
+                                    let floor = pathDownwardsTemplate.embeddedModel(at: [x, 0.1, z])
+                                    floor.entity.transform.rotation = simd_quatf(angle: direction.angle + .pi, axis: [0, 1, 0])
                                     return floor
                                 }
                             }
                         }
-                        return pathTemplate.modelEmbedded(at: [x, 0.101, z])
+                        return pathTemplate.embeddedModel(at: [x, 0.1, z])
                     }
                     anchor.addChild(floor.model)
-                case .lowerTower:
-                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.003, z], debugInfo: true)
-                    towerPlacing.model.generateCollisionShapes(recursive: true)
-                    placings.append((towerPlacing, .empty))
-                    anchor.addChild(towerPlacing.model)
-                case .higherTower:
-                    let towerPlacing = placingTemplate.modelEmbedded(at: [x, 0.103, z], debugInfo: true)
-                    towerPlacing.model.generateCollisionShapes(recursive: true)
-                    placings.append((towerPlacing, .empty))
-                    anchor.addChild(towerPlacing.model)
+                case .lowerPlacing:
+                    let placing = placingTemplate.embeddedModel(at: [x, 0.005, z])
+                    let bounds = placing.entity.visualBounds(relativeTo: placing.model)
+                    placing.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
+                    anchor.addChild(placing.model)
+                    placings.append((placing.model, (row,column), nil))
+                case .higherPlacing:
+                    let placing = placingTemplate.embeddedModel(at: [x, 0.102, z])
+                    let bounds = placing.entity.visualBounds(relativeTo: placing.model)
+                    placing.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
+                    anchor.addChild(placing.model)
+                    placings.append((placing.model, (row,column), nil))
                 case .spawn:
-                    let station = spawnTemplate.modelEmbedded(at: [x, 0.001, z])
-                    spawnPlaces.append((station.entity, (row, column), usedMaps))
+                    let station = spawnTemplate.embeddedModel(at: [x, 0.001, z])
+                    spawnPlaces.append((station.model, (row, column), usedMaps))
                     anchor.addChild(station.model)
                 }
             }
         }
     }
-
-    func insertTower(template: Entity, range: Float, cost: Int) {
-        guard let referenceEntity = selectedPlacing,
-            let anchor = referenceEntity.anchor as? AnchorEntity,
-            cost <= coins else { return }
-        coins -= cost
-        let position = referenceEntity.transformMatrix(relativeTo: anchor).toTranslation()
-        let model = ModelEntity()
-        let tower = template.clone(recursive: true)
-        model.addChild(tower)
-        tower.position = SIMD3(x: position.x, y: position.y + 0.003, z: position.z)
-        anchor.addChild(model)
+    
+    func insertTower(towerType: TowerType, lvl: TowerLevel) {
+        guard var placing = selectedPlacing, let anchor = placing.model.anchor as? AnchorEntity else { return }
+        coins -= towerType.cost(lvl: lvl)
+        let placingIndex = placings.enumerated().first( where: { index, placing in placing.model.id == placing.model.id })!.0
+        let placingPosition = placing.model.position
+        let tower: EmbeddedModel = {
+            switch lvl {
+            case .lvl1:
+                switch towerType{
+                case .turret: return turretLvl1Template.embeddedModel(at: placingPosition)
+                case .rocketLauncher: return rocketLauncherLvl1Template.embeddedModel(at: placingPosition)
+                case .barracks: return barracksTemplate.embeddedModel(at: placingPosition)
+                }
+            case .lvl2:
+                switch towerType{
+                case .turret: return turretLvl2Template.embeddedModel(at: placingPosition)
+                case .rocketLauncher: return rocketLauncherLvl2Template.embeddedModel(at: placingPosition)
+                case .barracks: return barracksTemplate.embeddedModel(at: placingPosition)
+                }
+            }
+        }()
+        placings[placingIndex].towerId = tower.model.id
+        selectedPlacing?.towerId = tower.model.id
+        tower.model.position.y += 0.003
+        anchor.addChild(tower.model)
+        var priorityList = [UInt64]()
+        reloadActionStrip(with: ActionStrip.tower.options(for: towerType))
         ///Tower range
-        let box = MeshResource.generatePlane(width: range, depth: range, cornerRadius: range/2)
-        let material = SimpleMaterial(color: UIColor.red.withAlphaComponent(0.2), isMetallic: true)
-        let rangeModel = ModelEntity(mesh: box, materials: [material])
-        anchor.addChild(rangeModel)
-        rangeModel.generateCollisionShapes(recursive: true)
-        rangeModel.position = tower.position
-        rangeModel.position.y += 0.05
-        ///Tower collision
-//        let bounds = rangeEntity.visualBounds(relativeTo: model)
-//        tower.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)]))
-//        tower.playAnimation(tower.availableAnimations[0].repeat())
-        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: rangeModel) {
+        let diameter = 2.0 * gridDiameter * towerType.range * 0.1
+        let rangeAccessory = rangeTemplate.clone(recursive: true)
+        tower.model.addChild(rangeAccessory)
+        let rangeBounds = rangeAccessory.visualBounds(relativeTo: anchor)
+        let rangeScale = diameter / rangeBounds.extents.x
+//        let scaleHeight = 0.03 / rangeBounds.extents.y
+        rangeAccessory.setScale([rangeScale, rangeScale, rangeScale], relativeTo: nil)
+//        range.playAnimation(range.availableAnimations[0].repeat())
+        rangeAccessory.position.y += 0.04
+        if towerType == .barracks { rangeAccessory.position.z += diameter }
+        towers.append((tower.model, towerType, .lvl1, rangeAccessory, priorityList))
+        ///Set range
+        tower.model.components.set(CollisionComponent(shapes: [ShapeResource.generateBox(width: diameter, height: 0.02, depth: diameter).offsetBy(translation: SIMD3<Float>(0, 0.02, 0))], mode: .trigger, filter: CollisionFilter.init(group: Filter.towers.group, mask: Filter.creeps.group)))
+        
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Ended.self, on: tower.model) {
             event in
-//            let range = event.entityA
-//            let object = event.entityB
-                tower.playAnimation(tower.availableAnimations[0].repeat())
+            guard let creep = event.entityB as? ModelEntity else { return }
+            switch towerType {
+            case .turret:
+                priorityList.removeAll(where: { id in id == creep.id })
+            case .rocketLauncher: break
+            case .barracks: break
+            }
+        })
+        
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Updated.self, on: tower.model) {
+            event in
+            guard let enemyID = priorityList.first, let creep = event.entityB as? ModelEntity, creep.id == enemyID else { return }
+            switch towerType {
+            case .turret:
+                let angle = atan2(event.position.z - placingPosition.z, event.position.x - placingPosition.x)
+                let orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
+//                let orientation = simd_quatf(from: selectedPlacing.model.position, to: event.position)
+                tower.model.setOrientation(orientation, relativeTo: anchor)
+            case .rocketLauncher: break
+            case .barracks: break
+            }
+        })
+        
+        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower.model) {
+            event in
+            guard let tower = event.entityA as? ModelEntity, let creep = event.entityB as? ModelEntity else { return }
+            guard let towerBundleIndex = self.towers.firstIndex(where: { $0.model.id == event.entityA.id }) else { return }
+            switch towerType {
+            case .turret, .rocketLauncher:
+                self.towers[towerBundleIndex].enemiesIds.append(creep.id)
+                _ = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: lvl)), repeats: true) { timer in
+                    guard self.towers.contains(where: { $0.model.id == tower.id }), self.towers[towerBundleIndex].enemiesIds.contains(creep.id) else { timer.invalidate() ; return }
+                    let capacity = min(self.towers[towerBundleIndex].enemiesIds.count, towerType.capacity(lvl: lvl))
+                    self.towers[towerBundleIndex].enemiesIds[0..<capacity].forEach { id in
+                        guard id == creep.id else { return }
+                        let bullet = self.bulletTemplate.embeddedModel(at: placingPosition)
+                        bullet.model.transform.translation.y += 0.015
+                        anchor.addChild(bullet.model)
+                        var bulletTransform = bullet.model.transform
+                        bulletTransform.translation = creep.transformMatrix(relativeTo: anchor).toTranslation()
+                        let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.4, timingFunction: .easeOut)
+                        self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+                            .filter { $0.playbackController == animation }
+                            .sink(receiveValue: { event in
+                                bullet.model.removeFromParent()
+                                if let index = self.creeps.firstIndex(where: {$0.id == creep.id}) {
+                                    self.creeps[index].hp -= towerType.attack(lvl: lvl)
+                                    //Add lifebar reduction here
+                                    if self.creeps[index].hp < 0 {
+                                        self.towers[towerBundleIndex].enemiesIds.removeAll(where: { id in id == creep.id })
+                                        creep.removeFromParent()
+                                    }
+                                }
+                            })
+                        )
+                    }
+                }
+            case .barracks: break
+            }
         })
     }
 }
@@ -374,8 +550,7 @@ extension ViewController: ARSessionDelegate {
     }
     func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
         for anchor in anchors {
-            //            guard let planeAnchor = anchor as? ARPlaneAnchor,
-            //                var planeEntity = planeEntities[planeAnchor.identifier]?.entity else { continue }
+
             if anchor.name == "Terrain" {
                 
             }
@@ -407,41 +582,47 @@ extension ViewController: ARSessionDelegate {
         }
     }
 }
-extension ViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        switch TowerType.allCases[indexPath.row] {
-        case .turret: insertTower(template: towerTemplate, range: 0.25, cost: 50)
-        case .rocket: insertTower(template: portalTemplate, range: 0.3, cost: 100)
-        case .fighters: insertTower(template: creepTemplate, range: 0.1, cost: 150)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch strip.action {
+        case .none: break
+        case .map: break
+        case .placing:
+            let towerType = TowerType.allCases[indexPath.row]
+            if towerType.cost(lvl: .lvl1) <= coins {
+                insertTower(towerType: towerType, lvl: .lvl1)
+            }
+        case .tower:
+            guard let towerId = selectedPlacing?.towerId,
+                let tower = towers.first(where: { $0.model.id == towerId}) else { break }
+            
+            switch strip.options[indexPath.row] {
+            case .upgrade:
+                towers.removeAll(where: { $0.model.id == towerId })
+                tower.model.removeFromParent()
+                insertTower(towerType: tower.type, lvl: .lvl2)
+            case .sell:
+                coins += Int(Float(tower.type.cost(lvl: tower.lvl)) * 0.75)
+                towers.removeAll(where: { $0.model.id == towerId })
+                tower.model.removeFromParent()
+                reloadActionStrip(with: ActionStrip.placing.options())
+            default: break
+            }
         }
-        selectedPlacing = nil
-        collectionView.isHidden = true
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return strip.options.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.size.height, height: collectionView.frame.size.height)
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return defensors.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DefensorCollectionViewCell", for: indexPath) as! DefensorCollectionViewCell
-        let defensor = defensors[indexPath.item]
-        
-        cell.defensor = defensor
-        
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Action Strip Cell", for: indexPath)
+        let imageView = cell.contentView.viewWithTag(10) as? UIImageView
+        imageView?.image = strip.options[indexPath.row].iconImage
+        imageView?.layer.cornerRadius = 30.0
+        imageView?.layer.masksToBounds = true
+        cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
         return cell
     }
 }

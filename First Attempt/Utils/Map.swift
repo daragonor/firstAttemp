@@ -9,36 +9,143 @@
 import Foundation
 import RealityKit
 import GameplayKit
+enum CreepType: CaseIterable {
+    case common
+    var lifepoints: Int {
+        switch self {
+        case .common: return 100
+        }
+    }
+    var reward: Int {
+        switch self {
+        case .common: return 10
+        }
+    }
+}
+enum TowerLevel: CaseIterable {
+    case lvl1, lvl2
+}
+enum TowerType: CaseIterable {
+    case turret, rocketLauncher, barracks
+    func cost(lvl: TowerLevel) -> Int {
+        switch lvl {
+        case .lvl1:
+                    switch self {
+            case .turret: return 150
+            case .rocketLauncher: return 200
+            case .barracks: return 300
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 250
+            case .rocketLauncher: return 400
+            case .barracks: return 500
+            }
+        }
+    }
+    var range: Float {
+        switch self {
+        case .turret: return 3.0
+        case .rocketLauncher: return 6.0
+        case .barracks: return 1.0
+        }
+    }
+    
+    func capacity(lvl: TowerLevel) -> Int {
+        switch lvl {
+        case .lvl1:
+            switch self {
+            case .turret: return 1
+            case .rocketLauncher: return 2
+            case .barracks: return 1
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 1
+            case .rocketLauncher: return 4
+            case .barracks: return 2
+            }
+        }
+    }
+    func cadence(lvl: TowerLevel) -> Float {
+        switch lvl {
+        case .lvl1:
+            switch self {
+            case .turret: return 1.0
+            case .rocketLauncher: return 2.5
+            case .barracks: return 5.0
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 0.75
+            case .rocketLauncher: return 1.75
+            case .barracks: return 2.5
+            }
+        }
+    }
+    func attack(lvl: TowerLevel) -> Int {
+        switch lvl {
+        case .lvl1:
+            switch self {
+            case .turret: return 50
+            case .rocketLauncher: return 80
+            case .barracks: return 20
+            }
+        case .lvl2:
+            switch self {
+            case .turret: return 50
+            case .rocketLauncher: return 80
+            case .barracks: return 20
+            }
+        }
+    }
+}
 
 enum MapLegend: CaseIterable {
-    case neutral, goal, lowerTower, higherTower, spawn, lowerPath, higherPath, zipLineIn, zipLineOut
+    case neutral, goal, lowerPlacing, higherPlacing, spawn, lowerPath, higherPath, zipLineIn, zipLineOut
 }
 
 enum Direction: CaseIterable {
     case up, down, left, right
+    case upright, downright, downleft, upleft
+    static var baseMoves: [Direction] {
+        return [.up, .down, .left, .right]
+    }
+    
     var offset: Position {
         switch self {
         case .up: return (0, 1)
         case .down: return (0, -1)
         case .left: return (-1, 0)
         case .right: return (1, 0)
+        case .upright: return (1, 1)
+        case .downright: return (1, -1)
+        case .downleft: return (-1, -1)
+        case .upleft : return (-1, 1)
         }
     }
-    var baseRotation: Float {
+    var angle: Float {
         switch self {
         case .up: return 0
         case .right: return .pi/2
         case .down: return .pi
         case .left: return 3*(.pi)/2
+        case .upright: return .pi/4
+        case .downright: return 3*(.pi)/4
+        case .downleft: return 5*(.pi)/4
+        case .upleft : return 7*(.pi)/4
         }
     }
-    func rotation(previous: Direction) -> Float {
+    func rotation(offset: Float = 0) -> simd_quatf {
+        return simd_quatf(angle: self.angle + offset, axis: [0, 1, 0])
+    }
+    func blendDirection(previous: Direction) -> Direction {
         switch (self, previous) {
-        case (.up, .right), (.right, .up): return .pi/4
-        case (.right, .down), (.down, .right): return 3*(.pi)/4
-        case (.down, .left), (.left, .down): return 5*(.pi)/4
-        case (.left, .up), (.up, .left): return 7*(.pi)/4
-        default: return 0.0
+        case (.up, .right), (.right, .up): return .upright
+        case (.right, .down), (.down, .right): return .downright
+        case (.down, .left), (.left, .down): return .downleft
+        case (.left, .up), (.up, .left): return .upleft
+        default: return previous
         }
     }
 }
@@ -56,7 +163,6 @@ enum PathAssets: CaseIterable {
 }
 
 struct GameModel: Codable {
-    var assets: AssetsModel
     var levels: [LevelModel]
 }
 
@@ -93,7 +199,7 @@ struct LevelModel: Codable {
 
 typealias Position = (row: Int, column: Int)
 typealias OrientedPosition = (position: Position, direction: Direction)
-typealias OrientedCoordinate = (coordinate: SIMD3<Float>, rotation: simd_quatf)
+typealias OrientedCoordinate = (coordinate: SIMD3<Float>, rotation: simd_quatf, position: Position)
 
 struct MapModel: Codable {
     var matrix: [[Int]]
@@ -129,10 +235,16 @@ struct MapModel: Codable {
         path.append(orientedPosition)
         let mapType = MapLegend.allCases[matrix[current.row][current.column]]
         if [MapLegend.goal, .zipLineOut].contains(mapType) {
-            allPaths.append(path)
+            allPaths.append(path.enumerated().map { index, move in
+                var move = move
+                if index + 1 < path.count {
+                    move.direction = path[index + 1].direction.blendDirection(previous: move.direction)
+                }
+                return move
+            })
             return
         } else {
-            for direction in Direction.allCases {
+            for direction in Direction.baseMoves {
                 let position = Position(current.row + direction.offset.row, current.column + direction.offset.column)
                 if position.row >= 0 && position.row < rows &&
                     position.column >= 0 && position.column < columns &&
@@ -155,17 +267,13 @@ struct MapModel: Codable {
                 let x = (Float(row) - rowDistance ) * 0.1
                 var y: Float {
                     switch MapLegend.allCases[self.matrix[row][column]] {
-                    case .higherPath, .higherTower: return 0.1
+                    case .higherPath, .higherPlacing: return 0.1
                     default: return 0.0
                     }
                 }
                 let z = (Float(column) - columnDistance) * 0.1
-
-                var rotation: Float {
-                    guard index + 1 < path.count, path[index + 1].direction != move.direction else { return move.direction.baseRotation}
-                    return path[index + 1].direction.rotation(previous: move.direction)
-                }
-                return ([x, y, z], simd_quatf(angle: rotation + aditionalRotationOffset, axis: [0, 1, 0]))
+                let rotation = move.direction.rotation(offset: aditionalRotationOffset)
+                return ([x, y, z], rotation, move.position)
             }
         }
     }
