@@ -52,7 +52,7 @@ enum TowerType: CaseIterable {
     func cost(lvl: TowerLevel) -> Int {
         switch lvl {
         case .lvl1:
-                    switch self {
+            switch self {
             case .turret: return 150
             case .rocketLauncher: return 200
             case .barracks: return 300
@@ -95,13 +95,13 @@ enum TowerType: CaseIterable {
             switch self {
             case .turret: return 0.75
             case .rocketLauncher: return 2.5
-            case .barracks: return 5.0
+            case .barracks: return 0.5
             }
         case .lvl2:
             switch self {
             case .turret: return 0.4
             case .rocketLauncher: return 1
-            case .barracks: return 2.5
+            case .barracks: return 0.2
             }
         }
     }
