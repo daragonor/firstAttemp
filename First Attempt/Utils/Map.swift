@@ -9,16 +9,38 @@
 import Foundation
 import RealityKit
 import GameplayKit
+
 enum CreepType: CaseIterable {
-    case common
-    var lifepoints: Int {
+    case regular, flying
+    var angleOffset: Float {
         switch self {
-        case .common: return 100
+        case .regular: return .pi
+        case .flying: return 0.0
+        }
+    }
+    var heightOffset: Float {
+        switch self {
+        case .regular: return 0.03
+        case .flying: return 0.13
+        }
+    }
+    var speed: Float {
+        ///in seconds per tile
+        switch self {
+        case .regular: return 2.0
+        case .flying: return 0.75
+        }
+    }
+    var maxHP: Int {
+        switch self {
+        case .regular: return 100
+        case .flying: return 75
         }
     }
     var reward: Int {
         switch self {
-        case .common: return 10
+        case .regular: return 10
+        case .flying: return 25
         }
     }
 }
@@ -45,8 +67,8 @@ enum TowerType: CaseIterable {
     }
     var range: Float {
         switch self {
-        case .turret: return 3.0
-        case .rocketLauncher: return 6.0
+        case .turret: return 2.5
+        case .rocketLauncher: return 4.5
         case .barracks: return 1.0
         }
     }
@@ -71,14 +93,14 @@ enum TowerType: CaseIterable {
         switch lvl {
         case .lvl1:
             switch self {
-            case .turret: return 1.0
+            case .turret: return 0.75
             case .rocketLauncher: return 2.5
             case .barracks: return 5.0
             }
         case .lvl2:
             switch self {
-            case .turret: return 0.2
-            case .rocketLauncher: return 0.2
+            case .turret: return 0.4
+            case .rocketLauncher: return 1
             case .barracks: return 2.5
             }
         }
@@ -87,7 +109,7 @@ enum TowerType: CaseIterable {
         switch lvl {
         case .lvl1:
             switch self {
-            case .turret: return 50
+            case .turret: return 20
             case .rocketLauncher: return 80
             case .barracks: return 20
             }
