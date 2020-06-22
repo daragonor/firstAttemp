@@ -509,7 +509,7 @@ class ViewController: UIViewController {
             anchor.addChild(bullet.model)
             var bulletTransform = bullet.model.transform
             bulletTransform.translation = creep.position
-            let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.3, timingFunction: .linear)
+            let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.2, timingFunction: .linear)
             self.subscriptions.append(self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                 .filter { $0.playbackController == animation }
                 .sink(receiveValue: { event in
