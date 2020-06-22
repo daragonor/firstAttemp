@@ -267,7 +267,6 @@ class ViewController: UIViewController {
             ///Start moving
             let animation = creep.move(to: unitTransform, relativeTo: creep.anchor, duration: TimeInterval(speed), timingFunction: .linear)
             creeps[creep.id]?.animation = animation
-            //arView.scene.subscribe(to:on:completion:)
             subscriptions.append(arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                 .filter { $0.playbackController == animation }
                 .sink(receiveValue: { event in
@@ -439,9 +438,9 @@ class ViewController: UIViewController {
         anchor.addChild(tower.model)
         ///Tower range accesorry
         let diameter = 2.0 * gridDiameter * towerType.range * 0.1
-//        let rangeAccessory = rangeTemplate.clone(recursive: true)
         let rangeAccessory = ModelEntity(mesh: .generateBox(size: SIMD3(x: diameter, y: 0.02, z: diameter), cornerRadius: 0.025), materials: [SimpleMaterial(color: UIColor.red.withAlphaComponent(0.05), isMetallic: false)])
         tower.model.addChild(rangeAccessory)
+//        let rangeAccessory = rangeTemplate.clone(recursive: true)
 //        let rangeBounds = rangeAccessory.visualBounds(relativeTo: anchor)
 //        let rangeScale = diameter / rangeBounds.extents.x
 //        rangeAccessory.setScale([rangeScale, rangeScale, rangeScale], relativeTo: nil)
