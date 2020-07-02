@@ -116,15 +116,8 @@ class ViewController: UIViewController {
     let barracksTemplate = try! Entity.load(named: "barracks")
 
     let placingTemplate = try! Entity.load(named: "tower_placing")
-<<<<<<< HEAD
-    let creepTemplate = try! Entity.load(named: "mech_drone")
-
-    let lifeCreepTemplate = try! Entity.load(named: "lifebar")
-
-=======
     let regularCreep = try! Entity.load(named: "regular_creep")
     let flyingCreep = try! Entity.load(named: "flying_creep")
->>>>>>> develop
     let runeTemplate = try! Entity.load(named: "here")
     let portalTemplate = try! Entity.load(named: "gate")
     let spawnTemplate = try! Entity.load(named: "spawn_port")
@@ -186,7 +179,6 @@ class ViewController: UIViewController {
         runeTemplate.setScale(SIMD3(repeating: 0.0003), relativeTo: nil)
 
         //lifeBar
-        lifeCreepTemplate.setScale(SIMD3(repeating: 0.000115), relativeTo: nil)
         turretLvl1Template.setScale(SIMD3(repeating: 0.0005), relativeTo: nil)
         turretLvl2Template.setScale(SIMD3(repeating: 0.00017), relativeTo: nil)
         rocketLauncherLvl1Template.setScale(SIMD3(repeating: 0.0002), relativeTo: nil)
@@ -240,37 +232,17 @@ class ViewController: UIViewController {
                 let creepType = CreepType.regular//CreepType.allCases[Int.random(in: 0..<CreepType.allCases.count)]
                 var spawnPosition =  spawn.model.transform.translation
                 spawnPosition.y = 0.03
-<<<<<<< HEAD
 
-                let creep = self.creepTemplate.embeddedModel(at: spawnPosition)
-                var lifeCreepPosition = spawnPosition
-                lifeCreepPosition.y = 0.13
-                let lifeCreep = self.lifeCreepTemplate.embeddedModel(at: lifeCreepPosition)
-                let creepType = CreepType.common
-                self.creeps.append((creep.model.id, creepType, creepType.lifepoints))
-=======
                 let creep: EmbeddedModel = {
                     switch creepType {
                     case .regular: return self.regularCreep.embeddedModel(at: spawnPosition)
                     case .flying: return self.flyingCreep.embeddedModel(at: spawnPosition)
                     }
                 }()
-               
->>>>>>> develop
                 let bounds = creep.entity.visualBounds(relativeTo: creep.model)
                 creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: SIMD3(repeating: 0.0015)).offsetBy(translation: bounds.center)], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
                 spawn.model.anchor?.addChild(creep.model)
-<<<<<<< HEAD
-                spawn.model.anchor?.addChild(lifeCreep.model)
-                creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
-                if lifeCreep.entity.availableAnimations.count > 0 {
-                    lifeCreep.entity.playAnimation(lifeCreep.entity.availableAnimations[0].repeat())
-                }
-                let randomPathIndx = Int.random(in: 0..<paths.count)
 
-                self.deployUnit(lifeCreep, on: paths[randomPathIndx], setScale: 0.00015)
-                self.deployUnit(creep, on: paths[Int.random(in: 0..<paths.count)], setScale: 10)
-=======
                 let creepHPbar = self.fullHPBarTemplate.clone(recursive: true)
                 creep.model.addChild(creepHPbar)
                 creepHPbar.position.y = (bounds.extents.y / 2) + 0.003
@@ -278,7 +250,6 @@ class ViewController: UIViewController {
 
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 self.deployUnit(creep.model, speed: creepType.speed, on: paths[Int.random(in: 0..<paths.count)], setScale: 10)
->>>>>>> develop
             }
             timer.fire()
         }

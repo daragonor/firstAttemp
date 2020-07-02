@@ -14,7 +14,6 @@
 		1935BBB324290F9500C764C1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB124290F9500C764C1 /* Main.storyboard */; };
 		1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB424290F9800C764C1 /* Assets.xcassets */; };
 		1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB624290F9800C764C1 /* LaunchScreen.storyboard */; };
-		19363E652489AFA900698A72 /* mech_drone.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E642489AFA800698A72 /* mech_drone.usdz */; };
 		195C803D249DA9FD0075C4B7 /* turret_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */; };
 		195C803F249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */; };
 		195C8041249DDB370075C4B7 /* circle_effect.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C8040249DDB370075C4B7 /* circle_effect.usdz */; };
@@ -50,7 +49,6 @@
 		1935BBB424290F9800C764C1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1935BBB724290F9800C764C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1935BBB924290F9800C764C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		19363E642489AFA800698A72 /* mech_drone.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = mech_drone.usdz; sourceTree = "<group>"; };
 		195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl1.usdz; sourceTree = "<group>"; };
 		195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl1.usdz; sourceTree = "<group>"; };
 		195C8040249DDB370075C4B7 /* circle_effect.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = circle_effect.usdz; sourceTree = "<group>"; };
@@ -91,8 +89,7 @@
 		19163583249A0A4300B8D6EF /* creeps */ = {
 			isa = PBXGroup;
 			children = (
-				19E2F5552496D2DC00879050 /* spawn_port.usdz */,
-				19363E642489AFA800698A72 /* mech_drone.usdz */,
+				19E2F5552496D2DC00879050 /* spawn_port.usdz */
 			);
 			path = creeps;
 			sourceTree = "<group>";
@@ -461,7 +458,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 438BTGM47G;
+				DEVELOPMENT_TEAM = 3FA8LSWNJ5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/GoogleWebRTC/Frameworks/frameworks",
@@ -483,7 +480,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 438BTGM47G;
+				DEVELOPMENT_TEAM = 3FA8LSWNJ5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/GoogleWebRTC/Frameworks/frameworks",
