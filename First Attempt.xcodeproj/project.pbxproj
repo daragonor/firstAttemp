@@ -38,10 +38,6 @@
 		19E2F56B249746A700879050 /* neutral_barrel.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F56A249746A700879050 /* neutral_barrel.usdz */; };
 		19E51B352478B37C00443998 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E51B342478B37C00443998 /* Map.swift */; };
 		19E51B372478B6F500443998 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 19E51B362478B6F500443998 /* config.json */; };
-		19FF8EFC2461EA6E00969996 /* turret_gun.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19FF8EFB2461EA6E00969996 /* turret_gun.usdz */; };
-		19FF8F002462913200969996 /* placing_glyph.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19FF8EFF2462913200969996 /* placing_glyph.usdz */; };
-		F142C0B52497005D00FA4CAD /* lifebar.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F142C0B42497005D00FA4CAD /* lifebar.usdz */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -79,11 +75,6 @@
 		19E2F56A249746A700879050 /* neutral_barrel.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_barrel.usdz; sourceTree = "<group>"; };
 		19E51B342478B37C00443998 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		19E51B362478B6F500443998 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
-
-		19FF8EFB2461EA6E00969996 /* turret_gun.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_gun.usdz; sourceTree = "<group>"; };
-		19FF8EFF2462913200969996 /* placing_glyph.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = placing_glyph.usdz; sourceTree = "<group>"; };
-		F142C0B42497005D00FA4CAD /* lifebar.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lifebar.usdz; sourceTree = "<group>"; };
-
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,20 +154,10 @@
 		19B61AF52491F9DB00980B59 /* 3DModels */ = {
 			isa = PBXGroup;
 			children = (
-
-				19B61AF12491F9D100980B59 /* creep_path_downwards.usdz */,
-				19B61AFC2494A2F400980B59 /* creep_path_upwards_2.usdz */,
-				F142C0B42497005D00FA4CAD /* lifebar.usdz */,
-				19B61AF22491F9D200980B59 /* creep_path_upwards.usdz */,
-				19DEDFDB248E00800010AC79 /* creep_path.usdz */,
-				197D980D247B280800447567 /* magic_portal.usdz */,
-				19363E60248602F200698A72 /* map_icon.usdz */,
-				19363E642489AFA800698A72 /* mech_drone.usdz */,
-				19FF8EFF2462913200969996 /* placing_glyph.usdz */,
-				197D9811247B3F3C00447567 /* spawn_station.usdz */,
-				19B61AFE2494B35E00980B59 /* tower_placing.usdz */,
-				19FF8EFB2461EA6E00969996 /* turret_gun.usdz */,
-
+				19163583249A0A4300B8D6EF /* creeps */,
+				19E2F56D2497591000879050 /* paths */,
+				19E2F56C249758FB00879050 /* towers */,
+				19E2F5692497464300879050 /* map */,
 			);
 			path = 3DModels;
 			sourceTree = "<group>";
@@ -298,9 +279,6 @@
 				19E51B372478B6F500443998 /* config.json in Resources */,
 				19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */,
 				19B61AFF2494B35E00980B59 /* tower_placing.usdz in Resources */,
-				19FF8EFC2461EA6E00969996 /* turret_gun.usdz in Resources */,
-				F142C0B52497005D00FA4CAD /* lifebar.usdz in Resources */,
-				19FF8F002462913200969996 /* placing_glyph.usdz in Resources */,
 				19E2F5682497463600879050 /* neutral_tank.usdz in Resources */,
 				19E2F5622496FC6300879050 /* bullet.usdz in Resources */,
 				196F25E02499DF350027CF3C /* rocket_launcher_lvl2.usdz in Resources */,
@@ -483,7 +461,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 3FA8LSWNJ5;
+				DEVELOPMENT_TEAM = 438BTGM47G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/GoogleWebRTC/Frameworks/frameworks",
@@ -493,7 +471,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "upc.pworkshop.demo.First-Attempt1";
+				PRODUCT_BUNDLE_IDENTIFIER = "upc.pworkshop.demo.First-Attempt";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -505,7 +483,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 3FA8LSWNJ5;
+				DEVELOPMENT_TEAM = 438BTGM47G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/GoogleWebRTC/Frameworks/frameworks",
@@ -515,7 +493,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "upc.pworkshop.demo.First-Attempt1";
+				PRODUCT_BUNDLE_IDENTIFIER = "upc.pworkshop.demo.First-Attempt";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
