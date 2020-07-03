@@ -486,6 +486,8 @@ class ViewController: UIViewController {
             case .turret, .rocketLauncher:
                 let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: towerLvl)), repeats: true) { timer in
                     guard self.towers[tower.id]?.enemiesIds.contains(creep.id) ?? false else { timer.invalidate() ; return }
+                    
+                    self.rotateTower(towerId: tower.id, creep: creep)
                     self.fireBullet(towerId: tower.id, towerType: towerType, towerLvl: towerLvl, creep: creep, anchor: anchor, placingPosition: placingPosition)
                 }
                 timer.fire()
@@ -494,15 +496,40 @@ class ViewController: UIViewController {
                 creepBundle?.animation?.pause()
                 let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: towerLvl)), repeats: true) { timer in
                     guard self.towers[tower.id]?.enemiesIds.contains(creep.id) ?? false else { timer.invalidate() ; return }
+                    self.rotateTower(towerId: tower.id, creep: creep)
                     self.damageCreep(creep: creep, attack: towerType.attack(lvl: towerLvl), towerId: tower.id)
                 }
                 timer.fire()
             }
         })
     }
+    
+    func degreesToRadians(_ degrees: Float) -> Float {
+        return degrees * .pi / 180
+    }
+    
+    func rotateTower(towerId: UInt64, creep: ModelEntity){
+        print(creep.position)
+        let tower = self.towers[towerId]!.model
+        let vectorProduct = creep.position.x * tower.position.x + creep.position.y * tower.position.y + creep.position.z * tower.position.z
+        let vectorAModule = sqrtf(powf(creep.position.x, 2.0) + powf(creep.position.y, 2.0) + powf(creep.position.z, 2.0))
+        let vectorBModule = sqrtf(powf(tower.position.x, 2.0) + powf(tower.position.y, 2.0) + powf(tower.position.z, 2.0))
+        let angle = acosf(vectorProduct / (vectorAModule * vectorBModule))
+        
+        let sinTower = sinf(angle * 0.5)
+        let cosTower = cosf(angle * 0.5)
+            
+        let q0 = simd_quatf(ix: 0.0, iy: sinTower, iz: 0.0, r: cosTower)
+
+        self.towers[towerId]?.model.setOrientation(q0, relativeTo: creep
+            .anchor)
+        
+    }
+    
     func fireBullet(towerId: UInt64, towerType: TowerType, towerLvl: TowerLevel, creep: ModelEntity, anchor: AnchorEntity, placingPosition: SIMD3<Float>) {
         guard let enemiesCount = self.towers[towerId]?.enemiesIds.count else { return }
         let capacity = min(enemiesCount, towerType.capacity(lvl: towerLvl))
+        
         self.towers[towerId]?.enemiesIds[0..<capacity].forEach { id in
             guard id == creep.id else { return }
             let bullet = self.bulletTemplate.embeddedModel(at: placingPosition)

@@ -18,6 +18,27 @@
 		19CA62C824545074007F9198 /* ViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */; };
 		19E51B352478B37C00443998 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E51B342478B37C00443998 /* Map.swift */; };
 		19E51B372478B6F500443998 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 19E51B362478B6F500443998 /* config.json */; };
+		F1226F5A24AE37D5006A6673 /* flying_creep.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F5724AE37D4006A6673 /* flying_creep.usdz */; };
+		F1226F5B24AE37D5006A6673 /* regular_creep.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F5824AE37D4006A6673 /* regular_creep.usdz */; };
+		F1226F5C24AE37D5006A6673 /* spawn_port.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F5924AE37D4006A6673 /* spawn_port.usdz */; };
+		F1226F6624AE3869006A6673 /* turret_lvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F5D24AE3865006A6673 /* turret_lvl2.usdz */; };
+		F1226F6724AE3869006A6673 /* bullet.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F5E24AE3866006A6673 /* bullet.usdz */; };
+		F1226F6824AE3869006A6673 /* barracks.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F5F24AE3866006A6673 /* barracks.usdz */; };
+		F1226F6924AE3869006A6673 /* rocket_launcher_lvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6024AE3866006A6673 /* rocket_launcher_lvl2.usdz */; };
+		F1226F6A24AE3869006A6673 /* selectionRing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6124AE3867006A6673 /* selectionRing.usdz */; };
+		F1226F6B24AE3869006A6673 /* rocket_launcher_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6224AE3867006A6673 /* rocket_launcher_lvl1.usdz */; };
+		F1226F6C24AE3869006A6673 /* circle_effect.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6324AE3867006A6673 /* circle_effect.usdz */; };
+		F1226F6D24AE3869006A6673 /* turret_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6424AE3868006A6673 /* turret_lvl1.usdz */; };
+		F1226F6E24AE3869006A6673 /* tower_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6524AE3869006A6673 /* tower_placing.usdz */; };
+		F1226F7224AE387C006A6673 /* gate.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F6F24AE387B006A6673 /* gate.usdz */; };
+		F1226F7324AE387C006A6673 /* here.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7024AE387B006A6673 /* here.usdz */; };
+		F1226F7424AE387C006A6673 /* hud_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7124AE387C006A6673 /* hud_placing.usdz */; };
+		F1226F7B24AE3892006A6673 /* neutral_floor_1x1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7524AE388F006A6673 /* neutral_floor_1x1.usdz */; };
+		F1226F7C24AE3892006A6673 /* creep_path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7624AE388F006A6673 /* creep_path.usdz */; };
+		F1226F7D24AE3892006A6673 /* neutral_tank.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7724AE3890006A6673 /* neutral_tank.usdz */; };
+		F1226F7E24AE3892006A6673 /* creep_path_upwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7824AE3891006A6673 /* creep_path_upwards.usdz */; };
+		F1226F7F24AE3892006A6673 /* neutral_barrel.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7924AE3892006A6673 /* neutral_barrel.usdz */; };
+		F1226F8024AE3892006A6673 /* creep_path_downwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = F1226F7A24AE3892006A6673 /* creep_path_downwards.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +56,27 @@
 		19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
 		19E51B342478B37C00443998 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		19E51B362478B6F500443998 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
+		F1226F5724AE37D4006A6673 /* flying_creep.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = flying_creep.usdz; sourceTree = "<group>"; };
+		F1226F5824AE37D4006A6673 /* regular_creep.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = regular_creep.usdz; sourceTree = "<group>"; };
+		F1226F5924AE37D4006A6673 /* spawn_port.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawn_port.usdz; sourceTree = "<group>"; };
+		F1226F5D24AE3865006A6673 /* turret_lvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl2.usdz; sourceTree = "<group>"; };
+		F1226F5E24AE3866006A6673 /* bullet.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = bullet.usdz; sourceTree = "<group>"; };
+		F1226F5F24AE3866006A6673 /* barracks.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracks.usdz; sourceTree = "<group>"; };
+		F1226F6024AE3866006A6673 /* rocket_launcher_lvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl2.usdz; sourceTree = "<group>"; };
+		F1226F6124AE3867006A6673 /* selectionRing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = selectionRing.usdz; sourceTree = "<group>"; };
+		F1226F6224AE3867006A6673 /* rocket_launcher_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl1.usdz; sourceTree = "<group>"; };
+		F1226F6324AE3867006A6673 /* circle_effect.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = circle_effect.usdz; sourceTree = "<group>"; };
+		F1226F6424AE3868006A6673 /* turret_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl1.usdz; sourceTree = "<group>"; };
+		F1226F6524AE3869006A6673 /* tower_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = tower_placing.usdz; sourceTree = "<group>"; };
+		F1226F6F24AE387B006A6673 /* gate.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = gate.usdz; sourceTree = "<group>"; };
+		F1226F7024AE387B006A6673 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
+		F1226F7124AE387C006A6673 /* hud_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud_placing.usdz; sourceTree = "<group>"; };
+		F1226F7524AE388F006A6673 /* neutral_floor_1x1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_floor_1x1.usdz; sourceTree = "<group>"; };
+		F1226F7624AE388F006A6673 /* creep_path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path.usdz; sourceTree = "<group>"; };
+		F1226F7724AE3890006A6673 /* neutral_tank.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_tank.usdz; sourceTree = "<group>"; };
+		F1226F7824AE3891006A6673 /* creep_path_upwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path_upwards.usdz; sourceTree = "<group>"; };
+		F1226F7924AE3892006A6673 /* neutral_barrel.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_barrel.usdz; sourceTree = "<group>"; };
+		F1226F7A24AE3892006A6673 /* creep_path_downwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path_downwards.usdz; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +129,7 @@
 		1935BBAA24290F9500C764C1 /* First Attempt */ = {
 			isa = PBXGroup;
 			children = (
+				F1226F4824AE3696006A6673 /* 3DModels */,
 				192222C3245D0B84001364E9 /* Utils */,
 				192222C2245D0B6D001364E9 /* Network */,
 				1935BBAB24290F9500C764C1 /* AppDelegate.swift */,
@@ -114,6 +157,66 @@
 				19B0EDD3243851700045E263 /* WebRTC.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F1226F4824AE3696006A6673 /* 3DModels */ = {
+			isa = PBXGroup;
+			children = (
+				F1226F5424AE3776006A6673 /* paths */,
+				F1226F5324AE3769006A6673 /* towers */,
+				F1226F5224AE375F006A6673 /* map */,
+				F1226F5124AE374A006A6673 /* creeps */,
+			);
+			path = 3DModels;
+			sourceTree = "<group>";
+		};
+		F1226F5124AE374A006A6673 /* creeps */ = {
+			isa = PBXGroup;
+			children = (
+				F1226F5724AE37D4006A6673 /* flying_creep.usdz */,
+				F1226F5824AE37D4006A6673 /* regular_creep.usdz */,
+				F1226F5924AE37D4006A6673 /* spawn_port.usdz */,
+			);
+			path = creeps;
+			sourceTree = "<group>";
+		};
+		F1226F5224AE375F006A6673 /* map */ = {
+			isa = PBXGroup;
+			children = (
+				F1226F6F24AE387B006A6673 /* gate.usdz */,
+				F1226F7024AE387B006A6673 /* here.usdz */,
+				F1226F7124AE387C006A6673 /* hud_placing.usdz */,
+			);
+			path = map;
+			sourceTree = "<group>";
+		};
+		F1226F5324AE3769006A6673 /* towers */ = {
+			isa = PBXGroup;
+			children = (
+				F1226F5F24AE3866006A6673 /* barracks.usdz */,
+				F1226F5E24AE3866006A6673 /* bullet.usdz */,
+				F1226F6324AE3867006A6673 /* circle_effect.usdz */,
+				F1226F6224AE3867006A6673 /* rocket_launcher_lvl1.usdz */,
+				F1226F6024AE3866006A6673 /* rocket_launcher_lvl2.usdz */,
+				F1226F6124AE3867006A6673 /* selectionRing.usdz */,
+				F1226F6524AE3869006A6673 /* tower_placing.usdz */,
+				F1226F6424AE3868006A6673 /* turret_lvl1.usdz */,
+				F1226F5D24AE3865006A6673 /* turret_lvl2.usdz */,
+			);
+			path = towers;
+			sourceTree = "<group>";
+		};
+		F1226F5424AE3776006A6673 /* paths */ = {
+			isa = PBXGroup;
+			children = (
+				F1226F7A24AE3892006A6673 /* creep_path_downwards.usdz */,
+				F1226F7824AE3891006A6673 /* creep_path_upwards.usdz */,
+				F1226F7624AE388F006A6673 /* creep_path.usdz */,
+				F1226F7924AE3892006A6673 /* neutral_barrel.usdz */,
+				F1226F7524AE388F006A6673 /* neutral_floor_1x1.usdz */,
+				F1226F7724AE3890006A6673 /* neutral_tank.usdz */,
+			);
+			path = paths;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -174,10 +277,31 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1226F8024AE3892006A6673 /* creep_path_downwards.usdz in Resources */,
+				F1226F5A24AE37D5006A6673 /* flying_creep.usdz in Resources */,
+				F1226F7E24AE3892006A6673 /* creep_path_upwards.usdz in Resources */,
+				F1226F7324AE387C006A6673 /* here.usdz in Resources */,
+				F1226F6624AE3869006A6673 /* turret_lvl2.usdz in Resources */,
+				F1226F7B24AE3892006A6673 /* neutral_floor_1x1.usdz in Resources */,
+				F1226F5C24AE37D5006A6673 /* spawn_port.usdz in Resources */,
+				F1226F7D24AE3892006A6673 /* neutral_tank.usdz in Resources */,
+				F1226F7224AE387C006A6673 /* gate.usdz in Resources */,
+				F1226F6B24AE3869006A6673 /* rocket_launcher_lvl1.usdz in Resources */,
+				F1226F7F24AE3892006A6673 /* neutral_barrel.usdz in Resources */,
+				F1226F6E24AE3869006A6673 /* tower_placing.usdz in Resources */,
 				1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */,
+				F1226F6A24AE3869006A6673 /* selectionRing.usdz in Resources */,
+				F1226F6724AE3869006A6673 /* bullet.usdz in Resources */,
+				F1226F7424AE387C006A6673 /* hud_placing.usdz in Resources */,
 				19E51B372478B6F500443998 /* config.json in Resources */,
+				F1226F6824AE3869006A6673 /* barracks.usdz in Resources */,
+				F1226F6D24AE3869006A6673 /* turret_lvl1.usdz in Resources */,
+				F1226F6924AE3869006A6673 /* rocket_launcher_lvl2.usdz in Resources */,
 				1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */,
+				F1226F5B24AE37D5006A6673 /* regular_creep.usdz in Resources */,
+				F1226F6C24AE3869006A6673 /* circle_effect.usdz in Resources */,
 				1935BBB324290F9500C764C1 /* Main.storyboard in Resources */,
+				F1226F7C24AE3892006A6673 /* creep_path.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
