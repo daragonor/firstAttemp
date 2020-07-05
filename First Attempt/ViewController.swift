@@ -236,24 +236,15 @@ class ViewController: UIViewController {
             let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                 guard counter < 1 else { timer.invalidate() ; return }
                 counter += 1
-<<<<<<< HEAD
-                let creepType = CreepType.regular//CreepType.allCases[Int.random(in: 0..<CreepType.allCases.count)]
-                var spawnPosition =  spawn.model.transform.translation
-                spawnPosition.y = 0.03
 
-=======
                 let creepType = CreepType.allCases[Int.random(in: 0..<CreepType.allCases.count)]
->>>>>>> develop
                 let creep: EmbeddedModel = {
                     switch creepType {
                     case .regular: return self.regularCreep.embeddedModel(at: spawn.model.transform.translation)
                     case .flying: return self.flyingCreep.embeddedModel(at: spawn.model.transform.translation)
                     }
                 }()
-<<<<<<< HEAD
-=======
                 creep.model.position.y += 0.03
->>>>>>> develop
                 let bounds = creep.entity.visualBounds(relativeTo: creep.model)
                 creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: SIMD3(repeating: 0.0015)).offsetBy(translation: bounds.center)], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
                 spawn.model.anchor?.addChild(creep.model)
@@ -528,39 +519,16 @@ class ViewController: UIViewController {
             let updateSubs = arView.scene.subscribe(to: CollisionEvents.Updated.self, on: tower.model) {
                 event in
                 switch towerType {
-                case .turret: break
+                case .turret:
+                    guard let creep = event.entityB as? ModelEntity else { return }
+                    self.rotateTower(tower: tower.model, creep: creep)
+                    break
 //                guard let enemyID = self.towers[tower.model.id]?.enemiesIds.first, let creep = event.entityB as? ModelEntity, creep.id == enemyID else { return }
 //                let angle = atan2(event.position.z - placingPosition.z, event.position.x - placingPosition.x)
 //                let orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
 //                let orientation = simd_quatf(from: selectedPlacing.model.position, to: event.position)
 //                tower.model.setOrientation(orientation, relativeTo: anchor)
-<<<<<<< HEAD
-            case .rocketLauncher: break
-            case .barracks: break
-            }
-        })
-        
-        subscriptions.append(arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower.model) {
-            event in
-            guard let tower = event.entityA as? ModelEntity, let creep = event.entityB as? ModelEntity else { return }
-            self.towers[tower.id]?.enemiesIds.append(creep.id)
-            switch towerType {
-            case .turret, .rocketLauncher:
-                let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: towerLvl)), repeats: true) { timer in
-                    guard self.towers[tower.id]?.enemiesIds.contains(creep.id) ?? false else { timer.invalidate() ; return }
-                    
-                    self.rotateTower(towerId: tower.id, creep: creep)
-                    self.fireBullet(towerId: tower.id, towerType: towerType, towerLvl: towerLvl, creep: creep, anchor: anchor, placingPosition: placingPosition)
-                }
-                timer.fire()
-            case .barracks:
-                let creepBundle = self.creeps[creep.id]
-                creepBundle?.animation?.pause()
-                let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: towerLvl)), repeats: true) { timer in
-                    guard self.towers[tower.id]?.enemiesIds.contains(creep.id) ?? false else { timer.invalidate() ; return }
-                    self.rotateTower(towerId: tower.id, creep: creep)
-                    self.damageCreep(creep: creep, attack: towerType.attack(lvl: towerLvl), towerId: tower.id)
-=======
+                        
                 case .barracks, .rocketLauncher: break
                 }
             }
@@ -578,7 +546,6 @@ class ViewController: UIViewController {
                     }
                     timer.fire()
                 case .barracks: break
->>>>>>> develop
                 }
             }
             
@@ -587,14 +554,9 @@ class ViewController: UIViewController {
         towers[tower.model.id] = (tower.model, towerType, towerLvl, rangeAccessory, [], towerSubscriptions)
     }
     
-<<<<<<< HEAD
-    func degreesToRadians(_ degrees: Float) -> Float {
-        return degrees * .pi / 180
-    }
-    
-    func rotateTower(towerId: UInt64, creep: ModelEntity){
-        print(creep.position)
-        let tower = self.towers[towerId]!.model
+
+    func rotateTower(tower: ModelEntity, creep: ModelEntity){
+        
         let vectorProduct = creep.position.x * tower.position.x + creep.position.y * tower.position.y + creep.position.z * tower.position.z
         let vectorAModule = sqrtf(powf(creep.position.x, 2.0) + powf(creep.position.y, 2.0) + powf(creep.position.z, 2.0))
         let vectorBModule = sqrtf(powf(tower.position.x, 2.0) + powf(tower.position.y, 2.0) + powf(tower.position.z, 2.0))
@@ -605,24 +567,17 @@ class ViewController: UIViewController {
             
         let q0 = simd_quatf(ix: 0.0, iy: sinTower, iz: 0.0, r: cosTower)
 
-        self.towers[towerId]?.model.setOrientation(q0, relativeTo: creep
+        tower.setOrientation(q0, relativeTo: creep
             .anchor)
         
     }
     
-    func fireBullet(towerId: UInt64, towerType: TowerType, towerLvl: TowerLevel, creep: ModelEntity, anchor: AnchorEntity, placingPosition: SIMD3<Float>) {
-        guard let enemiesCount = self.towers[towerId]?.enemiesIds.count else { return }
-        let capacity = min(enemiesCount, towerType.capacity(lvl: towerLvl))
-        
-        self.towers[towerId]?.enemiesIds[0..<capacity].forEach { id in
-            guard id == creep.id else { return }
-=======
+
     func fireBullet(towerId: UInt64, towerType: TowerType, towerLvl: TowerLevel, creepModel: ModelEntity, anchor: AnchorEntity, placingPosition: SIMD3<Float>, creepBundle: CreepBundle) {
         guard let enemiesCount = self.towers[towerId]?.enemiesIds.count else { return }
         let capacity = min(enemiesCount, towerType.capacity(lvl: towerLvl))
         towers[towerId]?.enemiesIds[0..<capacity].forEach { id in
             guard id == creepModel.id else { return }
->>>>>>> develop
             let bullet = self.bulletTemplate.embeddedModel(at: placingPosition)
             bullet.model.transform.translation.y += 0.015
             anchor.addChild(bullet.model)
