@@ -7,74 +7,86 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		191B2A2324B235DF0010E66E /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191B2A2224B235DF0010E66E /* MainViewController.swift */; };
 		192222BF245D0A09001364E9 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192222BE245D0A09001364E9 /* Utils.swift */; };
-		192222C1245D0B63001364E9 /* ViewController+MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192222C0245D0B63001364E9 /* ViewController+MultipeerSession.swift */; };
-		192EEFE3243A7F9D00EAE788 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192EEFE2243A7F9D00EAE788 /* ViewController.swift */; };
+		192222C1245D0B63001364E9 /* GameViewController+MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192222C0245D0B63001364E9 /* GameViewController+MultipeerSession.swift */; };
+		192EEFE3243A7F9D00EAE788 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192EEFE2243A7F9D00EAE788 /* GameViewController.swift */; };
 		1935BBAC24290F9500C764C1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1935BBAB24290F9500C764C1 /* AppDelegate.swift */; };
 		1935BBB324290F9500C764C1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB124290F9500C764C1 /* Main.storyboard */; };
 		1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB424290F9800C764C1 /* Assets.xcassets */; };
 		1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1935BBB624290F9800C764C1 /* LaunchScreen.storyboard */; };
-		19363E652489AFA900698A72 /* regular_creep.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E642489AFA800698A72 /* regular_creep.usdz */; };
-		195C803D249DA9FD0075C4B7 /* turret_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */; };
-		195C803F249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */; };
+		19363E652489AFA900698A72 /* regular.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19363E642489AFA800698A72 /* regular.usdz */; };
 		195C8041249DDB370075C4B7 /* circle_effect.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 195C8040249DDB370075C4B7 /* circle_effect.usdz */; };
-		196F25E02499DF350027CF3C /* rocket_launcher_lvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 196F25DF2499DF350027CF3C /* rocket_launcher_lvl2.usdz */; };
+		198A28B524B24469002DD151 /* flying.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 198A28B424B24469002DD151 /* flying.usdz */; };
+		198A28B724B244F9002DD151 /* small.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 198A28B624B244F9002DD151 /* small.usdz */; };
+		198A28BA24B27C85002DD151 /* heavy.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 198A28B924B27C85002DD151 /* heavy.usdz */; };
+		198A28BD24B2A48B002DD151 /* MissionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198A28BC24B2A48B002DD151 /* MissionsViewController.swift */; };
 		19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055B2498984F00C70054 /* hud_placing.usdz */; };
 		19A205602498993700C70054 /* selectionRing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055F2498993700C70054 /* selectionRing.usdz */; };
 		19A205622498999700C70054 /* here.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205612498999700C70054 /* here.usdz */; };
-		19A205642498B4FF00C70054 /* gate.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205632498B4FE00C70054 /* gate.usdz */; };
-		19B366E82499D5E30009D62D /* barracks.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19B366E72499D5E30009D62D /* barracks.usdz */; };
-		19B61AFF2494B35E00980B59 /* tower_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19B61AFE2494B35E00980B59 /* tower_placing.usdz */; };
-		19C66E7124A0316600552038 /* flying_creep.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19C66E7024A0316600552038 /* flying_creep.usdz */; };
 		19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C52454500D007F9198 /* MultipeerSession.swift */; };
-		19CA62C824545074007F9198 /* ViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */; };
-		19DEDFDC248E00810010AC79 /* creep_path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19DEDFDB248E00800010AC79 /* creep_path.usdz */; };
-		19E2F5562496D2DC00879050 /* spawn_port.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5552496D2DC00879050 /* spawn_port.usdz */; };
-		19E2F55A2496E5D400879050 /* turret_lvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5592496E5D400879050 /* turret_lvl2.usdz */; };
-		19E2F5602496FA2700879050 /* creep_path_downwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */; };
+		19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */; };
+		19CDD42724B555D400551CE8 /* path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42624B555D400551CE8 /* path.usdz */; };
+		19CDD42924B559AD00551CE8 /* spawnPort.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42824B559AD00551CE8 /* spawnPort.usdz */; };
+		19CDD42D24B5839100551CE8 /* goal.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42C24B5839100551CE8 /* goal.usdz */; };
+		19CDD42F24B5A0E100551CE8 /* towerPlacing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42E24B5A0E100551CE8 /* towerPlacing.usdz */; };
+		19CDD43124B5A9DD00551CE8 /* pathUpwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43024B5A9DD00551CE8 /* pathUpwards.usdz */; };
+		19CDD43B24B5B04000551CE8 /* barracksLvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43224B5B03D00551CE8 /* barracksLvl2.usdz */; };
+		19CDD43C24B5B04000551CE8 /* barracksLvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43324B5B03D00551CE8 /* barracksLvl1.usdz */; };
+		19CDD43D24B5B04000551CE8 /* rocketLvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43424B5B03E00551CE8 /* rocketLvl1.usdz */; };
+		19CDD43E24B5B04000551CE8 /* rocketLvl3.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43524B5B03E00551CE8 /* rocketLvl3.usdz */; };
+		19CDD43F24B5B04000551CE8 /* rocketLvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43624B5B03E00551CE8 /* rocketLvl2.usdz */; };
+		19CDD44024B5B04000551CE8 /* turretLvl3.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43724B5B03F00551CE8 /* turretLvl3.usdz */; };
+		19CDD44124B5B04000551CE8 /* turretLvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43824B5B03F00551CE8 /* turretLvl2.usdz */; };
+		19CDD44224B5B04000551CE8 /* barracksLvl3.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43924B5B03F00551CE8 /* barracksLvl3.usdz */; };
+		19CDD44324B5B04000551CE8 /* turretLvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43A24B5B03F00551CE8 /* turretLvl1.usdz */; };
+		19CDD44524B5B12600551CE8 /* pathDownwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD44424B5B12600551CE8 /* pathDownwards.usdz */; };
+		19CDD44724B64D6500551CE8 /* ModelUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CDD44624B64D6400551CE8 /* ModelUtils.swift */; };
 		19E2F5622496FC6300879050 /* bullet.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5612496FC6300879050 /* bullet.usdz */; };
-		19E2F5642496FFC000879050 /* creep_path_upwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */; };
-		19E2F566249741C800879050 /* neutral_floor_1x1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F565249741C700879050 /* neutral_floor_1x1.usdz */; };
-		19E2F5682497463600879050 /* neutral_tank.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5672497463600879050 /* neutral_tank.usdz */; };
-		19E2F56B249746A700879050 /* neutral_barrel.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F56A249746A700879050 /* neutral_barrel.usdz */; };
 		19E51B352478B37C00443998 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E51B342478B37C00443998 /* Map.swift */; };
 		19E51B372478B6F500443998 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 19E51B362478B6F500443998 /* config.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		191B2A2224B235DF0010E66E /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		192222BE245D0A09001364E9 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		192222C0245D0B63001364E9 /* ViewController+MultipeerSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+MultipeerSession.swift"; sourceTree = "<group>"; };
-		192EEFE2243A7F9D00EAE788 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		192222C0245D0B63001364E9 /* GameViewController+MultipeerSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+MultipeerSession.swift"; sourceTree = "<group>"; };
+		192EEFE2243A7F9D00EAE788 /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		1935BBA824290F9500C764C1 /* First Attempt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "First Attempt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1935BBAB24290F9500C764C1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1935BBB224290F9500C764C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1935BBB424290F9800C764C1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1935BBB724290F9800C764C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1935BBB924290F9800C764C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		19363E642489AFA800698A72 /* regular_creep.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = regular_creep.usdz; sourceTree = "<group>"; };
-		195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl1.usdz; sourceTree = "<group>"; };
-		195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl1.usdz; sourceTree = "<group>"; };
+		19363E642489AFA800698A72 /* regular.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = regular.usdz; sourceTree = "<group>"; };
 		195C8040249DDB370075C4B7 /* circle_effect.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = circle_effect.usdz; sourceTree = "<group>"; };
-		196F25DF2499DF350027CF3C /* rocket_launcher_lvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocket_launcher_lvl2.usdz; sourceTree = "<group>"; };
+		198A28B424B24469002DD151 /* flying.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = flying.usdz; sourceTree = "<group>"; };
+		198A28B624B244F9002DD151 /* small.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = small.usdz; sourceTree = "<group>"; };
+		198A28B924B27C85002DD151 /* heavy.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = heavy.usdz; sourceTree = "<group>"; };
+		198A28BC24B2A48B002DD151 /* MissionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionsViewController.swift; sourceTree = "<group>"; };
 		19A2055B2498984F00C70054 /* hud_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud_placing.usdz; sourceTree = "<group>"; };
 		19A2055F2498993700C70054 /* selectionRing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = selectionRing.usdz; sourceTree = "<group>"; };
 		19A205612498999700C70054 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
-		19A205632498B4FE00C70054 /* gate.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = gate.usdz; sourceTree = "<group>"; };
 		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
-		19B366E72499D5E30009D62D /* barracks.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracks.usdz; sourceTree = "<group>"; };
-		19B61AFE2494B35E00980B59 /* tower_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = tower_placing.usdz; sourceTree = "<group>"; };
-		19C66E7024A0316600552038 /* flying_creep.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = flying_creep.usdz; sourceTree = "<group>"; };
 		19CA62C52454500D007F9198 /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
-		19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
-		19DEDFDB248E00800010AC79 /* creep_path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path.usdz; sourceTree = "<group>"; };
-		19E2F5552496D2DC00879050 /* spawn_port.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawn_port.usdz; sourceTree = "<group>"; };
-		19E2F5592496E5D400879050 /* turret_lvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turret_lvl2.usdz; sourceTree = "<group>"; };
-		19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path_downwards.usdz; sourceTree = "<group>"; };
+		19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
+		19CDD42624B555D400551CE8 /* path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = path.usdz; sourceTree = "<group>"; };
+		19CDD42824B559AD00551CE8 /* spawnPort.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawnPort.usdz; sourceTree = "<group>"; };
+		19CDD42C24B5839100551CE8 /* goal.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = goal.usdz; sourceTree = "<group>"; };
+		19CDD42E24B5A0E100551CE8 /* towerPlacing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = towerPlacing.usdz; sourceTree = "<group>"; };
+		19CDD43024B5A9DD00551CE8 /* pathUpwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = pathUpwards.usdz; sourceTree = "<group>"; };
+		19CDD43224B5B03D00551CE8 /* barracksLvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracksLvl2.usdz; sourceTree = "<group>"; };
+		19CDD43324B5B03D00551CE8 /* barracksLvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracksLvl1.usdz; sourceTree = "<group>"; };
+		19CDD43424B5B03E00551CE8 /* rocketLvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocketLvl1.usdz; sourceTree = "<group>"; };
+		19CDD43524B5B03E00551CE8 /* rocketLvl3.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocketLvl3.usdz; sourceTree = "<group>"; };
+		19CDD43624B5B03E00551CE8 /* rocketLvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = rocketLvl2.usdz; sourceTree = "<group>"; };
+		19CDD43724B5B03F00551CE8 /* turretLvl3.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turretLvl3.usdz; sourceTree = "<group>"; };
+		19CDD43824B5B03F00551CE8 /* turretLvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turretLvl2.usdz; sourceTree = "<group>"; };
+		19CDD43924B5B03F00551CE8 /* barracksLvl3.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracksLvl3.usdz; sourceTree = "<group>"; };
+		19CDD43A24B5B03F00551CE8 /* turretLvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = turretLvl1.usdz; sourceTree = "<group>"; };
+		19CDD44424B5B12600551CE8 /* pathDownwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = pathDownwards.usdz; sourceTree = "<group>"; };
+		19CDD44624B64D6400551CE8 /* ModelUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelUtils.swift; sourceTree = "<group>"; };
 		19E2F5612496FC6300879050 /* bullet.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = bullet.usdz; sourceTree = "<group>"; };
-		19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = creep_path_upwards.usdz; sourceTree = "<group>"; };
-		19E2F565249741C700879050 /* neutral_floor_1x1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_floor_1x1.usdz; sourceTree = "<group>"; };
-		19E2F5672497463600879050 /* neutral_tank.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_tank.usdz; sourceTree = "<group>"; };
-		19E2F56A249746A700879050 /* neutral_barrel.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutral_barrel.usdz; sourceTree = "<group>"; };
 		19E51B342478B37C00443998 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		19E51B362478B6F500443998 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -93,11 +105,31 @@
 		19163583249A0A4300B8D6EF /* creeps */ = {
 			isa = PBXGroup;
 			children = (
-				19E2F5552496D2DC00879050 /* spawn_port.usdz */,
-				19C66E7024A0316600552038 /* flying_creep.usdz */,
-				19363E642489AFA800698A72 /* regular_creep.usdz */,
+				198A28B924B27C85002DD151 /* heavy.usdz */,
+				198A28B624B244F9002DD151 /* small.usdz */,
+				198A28B424B24469002DD151 /* flying.usdz */,
+				19363E642489AFA800698A72 /* regular.usdz */,
 			);
 			path = creeps;
+			sourceTree = "<group>";
+		};
+		191B2A2024B233250010E66E /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				191B2A2224B235DF0010E66E /* MainViewController.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		191B2A2124B233300010E66E /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				1935BBAB24290F9500C764C1 /* AppDelegate.swift */,
+				192EEFE2243A7F9D00EAE788 /* GameViewController.swift */,
+				192222C0245D0B63001364E9 /* GameViewController+MultipeerSession.swift */,
+				19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */,
+			);
+			path = Game;
 			sourceTree = "<group>";
 		};
 		192222C2245D0B6D001364E9 /* Network */ = {
@@ -114,6 +146,7 @@
 				19E51B362478B6F500443998 /* config.json */,
 				192222BE245D0A09001364E9 /* Utils.swift */,
 				19E51B342478B37C00443998 /* Map.swift */,
+				19CDD44624B64D6400551CE8 /* ModelUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -139,12 +172,11 @@
 		1935BBAA24290F9500C764C1 /* First Attempt */ = {
 			isa = PBXGroup;
 			children = (
-				192222C3245D0B84001364E9 /* Utils */,
+				198A28BB24B2A47D002DD151 /* Missions */,
 				192222C2245D0B6D001364E9 /* Network */,
-				1935BBAB24290F9500C764C1 /* AppDelegate.swift */,
-				192EEFE2243A7F9D00EAE788 /* ViewController.swift */,
-				192222C0245D0B63001364E9 /* ViewController+MultipeerSession.swift */,
-				19CA62C724545074007F9198 /* ViewController+CoachingOverlay.swift */,
+				191B2A2124B233300010E66E /* Game */,
+				191B2A2024B233250010E66E /* Main */,
+				192222C3245D0B84001364E9 /* Utils */,
 				1935BBB124290F9500C764C1 /* Main.storyboard */,
 				1935BBB424290F9800C764C1 /* Assets.xcassets */,
 				19B61AF52491F9DB00980B59 /* 3DModels */,
@@ -152,6 +184,24 @@
 				1935BBB924290F9800C764C1 /* Info.plist */,
 			);
 			path = "First Attempt";
+			sourceTree = "<group>";
+		};
+		198A28B824B25372002DD151 /* accesories */ = {
+			isa = PBXGroup;
+			children = (
+				19A2055F2498993700C70054 /* selectionRing.usdz */,
+				195C8040249DDB370075C4B7 /* circle_effect.usdz */,
+				19E2F5612496FC6300879050 /* bullet.usdz */,
+			);
+			path = accesories;
+			sourceTree = "<group>";
+		};
+		198A28BB24B2A47D002DD151 /* Missions */ = {
+			isa = PBXGroup;
+			children = (
+				198A28BC24B2A48B002DD151 /* MissionsViewController.swift */,
+			);
+			path = Missions;
 			sourceTree = "<group>";
 		};
 		19B61AF52491F9DB00980B59 /* 3DModels */ = {
@@ -168,7 +218,9 @@
 		19E2F5692497464300879050 /* map */ = {
 			isa = PBXGroup;
 			children = (
-				19A205632498B4FE00C70054 /* gate.usdz */,
+				19CDD42E24B5A0E100551CE8 /* towerPlacing.usdz */,
+				19CDD42C24B5839100551CE8 /* goal.usdz */,
+				19CDD42824B559AD00551CE8 /* spawnPort.usdz */,
 				19A205612498999700C70054 /* here.usdz */,
 				19A2055B2498984F00C70054 /* hud_placing.usdz */,
 			);
@@ -178,15 +230,16 @@
 		19E2F56C249758FB00879050 /* towers */ = {
 			isa = PBXGroup;
 			children = (
-				19A2055F2498993700C70054 /* selectionRing.usdz */,
-				195C8040249DDB370075C4B7 /* circle_effect.usdz */,
-				19E2F5612496FC6300879050 /* bullet.usdz */,
-				19E2F5592496E5D400879050 /* turret_lvl2.usdz */,
-				195C803C249DA9FC0075C4B7 /* turret_lvl1.usdz */,
-				196F25DF2499DF350027CF3C /* rocket_launcher_lvl2.usdz */,
-				195C803E249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz */,
-				19B366E72499D5E30009D62D /* barracks.usdz */,
-				19B61AFE2494B35E00980B59 /* tower_placing.usdz */,
+				19CDD43324B5B03D00551CE8 /* barracksLvl1.usdz */,
+				19CDD43224B5B03D00551CE8 /* barracksLvl2.usdz */,
+				19CDD43924B5B03F00551CE8 /* barracksLvl3.usdz */,
+				19CDD43424B5B03E00551CE8 /* rocketLvl1.usdz */,
+				19CDD43624B5B03E00551CE8 /* rocketLvl2.usdz */,
+				19CDD43524B5B03E00551CE8 /* rocketLvl3.usdz */,
+				19CDD43A24B5B03F00551CE8 /* turretLvl1.usdz */,
+				19CDD43824B5B03F00551CE8 /* turretLvl2.usdz */,
+				19CDD43724B5B03F00551CE8 /* turretLvl3.usdz */,
+				198A28B824B25372002DD151 /* accesories */,
 			);
 			path = towers;
 			sourceTree = "<group>";
@@ -194,12 +247,9 @@
 		19E2F56D2497591000879050 /* paths */ = {
 			isa = PBXGroup;
 			children = (
-				19E2F55F2496FA2700879050 /* creep_path_downwards.usdz */,
-				19E2F5632496FFBF00879050 /* creep_path_upwards.usdz */,
-				19DEDFDB248E00800010AC79 /* creep_path.usdz */,
-				19E2F565249741C700879050 /* neutral_floor_1x1.usdz */,
-				19E2F5672497463600879050 /* neutral_tank.usdz */,
-				19E2F56A249746A700879050 /* neutral_barrel.usdz */,
+				19CDD44424B5B12600551CE8 /* pathDownwards.usdz */,
+				19CDD43024B5A9DD00551CE8 /* pathUpwards.usdz */,
+				19CDD42624B555D400551CE8 /* path.usdz */,
 			);
 			path = paths;
 			sourceTree = "<group>";
@@ -277,31 +327,34 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				19E2F5562496D2DC00879050 /* spawn_port.usdz in Resources */,
+				19CDD44024B5B04000551CE8 /* turretLvl3.usdz in Resources */,
 				1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */,
 				19E51B372478B6F500443998 /* config.json in Resources */,
+				19CDD42F24B5A0E100551CE8 /* towerPlacing.usdz in Resources */,
+				19CDD43F24B5B04000551CE8 /* rocketLvl2.usdz in Resources */,
+				19CDD43C24B5B04000551CE8 /* barracksLvl1.usdz in Resources */,
+				19CDD43E24B5B04000551CE8 /* rocketLvl3.usdz in Resources */,
 				19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */,
-				19B61AFF2494B35E00980B59 /* tower_placing.usdz in Resources */,
-				19E2F5682497463600879050 /* neutral_tank.usdz in Resources */,
+				198A28B524B24469002DD151 /* flying.usdz in Resources */,
+				19CDD42724B555D400551CE8 /* path.usdz in Resources */,
 				19E2F5622496FC6300879050 /* bullet.usdz in Resources */,
-				196F25E02499DF350027CF3C /* rocket_launcher_lvl2.usdz in Resources */,
 				1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */,
-				195C803F249DBADD0075C4B7 /* rocket_launcher_lvl1.usdz in Resources */,
-				195C803D249DA9FD0075C4B7 /* turret_lvl1.usdz in Resources */,
 				1935BBB324290F9500C764C1 /* Main.storyboard in Resources */,
 				195C8041249DDB370075C4B7 /* circle_effect.usdz in Resources */,
-				19E2F5642496FFC000879050 /* creep_path_upwards.usdz in Resources */,
-				19A205642498B4FF00C70054 /* gate.usdz in Resources */,
-				19E2F55A2496E5D400879050 /* turret_lvl2.usdz in Resources */,
-				19DEDFDC248E00810010AC79 /* creep_path.usdz in Resources */,
-				19C66E7124A0316600552038 /* flying_creep.usdz in Resources */,
+				198A28B724B244F9002DD151 /* small.usdz in Resources */,
+				19CDD43D24B5B04000551CE8 /* rocketLvl1.usdz in Resources */,
+				19CDD43124B5A9DD00551CE8 /* pathUpwards.usdz in Resources */,
 				19A205622498999700C70054 /* here.usdz in Resources */,
-				19E2F56B249746A700879050 /* neutral_barrel.usdz in Resources */,
 				19A205602498993700C70054 /* selectionRing.usdz in Resources */,
-				19B366E82499D5E30009D62D /* barracks.usdz in Resources */,
-				19E2F566249741C800879050 /* neutral_floor_1x1.usdz in Resources */,
-				19E2F5602496FA2700879050 /* creep_path_downwards.usdz in Resources */,
-				19363E652489AFA900698A72 /* regular_creep.usdz in Resources */,
+				19CDD42924B559AD00551CE8 /* spawnPort.usdz in Resources */,
+				198A28BA24B27C85002DD151 /* heavy.usdz in Resources */,
+				19CDD43B24B5B04000551CE8 /* barracksLvl2.usdz in Resources */,
+				19CDD44224B5B04000551CE8 /* barracksLvl3.usdz in Resources */,
+				19CDD44524B5B12600551CE8 /* pathDownwards.usdz in Resources */,
+				19CDD42D24B5839100551CE8 /* goal.usdz in Resources */,
+				19CDD44324B5B04000551CE8 /* turretLvl1.usdz in Resources */,
+				19CDD44124B5B04000551CE8 /* turretLvl2.usdz in Resources */,
+				19363E652489AFA900698A72 /* regular.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,12 +366,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */,
-				19CA62C824545074007F9198 /* ViewController+CoachingOverlay.swift in Sources */,
+				19CDD44724B64D6500551CE8 /* ModelUtils.swift in Sources */,
+				19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */,
 				1935BBAC24290F9500C764C1 /* AppDelegate.swift in Sources */,
-				192EEFE3243A7F9D00EAE788 /* ViewController.swift in Sources */,
+				198A28BD24B2A48B002DD151 /* MissionsViewController.swift in Sources */,
+				192EEFE3243A7F9D00EAE788 /* GameViewController.swift in Sources */,
 				192222BF245D0A09001364E9 /* Utils.swift in Sources */,
 				19E51B352478B37C00443998 /* Map.swift in Sources */,
-				192222C1245D0B63001364E9 /* ViewController+MultipeerSession.swift in Sources */,
+				192222C1245D0B63001364E9 /* GameViewController+MultipeerSession.swift in Sources */,
+				191B2A2324B235DF0010E66E /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,7 +528,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "upc.pworkshop.demo.First-Attempt";
+				PRODUCT_BUNDLE_IDENTIFIER = "upc.workshop.first-attempt";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -491,7 +547,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "upc.pworkshop.demo.First-Attempt";
+				PRODUCT_BUNDLE_IDENTIFIER = "upc.workshop.first-attempt";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

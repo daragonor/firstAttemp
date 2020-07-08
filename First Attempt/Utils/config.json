@@ -1,48 +1,24 @@
 {
-    "assets": {
-        "creeps": [
-            {
-                "fileName": "mech_drone",
-                "scalingFactor": 0.0002,
-                "lifePoints": 100
-            }
-        ],
-        "towers": [
-            {
-                "fileName": "turret_gun",
-                "scalingFactor": 0.0003,
-                "attackValue": 25,
-                "range": 30.0
-            }
-        ],
-        "placings": [
-            {
-                "fileName": "tower_placing",
-                "scalingFactor": 0.0001
-            }
-        ],
-        "paths": [
-            {
-                "fileName": "floor_asset",
-                "scalingFactor": 0.00035
-            }
-        ],
-        "goal": {
-            "fileName": "magic_portal",
-            "scalingFactor": 0.0005
-        },
-        "spawn": {
-            "fileName": "spawn_station",
-            "scalingFactor": 0.00007
-        },
-        "rune": {
-            "fileName": "placing_glyph",
-            "scalingFactor": 0.0001
-        }
-    },
-    "levels": [
+    "missions": [
         {
-            "difficulty": 5,
+            "difficulty": 1,
+            "waves": 2,
+            "maps": [
+                {
+                    "matrix": [
+                        [0, 1, 5, 0, 0],
+                        [0, 0, 5, 0, 0],
+                        [0, 0, 5, 0, 0],
+                        [0, 2, 5, 0, 0],
+                        [0, 0, 5, 0, 0],
+                        [0, 0, 5, 5, 4]
+                    ]
+                }
+            ]
+        },
+        {
+            "difficulty": 2,
+            "waves": 7,
             "maps": [
                 {
                     "matrix": [
