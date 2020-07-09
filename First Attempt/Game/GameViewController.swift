@@ -196,7 +196,12 @@ class GameViewController: UIViewController {
         multipeerSession = MultipeerSession(receivedDataHandler: receivedData, peerJoinedHandler:
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
     }
-    
+    func sendTower(type: String, lvl: String) {
+        guard let multipeerSession = multipeerSession else { return }
+        if let data = "\(type)+\(lvl)".data(using: .utf8) {
+            multipeerSession.sendToPeers(data, reliably: true, peers: multipeerSession.connectedPeers)
+        }
+    }
     func sendAction(option: StripOption) {
         guard let multipeerSession = multipeerSession else { return }
         if let data = option.key.data(using: .utf8) {
@@ -261,7 +266,7 @@ class GameViewController: UIViewController {
                 creepHPbar.position.y = (bounds.extents.y / 2) + 0.003
                 self.creeps[creep.model.id] = ((creepHPbar.id, creepType.maxHP, creepType.maxHP), creepType, nil, nil)
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
-                self.deployUnit(creep.model, type: creepType,speed: creepType.speed, on: paths[Int.random(in: 0..<paths.count)], setScale: 10)
+                self.deployUnit(creep.model, type: creepType,speed: creepType.speed, on: paths[self.waveCount % paths.count], setScale: 10)
             }
             timer.fire()
         }
@@ -333,10 +338,12 @@ class GameViewController: UIViewController {
         guard let entity = entities.first else { return }
         if hasStarted, let tappedPlacing = placings.first(where: { id, _ in entities.contains(where: {$0.id == id}) }) {
             if tappedPlacing.key == selectedPlacing?.model.id {
+                sendSelectedPlacing(position: (-1, -1))
                 selectedPlacing = nil
                 towers.forEach { $1.accesory.isEnabled = false }
                 reloadActionStrip(with: Action.none.strip())
             } else {
+                sendSelectedPlacing(position: tappedPlacing.value.position)
                 selectedPlacing = tappedPlacing.value
                 towers.forEach { $1.accesory.isEnabled = false }
                 if let tappedTowerId = tappedPlacing.value.towerId {
@@ -761,6 +768,7 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
             let towerType = TowerType.allCases[indexPath.row]
             if towerType.cost(lvl: .lvl1) <= coins {
                 insertTower(towerType: towerType, towerLvl: .lvl1)
+                sendTower(type: towerType.rawValue, lvl: TowerLevel.lvl1.rawValue)
                 reloadActionStrip(with: Action.tower.strip(for: towerType))
             }
         case .tower:
@@ -820,6 +828,18 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
         if let collaborationData = try? NSKeyedUnarchiver.unarchivedObject(ofClass: ARSession.CollaborationData.self, from: data) {
             arView.session.update(with: collaborationData)
             return
+        } else if let data = String(data: data, encoding: .utf8), data.contains("+") {
+            DispatchQueue.main.async {
+                let data = data.split(separator: "+").map { return String($0) }
+                let towerType = TowerType.init(rawValue: data.first!)!
+                let towerLvl = TowerLevel.init(rawValue: data.last!)!
+                self.insertTower(towerType: towerType, towerLvl: towerLvl)
+            }
+        } else if let data = String(data: data, encoding: .utf8), data.contains(",") {
+            DispatchQueue.main.async {
+                let position = data.split(separator: ",").map { return Int($0) }
+                self.selectedPlacing = self.placings.values.first(where: { $0.position.row == position.first && $0.position.column == position.last })
+            }
         } else if let data = String(data: data, encoding: .utf8) {
             DispatchQueue.main.async {
                 switch data {
