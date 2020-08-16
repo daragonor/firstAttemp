@@ -35,6 +35,27 @@ enum MapLegend: CaseIterable {
     case neutral, goal, lowerPlacing, higherPlacing, spawn, lowerPath, higherPath, zipLineIn, zipLineOut
 }
 
+enum Lifepoints: String, CaseIterable {
+    case full, half, low
+    static func status(hp: Float) -> Lifepoints {
+        switch hp {
+        case (0.66...1.00): return .full
+        case (0.33...0.65): return .half
+        default: return .low
+        }
+        
+    }
+    
+    var color: UIColor {
+        switch self {
+        case .full: return .green
+        case .half: return .yellow
+        case .low: return .red
+        }
+    }
+    var key: String { self.rawValue }
+}
+
 enum Direction: CaseIterable {
     case up, down, left, right
     case upright, downright, downleft, upleft

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		191B2A2324B235DF0010E66E /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191B2A2224B235DF0010E66E /* MainViewController.swift */; };
 		192222BF245D0A09001364E9 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192222BE245D0A09001364E9 /* Utils.swift */; };
 		192222C1245D0B63001364E9 /* GameViewController+MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192222C0245D0B63001364E9 /* GameViewController+MultipeerSession.swift */; };
 		192EEFE3243A7F9D00EAE788 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192EEFE2243A7F9D00EAE788 /* GameViewController.swift */; };
@@ -20,10 +19,11 @@
 		198A28B524B24469002DD151 /* flying.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 198A28B424B24469002DD151 /* flying.usdz */; };
 		198A28B724B244F9002DD151 /* small.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 198A28B624B244F9002DD151 /* small.usdz */; };
 		198A28BA24B27C85002DD151 /* heavy.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 198A28B924B27C85002DD151 /* heavy.usdz */; };
-		198A28BD24B2A48B002DD151 /* MissionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198A28BC24B2A48B002DD151 /* MissionsViewController.swift */; };
+		198E215024BAF1A5008FBB56 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198E214F24BAF1A5008FBB56 /* MenuViewController.swift */; };
 		19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055B2498984F00C70054 /* hud_placing.usdz */; };
 		19A205602498993700C70054 /* selectionRing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055F2498993700C70054 /* selectionRing.usdz */; };
 		19A205622498999700C70054 /* here.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205612498999700C70054 /* here.usdz */; };
+		19C4135824E9D674003AE195 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C4135724E9D674003AE195 /* Models.swift */; };
 		19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C52454500D007F9198 /* MultipeerSession.swift */; };
 		19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */; };
 		19CDD42724B555D400551CE8 /* path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42624B555D400551CE8 /* path.usdz */; };
@@ -48,7 +48,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		191B2A2224B235DF0010E66E /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		192222BE245D0A09001364E9 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		192222C0245D0B63001364E9 /* GameViewController+MultipeerSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+MultipeerSession.swift"; sourceTree = "<group>"; };
 		192EEFE2243A7F9D00EAE788 /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -63,11 +62,12 @@
 		198A28B424B24469002DD151 /* flying.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = flying.usdz; sourceTree = "<group>"; };
 		198A28B624B244F9002DD151 /* small.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = small.usdz; sourceTree = "<group>"; };
 		198A28B924B27C85002DD151 /* heavy.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = heavy.usdz; sourceTree = "<group>"; };
-		198A28BC24B2A48B002DD151 /* MissionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionsViewController.swift; sourceTree = "<group>"; };
+		198E214F24BAF1A5008FBB56 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		19A2055B2498984F00C70054 /* hud_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud_placing.usdz; sourceTree = "<group>"; };
 		19A2055F2498993700C70054 /* selectionRing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = selectionRing.usdz; sourceTree = "<group>"; };
 		19A205612498999700C70054 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
 		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
+		19C4135724E9D674003AE195 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		19CA62C52454500D007F9198 /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
 		19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
 		19CDD42624B555D400551CE8 /* path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = path.usdz; sourceTree = "<group>"; };
@@ -113,14 +113,6 @@
 			path = creeps;
 			sourceTree = "<group>";
 		};
-		191B2A2024B233250010E66E /* Main */ = {
-			isa = PBXGroup;
-			children = (
-				191B2A2224B235DF0010E66E /* MainViewController.swift */,
-			);
-			path = Main;
-			sourceTree = "<group>";
-		};
 		191B2A2124B233300010E66E /* Game */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,6 +120,7 @@
 				192EEFE2243A7F9D00EAE788 /* GameViewController.swift */,
 				192222C0245D0B63001364E9 /* GameViewController+MultipeerSession.swift */,
 				19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */,
+				198E214F24BAF1A5008FBB56 /* MenuViewController.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -147,6 +140,7 @@
 				192222BE245D0A09001364E9 /* Utils.swift */,
 				19E51B342478B37C00443998 /* Map.swift */,
 				19CDD44624B64D6400551CE8 /* ModelUtils.swift */,
+				19C4135724E9D674003AE195 /* Models.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -172,10 +166,8 @@
 		1935BBAA24290F9500C764C1 /* First Attempt */ = {
 			isa = PBXGroup;
 			children = (
-				198A28BB24B2A47D002DD151 /* Missions */,
 				192222C2245D0B6D001364E9 /* Network */,
 				191B2A2124B233300010E66E /* Game */,
-				191B2A2024B233250010E66E /* Main */,
 				192222C3245D0B84001364E9 /* Utils */,
 				1935BBB124290F9500C764C1 /* Main.storyboard */,
 				1935BBB424290F9800C764C1 /* Assets.xcassets */,
@@ -194,14 +186,6 @@
 				19E2F5612496FC6300879050 /* bullet.usdz */,
 			);
 			path = accesories;
-			sourceTree = "<group>";
-		};
-		198A28BB24B2A47D002DD151 /* Missions */ = {
-			isa = PBXGroup;
-			children = (
-				198A28BC24B2A48B002DD151 /* MissionsViewController.swift */,
-			);
-			path = Missions;
 			sourceTree = "<group>";
 		};
 		19B61AF52491F9DB00980B59 /* 3DModels */ = {
@@ -369,12 +353,12 @@
 				19CDD44724B64D6500551CE8 /* ModelUtils.swift in Sources */,
 				19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */,
 				1935BBAC24290F9500C764C1 /* AppDelegate.swift in Sources */,
-				198A28BD24B2A48B002DD151 /* MissionsViewController.swift in Sources */,
+				198E215024BAF1A5008FBB56 /* MenuViewController.swift in Sources */,
 				192EEFE3243A7F9D00EAE788 /* GameViewController.swift in Sources */,
 				192222BF245D0A09001364E9 /* Utils.swift in Sources */,
 				19E51B352478B37C00443998 /* Map.swift in Sources */,
 				192222C1245D0B63001364E9 /* GameViewController+MultipeerSession.swift in Sources */,
-				191B2A2324B235DF0010E66E /* MainViewController.swift in Sources */,
+				19C4135824E9D674003AE195 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -53,12 +53,14 @@ enum CreepType: String, CaseIterable {
         case .small: return 10.0
         }
     }
+    
     var heightOffset: Float {
         switch self {
         case .heavy, .regular, .small: return 0.03
         case .flying: return 0.13
         }
     }
+    
     var speed: Float {
         ///in seconds per tile
         switch self {
@@ -68,6 +70,7 @@ enum CreepType: String, CaseIterable {
         case .flying: return 1.25
         }
     }
+    
     var maxHP: Float {
         switch self {
         case .heavy: return 250.0
@@ -76,11 +79,12 @@ enum CreepType: String, CaseIterable {
         case .flying: return 100.0
         }
     }
+    
     var cadence: Float {
         switch self {
-        case .heavy: return 1.5
-        case .regular: return 0.75
-        case .small: return 4.0
+        case .heavy: return 1.5 // 3-4
+        case .regular: return 0.75 // 1.5
+        case .small: return 0.4 // 0.8
         case .flying: return 0.2
         }
     }
@@ -157,6 +161,7 @@ enum TowerType: String, CaseIterable {
         default: return 0.0
         }
     }
+    
     func capacity(lvl: TowerLevel) -> Int {
         switch lvl {
         case .lvl1:
@@ -179,28 +184,30 @@ enum TowerType: String, CaseIterable {
             }
         }
     }
+    
     func cadence(lvl: TowerLevel) -> Float {
         switch lvl {
         case .lvl1:
             switch self {
-            case .turret: return 0.75
+            case .turret: return 1.0
             case .rocket: return 2.5
-            case .barracks: return 0.6
+            case .barracks: return 0.7
             }
         case .lvl2:
             switch self {
-            case .turret: return 0.5
-            case .rocket: return 1.75
-            case .barracks: return 0.4
+            case .turret: return 0.75
+            case .rocket: return 2.25
+            case .barracks: return 0.5
             }
         case .lvl3:
             switch self {
-            case .turret: return 0.25
-            case .rocket: return 1
-            case .barracks: return 0.2
+            case .turret: return 0.5
+            case .rocket: return 2
+            case .barracks: return 0.3
             }
         }
     }
+    
     func attack(lvl: TowerLevel) -> Float {
         switch lvl {
         case .lvl1:

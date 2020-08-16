@@ -21,6 +21,7 @@ extension Entity {
 extension StringProtocol {
     var firstUppercased: String { return prefix(1).uppercased() + dropFirst() }
 }
+
 extension float4x4 {
     /// Returns the translation components of the matrix
     func toTranslation() -> SIMD3<Float> {

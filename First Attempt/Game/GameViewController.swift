@@ -13,6 +13,10 @@ import MultipeerConnectivity
 import Combine
 
 typealias EmbeddedModel = (model: ModelEntity, entity: Entity)
+enum GameState {
+    case start
+    case play
+}
 
 class GameViewController: UIViewController {
     enum Action {
@@ -50,15 +54,19 @@ class GameViewController: UIViewController {
     @IBOutlet weak var coinsLabel: UILabel!
     @IBOutlet weak var hpLabel: UILabel!
     @IBOutlet weak var waveLabel: UILabel!
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var stripTableView: UITableView!
     
+    @IBOutlet weak var menuContainer: UIView!
+    @IBOutlet weak var menuContainerHeight: NSLayoutConstraint!
+    @IBOutlet weak var gameMenuView: UIView!
+    @IBOutlet weak var gameInfoStackView: UIStackView!
     var arConfig: ARWorldTrackingConfiguration!
     
     var multipeerSession: MultipeerSession?
     let coachingOverlay = ARCoachingOverlayView()
     var peerSessionIDs = [MCPeerID: String]()
     var sessionIDObservation: NSKeyValueObservation?
-    
+    var state: GameState = .start
     var mapTemplates = [String: Entity]()
     var unitTemplates = [String: Entity]()
     
@@ -70,6 +78,7 @@ class GameViewController: UIViewController {
     var playerHP = 20
     var usedMaps = 0
     var coinsTimer: Timer?
+    
     var canStart: Bool {
         return usedMaps == gameConfig.missions[mission].maps.count
     }
@@ -106,13 +115,27 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
+        menuContainer.isHidden = false
+        gameInfoStackView.isHidden = true
         loadActionStrip()
-        loadMission()
-        configureMultipeer()
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let menu = segue.destination as? MenuViewController else { return }
+        menu.resize = { size in
+            self.menuContainerHeight.constant = CGFloat(size)
+        }
+        menu.start = {
+            self.gameMenuView.isHidden = true
+            self.loadMission()
+            self.configureMultipeer()
+            self.gameInfoStackView.isHidden = false
+        }
     }
     func showLoadingAssets() {
         let alert = UIAlertController(title: nil, message: "Loading assets...", preferredStyle: .alert)
@@ -138,6 +161,7 @@ class GameViewController: UIViewController {
         modelNames += TowerType.allCases.map { $0.key(.lvl1) }
         modelNames += TowerType.allCases.map { $0.key(.lvl2) }
         modelNames += TowerType.allCases.map { $0.key(.lvl3) }
+
         for name in modelNames {
             loadingSubs.append(ModelEntity.loadAsync(named: name)
                 .sink(receiveCompletion: { error in
@@ -145,6 +169,9 @@ class GameViewController: UIViewController {
                 }, receiveValue: { entity in
                     self.loadedModels += 1
                     if self.loadedModels == modelNames.count {
+                        for lifepoint in Lifepoints.allCases {
+                            self.mapTemplates[lifepoint.key] = ModelEntity(mesh: .generateBox(size: SIMD3(x: 0.003, y: 0.0005, z: 0.0005), cornerRadius: 0.0002), materials: [SimpleMaterial(color: lifepoint.color, isMetallic: false)])
+                        }
                         self.hideLoadingAssets()
                         self.loadAnchorConfiguration()
                     }
@@ -164,10 +191,10 @@ class GameViewController: UIViewController {
     }
     
     func loadActionStrip() {
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.transform = CGAffineTransform(rotationAngle: -(CGFloat)(Double.pi))
-        tableView.showsVerticalScrollIndicator = false
+        stripTableView.delegate = self
+        stripTableView.dataSource = self
+        stripTableView.transform = CGAffineTransform(rotationAngle: -(CGFloat)(Double.pi))
+        stripTableView.showsVerticalScrollIndicator = false
     }
     
     func loadAnchorConfiguration() {
@@ -216,7 +243,7 @@ class GameViewController: UIViewController {
     }
     func reloadActionStrip(with newStrip: ActionStripBundle) {
         strip = newStrip
-        tableView.reloadSections([0], with: .fade)
+        stripTableView.reloadSections([0], with: .fade)
     }
     
     func startMission() {
@@ -261,7 +288,7 @@ class GameViewController: UIViewController {
                 let bounds = creep.entity.visualBounds(relativeTo: creep.model)
                 creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: SIMD3(repeating: 0.0015))], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
                 spawn.model.anchor?.addChild(creep.model)
-                let creepHPbar = Models.shared.fullHPBarTemplate.clone(recursive: true)
+                let creepHPbar = self.mapTemplates[Lifepoints.full.key]!.clone(recursive: true)
                 creep.model.addChild(creepHPbar)
                 creepHPbar.position.y = (bounds.extents.y / 2) + 0.003
                 self.creeps[creep.model.id] = ((creepHPbar.id, creepType.maxHP, creepType.maxHP), creepType, nil, nil)
@@ -500,7 +527,7 @@ class GameViewController: UIViewController {
                 let bounds = troop.entity.visualBounds(relativeTo: troop.model)
                 troop.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents)], mode: .trigger, filter: CollisionFilter(group: Filter.towers.group, mask: Filter.creeps.group))
                 tower.model.addChild(troop.model)
-                let troopHPbar = Models.shared.fullHPBarTemplate.clone(recursive: true)
+                let troopHPbar = mapTemplates[Lifepoints.full.key]!.clone(recursive: true)
                 troop.model.addChild(troopHPbar)
                 troopHPbar.position.y = (bounds.extents.y / 2) + 0.003
                 troop.entity.playAnimation(troop.entity.availableAnimations[0].repeat())
@@ -634,18 +661,12 @@ class GameViewController: UIViewController {
             troops.removeValue(forKey: troopModel.id)
         }
         let hpPercentage = troopBundle.unit.hp / troopBundle.unit.maxHP
-        let newHPBar: ModelEntity = {
-            switch hpPercentage {
-            case (0.00...0.32): return Models.shared.lowHPBarTemplate.clone(recursive: true)
-            case (0.33...0.64): return Models.shared.halfHPBarTemplate.clone(recursive: true)
-            default: return Models.shared.fullHPBarTemplate.clone(recursive: true)
-            }
-        }()
-        newHPBar.scale = [hpPercentage, 1.0, 1.0]
-        troopModel.children[childIndex] = newHPBar
-        newHPBar.position = child.position
+        let hpBar = mapTemplates[Lifepoints.status(hp: hpPercentage).key]!.clone(recursive: true)
+        hpBar.scale = [hpPercentage, 1.0, 1.0]
+        troopModel.children[childIndex] = hpBar
+        hpBar.position = child.position
         child.removeFromParent()
-        troops[troopModel.id]?.unit.hpBarId = newHPBar.id
+        troops[troopModel.id]?.unit.hpBarId = hpBar.id
     }
     
     func damageCreep(creepModel: ModelEntity, towerId: UInt64, attack: Float) {
@@ -662,18 +683,12 @@ class GameViewController: UIViewController {
             }
         }
         let hpPercentage = creepBundle.unit.hp / creepBundle.unit.maxHP
-        let newHPBar: ModelEntity = {
-            switch hpPercentage {
-            case (0.00...0.32): return Models.shared.lowHPBarTemplate.clone(recursive: true)
-            case (0.33...0.64): return Models.shared.halfHPBarTemplate.clone(recursive: true)
-            default: return Models.shared.fullHPBarTemplate.clone(recursive: true)
-            }
-        }()
-        newHPBar.scale = [hpPercentage, 1.0, 1.0]
-        creepModel.children[childIndex] = newHPBar
-        newHPBar.position = child.position
+        let hpBar = mapTemplates[Lifepoints.status(hp: hpPercentage).key]!.clone(recursive: true)
+        hpBar.scale = [hpPercentage, 1.0, 1.0]
+        creepModel.children[childIndex] = hpBar
+        hpBar.position = child.position
         child.removeFromParent()
-        creeps[creepModel.id]?.unit.hpBarId = newHPBar.id
+        creeps[creepModel.id]?.unit.hpBarId = hpBar.id
     }
 }
 
