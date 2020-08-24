@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -251,6 +251,10 @@
                                         </userDefinedRuntimeAttributes>
                                     </tableViewCell>
                                 </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="gkI-dF-yuE"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Gvi-sK-zMb"/>
+                                </connections>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QYV-7j-XPz">
                                 <rect key="frame" x="83" y="240.5" width="248" height="415"/>
@@ -324,6 +328,7 @@
                         <outlet property="gameInfoStackView" destination="xlC-RS-bHY" id="Yab-ew-1kS"/>
                         <outlet property="gameMenuView" destination="QYV-7j-XPz" id="Omi-bb-RDs"/>
                         <outlet property="hpLabel" destination="tVG-js-AUa" id="UAI-kv-k7J"/>
+                        <outlet property="logoView" destination="SL1-gS-EzP" id="iQd-Ki-Zj3"/>
                         <outlet property="menuContainer" destination="Y1v-aB-ziZ" id="UmC-og-jdc"/>
                         <outlet property="menuContainerHeight" destination="AR4-W2-6GL" id="ZHj-zL-Qpe"/>
                         <outlet property="stripTableView" destination="joF-zS-uBv" id="fKc-Wd-f2w"/>

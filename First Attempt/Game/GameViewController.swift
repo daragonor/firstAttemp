@@ -14,41 +14,45 @@ import Combine
 
 typealias EmbeddedModel = (model: ModelEntity, entity: Entity)
 enum GameState {
-    case start
-    case play
+    case menu
+    case missions
+    case lobby
+}
+
+typealias ActionStripBundle = (action: Action, options: [StripOption])
+
+enum Action {
+    case none, placing, undo, ready, tower
+    func strip(for type: Any? = nil) -> ActionStripBundle {
+        var options = [StripOption]()
+        switch self {
+        case .undo: options = [.undo]
+        case .ready: options = [.undo, .start]
+        case .placing: options = [.turret, .launcher, .barracks]
+        case .tower:
+            guard let tower = type as? TowerType else { options = []; break}
+            switch tower {
+            case .turret, .rocket: options = [.upgrade, .sell]
+            case .barracks: options = [.upgrade, .sell, .rotateLeft, .rotateRight]
+            }
+        case .none: options = []
+        }
+        return (self, options)
+    }
+}
+enum Filter {
+    case placings, towers, creeps
+    var group: CollisionGroup {
+        switch self {
+        case .placings: return CollisionGroup.init(rawValue: 0)
+        case .towers: return CollisionGroup.init(rawValue: 1)
+        case .creeps: return CollisionGroup.init(rawValue: 2)
+        }
+    }
 }
 
 class GameViewController: UIViewController {
-    enum Action {
-        case none, placing, undo, ready, tower
-        func strip(for type: Any? = nil) -> ActionStripBundle {
-            var options = [StripOption]()
-            switch self {
-            case .undo: options = [.undo]
-            case .ready: options = [.undo, .start]
-            case .placing: options = [.turret, .launcher, .barracks]
-            case .tower:
-                guard let tower = type as? TowerType else { options = []; break}
-                switch tower {
-                case .turret, .rocket: options = [.upgrade, .sell]
-                case .barracks: options = [.upgrade, .sell, .rotateLeft, .rotateRight]
-                }
-            case .none: options = []
-            }
-            return (self, options)
-        }
-    }
-    enum Filter {
-        case placings, towers, creeps
-        var group: CollisionGroup {
-            switch self {
-            case .placings: return CollisionGroup.init(rawValue: 0)
-            case .towers: return CollisionGroup.init(rawValue: 1)
-            case .creeps: return CollisionGroup.init(rawValue: 2)
-            }
-        }
-    }
-    
+
     @IBOutlet var arView: ARView!
     
     @IBOutlet weak var coinsLabel: UILabel!
@@ -60,13 +64,15 @@ class GameViewController: UIViewController {
     @IBOutlet weak var menuContainerHeight: NSLayoutConstraint!
     @IBOutlet weak var gameMenuView: UIView!
     @IBOutlet weak var gameInfoStackView: UIStackView!
+    @IBOutlet weak var logoView: UIView!
+    var menuViewController: MenuViewController!
     var arConfig: ARWorldTrackingConfiguration!
     
     var multipeerSession: MultipeerSession?
     let coachingOverlay = ARCoachingOverlayView()
     var peerSessionIDs = [MCPeerID: String]()
     var sessionIDObservation: NSKeyValueObservation?
-    var state: GameState = .start
+    
     var mapTemplates = [String: Entity]()
     var unitTemplates = [String: Entity]()
     
@@ -82,17 +88,16 @@ class GameViewController: UIViewController {
     var canStart: Bool {
         return usedMaps == gameConfig.missions[mission].maps.count
     }
+    
     var hasStarted: Bool = false
     var didMissionFinish = false
     
     typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
     typealias PlacingBundle = (model: ModelEntity, position: Position, towerId: UInt64?)
-    typealias TowerBundle = (model: ModelEntity, type: TowerType, lvl: TowerLevel, accesory: Entity, enemiesIds: [UInt64], collisionSubs: [Cancellable])
     typealias UnitBundle = (hpBarId: UInt64, hp: Float, maxHP: Float)
     typealias CreepBundle = (unit: UnitBundle, type: CreepType, animation: AnimationPlaybackController?, subscription: Cancellable?)
     typealias TroopBundle = (unit: UnitBundle, towerId: UInt64, enemiesIds: [UInt64])
     typealias BulletBundle = (model: ModelEntity, animation: AnimationPlaybackController, subscription: Cancellable?)
-    typealias ActionStripBundle = (action: Action, options: [StripOption])
     var spawnPlaces = [SpawnBundle]()
     var glyphs = [UInt64: ModelEntity]()
     var usedGlyphs = [UInt64]()
@@ -117,26 +122,35 @@ class GameViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         menuContainer.isHidden = false
         gameInfoStackView.isHidden = true
+        gameMenuView.isHidden = false
         loadActionStrip()
+    }
 
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
         guard let menu = segue.destination as? MenuViewController else { return }
+        menuViewController = menu
+        menu.logoView = logoView
         menu.resize = { size in
             self.menuContainerHeight.constant = CGFloat(size)
         }
-        menu.start = {
+        
+        menu.showMenu = {
+            self.gameInfoStackView.isHidden = true
+            self.loadDefaultValues()
+            self.reloadActionStrip(with: Action.none.strip())
+            let arConfig = ARWorldTrackingConfiguration()
+            self.arView.session.run(arConfig, options: .removeExistingAnchors)
+        }
+
+        menu.startMission = { mission in
             self.gameMenuView.isHidden = true
-            self.loadMission()
+            self.loadMission(mission: mission)
             self.configureMultipeer()
-            self.gameInfoStackView.isHidden = false
         }
     }
+    
     func showLoadingAssets() {
         let alert = UIAlertController(title: nil, message: "Loading assets...", preferredStyle: .alert)
 
@@ -148,51 +162,65 @@ class GameViewController: UIViewController {
         alert.view.addSubview(loadingIndicator)
         present(alert, animated: true, completion: nil)
     }
+    
     func hideLoadingAssets() {
         dismiss(animated: false, completion: nil)
     }
-    func loadMission() {
+    
+    func loadDefaultValues() {
+        self.waveCount = 0
+        self.coins = 2000
+        self.mission = 0
+        self.playerHP = 20
+        self.usedMaps = 0
+    }
+    func loadMission(mission: Int) {
+        self.mission = mission
+        self.gameInfoStackView.isHidden = false
         coinsLabel.text = "\(coins)"
         hpLabel.text = "\(playerHP)"
         waveLabel.text = "0/\(gameConfig.missions[mission].waves)"
-        showLoadingAssets()
-        var modelNames = ModelType.allCases.map { $0.key }
-        modelNames += CreepType.allCases.map { $0.key }
-        modelNames += TowerType.allCases.map { $0.key(.lvl1) }
-        modelNames += TowerType.allCases.map { $0.key(.lvl2) }
-        modelNames += TowerType.allCases.map { $0.key(.lvl3) }
+        
+        if loadedModels == .zero {
+            showLoadingAssets()
+            var modelNames = ModelType.allCases.map { $0.key }
+            modelNames += CreepType.allCases.map { $0.key }
+            modelNames += TowerType.allCases.map { $0.key(.lvl1) }
+            modelNames += TowerType.allCases.map { $0.key(.lvl2) }
+            modelNames += TowerType.allCases.map { $0.key(.lvl3) }
 
-        for name in modelNames {
-            loadingSubs.append(ModelEntity.loadAsync(named: name)
-                .sink(receiveCompletion: { error in
-                    print(error)
-                }, receiveValue: { entity in
-                    self.loadedModels += 1
-                    if self.loadedModels == modelNames.count {
-                        for lifepoint in Lifepoints.allCases {
-                            self.mapTemplates[lifepoint.key] = ModelEntity(mesh: .generateBox(size: SIMD3(x: 0.003, y: 0.0005, z: 0.0005), cornerRadius: 0.0002), materials: [SimpleMaterial(color: lifepoint.color, isMetallic: false)])
+            for name in modelNames {
+                loadingSubs.append(ModelEntity.loadAsync(named: name)
+                    .sink(receiveCompletion: { error in
+                        print(error)
+                    }, receiveValue: { entity in
+                        self.loadedModels += 1
+                        if self.loadedModels == modelNames.count {
+                            for lifepoint in Lifepoints.allCases {
+                                self.mapTemplates[lifepoint.key] = ModelEntity(mesh: .generateBox(size: SIMD3(x: 0.003, y: 0.0005, z: 0.0005), cornerRadius: 0.0002), materials: [SimpleMaterial(color: lifepoint.color, isMetallic: false)])
+                            }
+                            self.hideLoadingAssets()
+                            self.loadAnchorConfiguration()
                         }
-                        self.hideLoadingAssets()
-                        self.loadAnchorConfiguration()
-                    }
-                    if let factor = ModelType(rawValue: name)?.scalingFactor {
-                        entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
-                        self.mapTemplates[name] = entity
-                    } else if let factor = CreepType(rawValue: name)?.scalingFactor {
-                        entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
-                        self.unitTemplates[name] = entity
-                    } else {
-                        entity.setScale(SIMD3(repeating: TowerType.scalingFactor), relativeTo: nil)
-                        self.unitTemplates[name] = entity
-                    }
-                })
-            )
+                        if let factor = ModelType(rawValue: name)?.scalingFactor {
+                            entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
+                            self.mapTemplates[name] = entity
+                        } else if let factor = CreepType(rawValue: name)?.scalingFactor {
+                            entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
+                            self.unitTemplates[name] = entity
+                        } else {
+                            entity.setScale(SIMD3(repeating: TowerType.scalingFactor), relativeTo: nil)
+                            self.unitTemplates[name] = entity
+                        }
+                    })
+                )
+            }
+        } else  {
+            self.loadAnchorConfiguration()
         }
     }
     
     func loadActionStrip() {
-        stripTableView.delegate = self
-        stripTableView.dataSource = self
         stripTableView.transform = CGAffineTransform(rotationAngle: -(CGFloat)(Double.pi))
         stripTableView.showsVerticalScrollIndicator = false
     }
@@ -205,12 +233,31 @@ class GameViewController: UIViewController {
         if ARWorldTrackingConfiguration.supportsFrameSemantics(.personSegmentationWithDepth) {
             arConfig.frameSemantics.insert(.personSegmentationWithDepth)
         }
-//                arView.debugOptions = [.showPhysics]
         arView.renderOptions.insert(.disableMotionBlur)
         arView.automaticallyConfigureSession = false
         arView.session.delegate = self
         arView.session.run(arConfig)
         arView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
+    }
+    
+    func checkMissionCompleted() {
+        if creeps.isEmpty, self.waveCount == self.gameConfig.missions[self.mission].waves {
+            didMissionFinish = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                let alert = UIAlertController(title: nil, message: "Mission Completed", preferredStyle: .alert)
+                self.present(alert, animated: true) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        self.dismiss(animated: true) {
+//                            self.terrainAnchors.forEach { terrain in terrain.removeFromParent() }
+//                            self.loadDefaultValues()
+                            self.menuViewController.state = .missions
+                            self.menuViewController.tableView.reloadData()
+                            self.gameMenuView.isHidden = false
+                        }
+                    }
+                }
+            }
+        }
     }
     
     func configureMultipeer() {
@@ -223,24 +270,28 @@ class GameViewController: UIViewController {
         multipeerSession = MultipeerSession(receivedDataHandler: receivedData, peerJoinedHandler:
             peerJoined, peerLeftHandler: peerLeft, peerDiscoveredHandler: peerDiscovered)
     }
+    
     func sendTower(type: String, lvl: String) {
         guard let multipeerSession = multipeerSession else { return }
         if let data = "\(type)+\(lvl)".data(using: .utf8) {
             multipeerSession.sendToPeers(data, reliably: true, peers: multipeerSession.connectedPeers)
         }
     }
+    
     func sendAction(option: StripOption) {
         guard let multipeerSession = multipeerSession else { return }
         if let data = option.key.data(using: .utf8) {
             multipeerSession.sendToPeers(data, reliably: true, peers: multipeerSession.connectedPeers)
         }
     }
+    
     func sendSelectedPlacing(position: Position) {
         guard let multipeerSession = multipeerSession else { return }
         if let data = "\(position.row),\(position.column)".data(using: .utf8) {
             multipeerSession.sendToPeers(data, reliably: true, peers: multipeerSession.connectedPeers)
         }
     }
+    
     func reloadActionStrip(with newStrip: ActionStripBundle) {
         strip = newStrip
         stripTableView.reloadSections([0], with: .fade)
@@ -333,23 +384,6 @@ class GameViewController: UIViewController {
         
     }
     
-    func checkMissionCompleted() {
-        if creeps.isEmpty, self.waveCount == self.gameConfig.missions[self.mission].waves {
-            didMissionFinish = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                let alert = UIAlertController(title: nil, message: "Mission Completed", preferredStyle: .alert)
-                self.present(alert, animated: true) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        self.dismiss(animated: true) {
-                            self.terrainAnchors.forEach { terrain in terrain.removeFromParent() }
-                            self.navigationController?.popViewController(animated: true)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     func undoPlacing() {
         if let lastMap = terrainAnchors.last {
             lastMap.removeFromParent()
@@ -367,15 +401,15 @@ class GameViewController: UIViewController {
             if tappedPlacing.key == selectedPlacing?.model.id {
                 sendSelectedPlacing(position: (-1, -1))
                 selectedPlacing = nil
-                towers.forEach { $1.accesory.isEnabled = false }
+                towers.forEach { $1.accessory.isEnabled = false }
                 reloadActionStrip(with: Action.none.strip())
             } else {
                 sendSelectedPlacing(position: tappedPlacing.value.position)
                 selectedPlacing = tappedPlacing.value
-                towers.forEach { $1.accesory.isEnabled = false }
+                towers.forEach { $1.accessory.isEnabled = false }
                 if let tappedTowerId = tappedPlacing.value.towerId {
                     guard let towerBundle = towers.first(where: { id, _ in id == tappedTowerId })?.value else { return }
-                    towerBundle.accesory.isEnabled = true
+                    towerBundle.accessory.isEnabled = true
                     reloadActionStrip(with: Action.tower.strip(for: towerBundle.type))
                 } else {
                     reloadActionStrip(with: Action.placing.strip())
@@ -605,7 +639,7 @@ class GameViewController: UIViewController {
             
             towerSubscriptions = [beganSubs, updateSubs, endSubs]
         }
-        towers[tower.model.id] = (tower.model, towerType, towerLvl, rangeAccessory, [], towerSubscriptions)
+        towers[tower.model.id] = TowerBundle(model: tower.model, type: towerType, lvl: towerLvl, accessory: rangeAccessory, collisionSubs: towerSubscriptions)
     }
     func rotateTower(towerId: UInt64, creep: ModelEntity){
         print(creep.position)
