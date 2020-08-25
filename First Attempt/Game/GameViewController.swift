@@ -518,31 +518,33 @@ class GameViewController: UIViewController {
         let tower: EmbeddedModel = {
             switch towerLvl {
             case .lvl1:
-                switch towerType{
+                switch towerType {
                 case .turret: return unitTemplates[TowerType.turret.key(.lvl1)]!.embeddedModel(at: placingPosition)
                 case .rocket: return unitTemplates[TowerType.rocket.key(.lvl1)]!.embeddedModel(at: placingPosition)
                 case .barracks: return unitTemplates[TowerType.barracks.key(.lvl1)]!.embeddedModel(at: placingPosition)
                 }
             case .lvl2:
-                switch towerType{
+                switch towerType {
                 case .turret: return unitTemplates[TowerType.turret.key(.lvl2)]!.embeddedModel(at: placingPosition)
                 case .rocket: return unitTemplates[TowerType.rocket.key(.lvl2)]!.embeddedModel(at: placingPosition)
                 case .barracks: return unitTemplates[TowerType.barracks.key(.lvl2)]!.embeddedModel(at: placingPosition)
                 }
             case .lvl3:
-                switch towerType{
+                switch towerType {
                 case .turret: return unitTemplates[TowerType.turret.key(.lvl3)]!.embeddedModel(at: placingPosition)
                 case .rocket: return unitTemplates[TowerType.rocket.key(.lvl3)]!.embeddedModel(at: placingPosition)
                 case .barracks: return unitTemplates[TowerType.barracks.key(.lvl3)]!.embeddedModel(at: placingPosition)
                 }
             }
         }()
+        
         placings.keys.forEach { id in
             if id == selectedPlacing?.model.id {
                 placings[id]?.towerId = tower.model.id
                 selectedPlacing?.towerId = tower.model.id
             }
         }
+        
         tower.model.position.y += 0.003
         anchor.addChild(tower.model)
         ///Tower range accesorry
@@ -625,22 +627,20 @@ class GameViewController: UIViewController {
                 event in
                 guard let creepModel = event.entityB as? ModelEntity, let creepBundle = self.creeps[creepModel.id] else { return }
                 guard let towerModel = event.entityA as? ModelEntity else { return }
-                switch towerType {
-                case .turret, .rocket:
-                    self.towers[towerModel.id]?.enemiesIds.append(creepModel.id)
-                    let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: towerLvl)), repeats: true) { timer in
-                        guard self.towers[towerModel.id]?.enemiesIds.contains(creepModel.id) ?? false else { timer.invalidate() ; return }
-                        self.fireBullet(towerId: towerModel.id, towerType: towerType, towerLvl: towerLvl, creepModel: creepModel, anchor: anchor, placingPosition: placingPosition, creepBundle: creepBundle)
-                    }
-                    timer.fire()
-                case .barracks: break
+                
+                self.towers[towerModel.id]?.enemiesIds.append(creepModel.id)
+                let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(towerType.cadence(lvl: towerLvl)), repeats: true) { timer in
+                    guard self.towers[towerModel.id]?.enemiesIds.contains(creepModel.id) ?? false else { timer.invalidate() ; return }
+                    self.fireBullet(towerId: towerModel.id, towerType: towerType, towerLvl: towerLvl, creepModel: creepModel, anchor: anchor, placingPosition: placingPosition, creepBundle: creepBundle)
                 }
+                timer.fire()
             }
-            
             towerSubscriptions = [beganSubs, updateSubs, endSubs]
         }
         towers[tower.model.id] = TowerBundle(model: tower.model, type: towerType, lvl: towerLvl, accessory: rangeAccessory, collisionSubs: towerSubscriptions)
     }
+    
+    
     func rotateTower(towerId: UInt64, creep: ModelEntity){
         print(creep.position)
         let tower = self.towers[towerId]!.model
@@ -656,11 +656,12 @@ class GameViewController: UIViewController {
         
         self.towers[towerId]?.model.setOrientation(q0, relativeTo: creep
             .anchor)
-        
     }
+    
     func fireBullet(towerId: UInt64, towerType: TowerType, towerLvl: TowerLevel, creepModel: ModelEntity, anchor: AnchorEntity, placingPosition: SIMD3<Float>, creepBundle: CreepBundle) {
         guard let enemiesCount = self.towers[towerId]?.enemiesIds.count else { return }
         let capacity = min(enemiesCount, towerType.capacity(lvl: towerLvl))
+        
         towers[towerId]?.enemiesIds[0..<capacity].forEach { id in
             guard id == creepModel.id else { return }
             let bullet = mapTemplates[ModelType.bullet.key]!.embeddedModel(at: placingPosition)
@@ -668,6 +669,7 @@ class GameViewController: UIViewController {
             anchor.addChild(bullet.model)
             var bulletTransform = bullet.model.transform
             bulletTransform.translation = creepModel.position
+//            bullet.model.orientation = orientato(to: creepModel)
             let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.2, timingFunction: .linear)
             let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
                 .filter { $0.playbackController == animation }
