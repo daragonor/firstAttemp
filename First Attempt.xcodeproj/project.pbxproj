@@ -23,7 +23,7 @@
 		19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055B2498984F00C70054 /* hud_placing.usdz */; };
 		19A205602498993700C70054 /* selectionRing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A2055F2498993700C70054 /* selectionRing.usdz */; };
 		19A205622498999700C70054 /* here.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19A205612498999700C70054 /* here.usdz */; };
-		19C4135824E9D674003AE195 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C4135724E9D674003AE195 /* Models.swift */; };
+		19C4135824E9D674003AE195 /* TowerBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C4135724E9D674003AE195 /* TowerBundle.swift */; };
 		19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C52454500D007F9198 /* MultipeerSession.swift */; };
 		19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */; };
 		19CDD42724B555D400551CE8 /* path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42624B555D400551CE8 /* path.usdz */; };
@@ -45,6 +45,12 @@
 		19E2F5622496FC6300879050 /* bullet.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5612496FC6300879050 /* bullet.usdz */; };
 		19E51B352478B37C00443998 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E51B342478B37C00443998 /* Map.swift */; };
 		19E51B372478B6F500443998 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 19E51B362478B6F500443998 /* config.json */; };
+		7C1BB385260F9C6C004E5C5C /* BulletBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB384260F9C6C004E5C5C /* BulletBundle.swift */; };
+		7C1BB389260FB137004E5C5C /* TroopBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB388260FB137004E5C5C /* TroopBundle.swift */; };
+		7C1BB38C260FB196004E5C5C /* UnitBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB38B260FB196004E5C5C /* UnitBundle.swift */; };
+		7C1BB38F260FB20F004E5C5C /* CreepBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB38E260FB20F004E5C5C /* CreepBundle.swift */; };
+		7C1BB397260FB267004E5C5C /* PlacingBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB396260FB267004E5C5C /* PlacingBundle.swift */; };
+		7C1BB39C260FB2E3004E5C5C /* SpawnBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB39B260FB2E3004E5C5C /* SpawnBundle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,7 +73,7 @@
 		19A2055F2498993700C70054 /* selectionRing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = selectionRing.usdz; sourceTree = "<group>"; };
 		19A205612498999700C70054 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
 		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
-		19C4135724E9D674003AE195 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		19C4135724E9D674003AE195 /* TowerBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerBundle.swift; sourceTree = "<group>"; };
 		19CA62C52454500D007F9198 /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
 		19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
 		19CDD42624B555D400551CE8 /* path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = path.usdz; sourceTree = "<group>"; };
@@ -89,6 +95,12 @@
 		19E2F5612496FC6300879050 /* bullet.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = bullet.usdz; sourceTree = "<group>"; };
 		19E51B342478B37C00443998 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		19E51B362478B6F500443998 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
+		7C1BB384260F9C6C004E5C5C /* BulletBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulletBundle.swift; sourceTree = "<group>"; };
+		7C1BB388260FB137004E5C5C /* TroopBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroopBundle.swift; sourceTree = "<group>"; };
+		7C1BB38B260FB196004E5C5C /* UnitBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitBundle.swift; sourceTree = "<group>"; };
+		7C1BB38E260FB20F004E5C5C /* CreepBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreepBundle.swift; sourceTree = "<group>"; };
+		7C1BB396260FB267004E5C5C /* PlacingBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacingBundle.swift; sourceTree = "<group>"; };
+		7C1BB39B260FB2E3004E5C5C /* SpawnBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpawnBundle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,7 +152,6 @@
 				192222BE245D0A09001364E9 /* Utils.swift */,
 				19E51B342478B37C00443998 /* Map.swift */,
 				19CDD44624B64D6400551CE8 /* ModelUtils.swift */,
-				19C4135724E9D674003AE195 /* Models.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -166,6 +177,7 @@
 		1935BBAA24290F9500C764C1 /* First Attempt */ = {
 			isa = PBXGroup;
 			children = (
+				7C1BB382260F6167004E5C5C /* Models */,
 				192222C2245D0B6D001364E9 /* Network */,
 				191B2A2124B233300010E66E /* Game */,
 				192222C3245D0B84001364E9 /* Utils */,
@@ -243,6 +255,20 @@
 			children = (
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		7C1BB382260F6167004E5C5C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				19C4135724E9D674003AE195 /* TowerBundle.swift */,
+				7C1BB384260F9C6C004E5C5C /* BulletBundle.swift */,
+				7C1BB388260FB137004E5C5C /* TroopBundle.swift */,
+				7C1BB38B260FB196004E5C5C /* UnitBundle.swift */,
+				7C1BB38E260FB20F004E5C5C /* CreepBundle.swift */,
+				7C1BB396260FB267004E5C5C /* PlacingBundle.swift */,
+				7C1BB39B260FB2E3004E5C5C /* SpawnBundle.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		EB7395D52FBF922820E95978 /* Frameworks */ = {
@@ -351,14 +377,20 @@
 			files = (
 				19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */,
 				19CDD44724B64D6500551CE8 /* ModelUtils.swift in Sources */,
+				7C1BB389260FB137004E5C5C /* TroopBundle.swift in Sources */,
 				19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */,
 				1935BBAC24290F9500C764C1 /* AppDelegate.swift in Sources */,
 				198E215024BAF1A5008FBB56 /* MenuViewController.swift in Sources */,
 				192EEFE3243A7F9D00EAE788 /* GameViewController.swift in Sources */,
 				192222BF245D0A09001364E9 /* Utils.swift in Sources */,
 				19E51B352478B37C00443998 /* Map.swift in Sources */,
+				7C1BB38F260FB20F004E5C5C /* CreepBundle.swift in Sources */,
 				192222C1245D0B63001364E9 /* GameViewController+MultipeerSession.swift in Sources */,
-				19C4135824E9D674003AE195 /* Models.swift in Sources */,
+				7C1BB38C260FB196004E5C5C /* UnitBundle.swift in Sources */,
+				7C1BB385260F9C6C004E5C5C /* BulletBundle.swift in Sources */,
+				7C1BB397260FB267004E5C5C /* PlacingBundle.swift in Sources */,
+				19C4135824E9D674003AE195 /* TowerBundle.swift in Sources */,
+				7C1BB39C260FB2E3004E5C5C /* SpawnBundle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

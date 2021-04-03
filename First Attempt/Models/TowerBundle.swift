@@ -13,13 +13,7 @@ import Combine
 
 
 class TowerBundle {
-    var model: ModelEntity
-    var type: TowerType
-    var lvl: TowerLevel
-    var accessory: Entity
-    var enemiesIds: [UInt64]
-    var collisionSubs: [Cancellable]
-    init(model: ModelEntity, type: TowerType, lvl: TowerLevel = .lvl1, accessory: Entity, collisionSubs: [Cancellable]) {
+    internal init(model: ModelEntity, type: TowerType, lvl: TowerLevel = .lvl1, accessory: Entity, collisionSubs: [Cancellable]) {
         self.model = model
         self.type = type
         self.lvl = lvl
@@ -27,4 +21,11 @@ class TowerBundle {
         self.enemiesIds = []
         self.collisionSubs = collisionSubs
     }
+    
+    var model: ModelEntity
+    var type: TowerType
+    var lvl: TowerLevel
+    var accessory: Entity
+    var enemiesIds: [UInt64]
+    var collisionSubs: [Cancellable]
 }

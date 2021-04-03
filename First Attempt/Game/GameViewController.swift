@@ -22,16 +22,15 @@ enum GameState {
 typealias ActionStripBundle = (action: Action, options: [StripOption])
 
 enum Action {
-    case none, placing, undo, ready, tower
-    func strip(for type: Any? = nil) -> ActionStripBundle {
+    case none, placing, undo, ready, tower(type: TowerType)
+    var strip: ActionStripBundle {
         var options = [StripOption]()
         switch self {
         case .undo: options = [.undo]
         case .ready: options = [.undo, .start]
         case .placing: options = [.turret, .launcher, .barracks]
-        case .tower:
-            guard let tower = type as? TowerType else { options = []; break}
-            switch tower {
+        case .tower(let type):
+            switch type {
             case .turret, .rocket: options = [.upgrade, .sell]
             case .barracks: options = [.upgrade, .sell, .rotateLeft, .rotateRight]
             }
@@ -40,14 +39,10 @@ enum Action {
         return (self, options)
     }
 }
-enum Filter {
+enum Filter: Int {
     case placings, towers, creeps
     var group: CollisionGroup {
-        switch self {
-        case .placings: return CollisionGroup.init(rawValue: 0)
-        case .towers: return CollisionGroup.init(rawValue: 1)
-        case .creeps: return CollisionGroup.init(rawValue: 2)
-        }
+        return CollisionGroup(rawValue: UInt32(rawValue))
     }
 }
 
@@ -84,20 +79,10 @@ class GameViewController: UIViewController {
     var playerHP = 20
     var usedMaps = 0
     var coinsTimer: Timer?
-    
-    var canStart: Bool {
-        return usedMaps == gameConfig.missions[mission].maps.count
-    }
-    
+    var canStart: Bool { usedMaps == gameConfig.missions[mission].maps.count }
     var hasStarted: Bool = false
     var didMissionFinish = false
     
-    typealias SpawnBundle = (model: ModelEntity, position: Position, map: Int)
-    typealias PlacingBundle = (model: ModelEntity, position: Position, towerId: UInt64?)
-    typealias UnitBundle = (hpBarId: UInt64, hp: Float, maxHP: Float)
-    typealias CreepBundle = (unit: UnitBundle, type: CreepType, animation: AnimationPlaybackController?, subscription: Cancellable?)
-    typealias TroopBundle = (unit: UnitBundle, towerId: UInt64, enemiesIds: [UInt64])
-    typealias BulletBundle = (model: ModelEntity, animation: AnimationPlaybackController, subscription: Cancellable?)
     var spawnPlaces = [SpawnBundle]()
     var glyphs = [UInt64: ModelEntity]()
     var usedGlyphs = [UInt64]()
@@ -106,6 +91,7 @@ class GameViewController: UIViewController {
     var towers = [UInt64:TowerBundle]()
     var troops = [UInt64:TroopBundle]()
     var bullets = [UInt64:BulletBundle]()
+    
     var selectedPlacing: PlacingBundle?
     var strip: ActionStripBundle = (.none, [])
     var terrainAnchors = [AnchorEntity]()
@@ -128,7 +114,6 @@ class GameViewController: UIViewController {
 
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
         guard let menu = segue.destination as? MenuViewController else { return }
         menuViewController = menu
         menu.logoView = logoView
@@ -139,12 +124,12 @@ class GameViewController: UIViewController {
         menu.showMenu = {
             self.gameInfoStackView.isHidden = true
             self.loadDefaultValues()
-            self.reloadActionStrip(with: Action.none.strip())
+            self.reloadActionStrip(with: Action.none.strip)
             let arConfig = ARWorldTrackingConfiguration()
             self.arView.session.run(arConfig, options: .removeExistingAnchors)
         }
 
-        menu.startMission = { mission in
+        menu.loadMission = { mission in
             self.gameMenuView.isHidden = true
             self.loadMission(mission: mission)
             self.configureMultipeer()
@@ -174,6 +159,7 @@ class GameViewController: UIViewController {
         self.playerHP = 20
         self.usedMaps = 0
     }
+    
     func loadMission(mission: Int) {
         self.mission = mission
         self.gameInfoStackView.isHidden = false
@@ -190,29 +176,31 @@ class GameViewController: UIViewController {
             modelNames += TowerType.allCases.map { $0.key(.lvl3) }
 
             for name in modelNames {
-                loadingSubs.append(ModelEntity.loadAsync(named: name)
-                    .sink(receiveCompletion: { error in
-                        print(error)
-                    }, receiveValue: { entity in
-                        self.loadedModels += 1
-                        if self.loadedModels == modelNames.count {
-                            for lifepoint in Lifepoints.allCases {
-                                self.mapTemplates[lifepoint.key] = ModelEntity(mesh: .generateBox(size: SIMD3(x: 0.003, y: 0.0005, z: 0.0005), cornerRadius: 0.0002), materials: [SimpleMaterial(color: lifepoint.color, isMetallic: false)])
+                loadingSubs.append(
+                    ModelEntity.loadAsync(named: name)
+                        .sink(receiveCompletion: { error in
+                            print(error)
+                        }, receiveValue: { entity in
+                            self.loadedModels += 1
+                            if self.loadedModels == modelNames.count {
+                                for lifepoint in Lifepoints.allCases {
+                                    self.mapTemplates[lifepoint.key] = ModelEntity(mesh: .generateBox(size: SIMD3(x: 0.003, y: 0.0005, z: 0.0005), cornerRadius: 0.0002), materials: [SimpleMaterial(color: lifepoint.color, isMetallic: false)])
+                                }
+                                self.hideLoadingAssets()
+                                self.loadAnchorConfiguration()
                             }
-                            self.hideLoadingAssets()
-                            self.loadAnchorConfiguration()
-                        }
-                        if let factor = ModelType(rawValue: name)?.scalingFactor {
-                            entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
-                            self.mapTemplates[name] = entity
-                        } else if let factor = CreepType(rawValue: name)?.scalingFactor {
-                            entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
-                            self.unitTemplates[name] = entity
-                        } else {
-                            entity.setScale(SIMD3(repeating: TowerType.scalingFactor), relativeTo: nil)
-                            self.unitTemplates[name] = entity
-                        }
-                    })
+                            
+                            if let factor = ModelType(rawValue: name)?.scalingFactor {
+                                entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
+                                self.mapTemplates[name] = entity
+                            } else if let factor = CreepType(rawValue: name)?.scalingFactor {
+                                entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
+                                self.unitTemplates[name] = entity
+                            } else {
+                                entity.setScale(SIMD3(repeating: TowerType.scalingFactor), relativeTo: nil)
+                                self.unitTemplates[name] = entity
+                            }
+                        })
                 )
             }
         } else  {
@@ -301,6 +289,7 @@ class GameViewController: UIViewController {
         didMissionFinish = false
         var timeRemaining: Float = 0
         coinsTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+        //agregar tiempo de espera entre waves
             if timeRemaining == 0, self.waveCount < self.gameConfig.missions[self.mission].waves {
                 timeRemaining = self.waveInterval
                 self.sendWave()
@@ -312,7 +301,7 @@ class GameViewController: UIViewController {
             self.coinsLabel.text = "\(self.coins)"
         }
         coinsTimer?.fire()
-        reloadActionStrip(with: Action.none.strip())
+        reloadActionStrip(with: Action.none.strip)
         hasStarted = true
     }
     
@@ -327,14 +316,7 @@ class GameViewController: UIViewController {
                 count += 1
                 print(self.waveCount % CreepType.allCases.count)
                 let creepType = CreepType.allCases[self.waveCount % CreepType.allCases.count]
-                let creep: EmbeddedModel = {
-                    switch creepType {
-                    case .heavy: return self.unitTemplates[CreepType.heavy.key]!.embeddedModel(at: spawn.model.transform.translation)
-                    case .regular: return self.unitTemplates[CreepType.regular.key]!.embeddedModel(at: spawn.model.transform.translation)
-                    case .small: return self.unitTemplates[CreepType.small.key]!.embeddedModel(at: spawn.model.transform.translation)
-                    case .flying: return self.unitTemplates[CreepType.flying.key]!.embeddedModel(at: spawn.model.transform.translation)
-                    }
-                }()
+                let creep: EmbeddedModel = self.unitTemplates[creepType.key]!.embeddedModel(at: spawn.model.transform.translation)
                 creep.model.position.y += 0.03
                 let bounds = creep.entity.visualBounds(relativeTo: creep.model)
                 creep.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: SIMD3(repeating: 0.0015))], mode: .trigger, filter: CollisionFilter(group: Filter.creeps.group, mask: Filter.towers.group))
@@ -342,7 +324,7 @@ class GameViewController: UIViewController {
                 let creepHPbar = self.mapTemplates[Lifepoints.full.key]!.clone(recursive: true)
                 creep.model.addChild(creepHPbar)
                 creepHPbar.position.y = (bounds.extents.y / 2) + 0.003
-                self.creeps[creep.model.id] = ((creepHPbar.id, creepType.maxHP, creepType.maxHP), creepType, nil, nil)
+                self.creeps[creep.model.id] = CreepBundle(hpBarId: creepHPbar.id, type: creepType, animation: nil, subscription: nil)
                 creep.entity.playAnimation(creep.entity.availableAnimations[0].repeat())
                 self.deployUnit(creep.model, type: creepType,speed: creepType.speed, on: paths[self.waveCount % paths.count], setScale: 10)
             }
@@ -402,7 +384,7 @@ class GameViewController: UIViewController {
                 sendSelectedPlacing(position: (-1, -1))
                 selectedPlacing = nil
                 towers.forEach { $1.accessory.isEnabled = false }
-                reloadActionStrip(with: Action.none.strip())
+                reloadActionStrip(with: Action.none.strip)
             } else {
                 sendSelectedPlacing(position: tappedPlacing.value.position)
                 selectedPlacing = tappedPlacing.value
@@ -410,9 +392,9 @@ class GameViewController: UIViewController {
                 if let tappedTowerId = tappedPlacing.value.towerId {
                     guard let towerBundle = towers.first(where: { id, _ in id == tappedTowerId })?.value else { return }
                     towerBundle.accessory.isEnabled = true
-                    reloadActionStrip(with: Action.tower.strip(for: towerBundle.type))
+                    reloadActionStrip(with: Action.tower(type: towerBundle.type).strip)
                 } else {
-                    reloadActionStrip(with: Action.placing.strip())
+                    reloadActionStrip(with: Action.placing.strip)
                 }
             }
         } else {
@@ -495,16 +477,16 @@ class GameViewController: UIViewController {
                     let bounds = placing.entity.visualBounds(relativeTo: placing.model)
                     placing.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
                     anchor.addChild(placing.model)
-                    placings[placing.model.id] = (placing.model, (row,column), nil)
+                    placings[placing.model.id] = PlacingBundle(model: placing.model, position: (row,column), towerId: nil)
                 case .higherPlacing:
                     let placing = mapTemplates[ModelType.towerPlacing.key]!.embeddedModel(at: [x, 0.102, z])
                     let bounds = placing.entity.visualBounds(relativeTo: placing.model)
                     placing.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
                     anchor.addChild(placing.model)
-                    placings[placing.model.id] = (placing.model, (row,column), nil)
+                    placings[placing.model.id] = PlacingBundle(model: placing.model, position: (row,column), towerId: nil)
                 case .spawn:
                     let station = mapTemplates[ModelType.spawnPort.key]!.embeddedModel(at: [x, 0.001, z])
-                    spawnPlaces.append((station.model, (row, column), usedMaps))
+                    spawnPlaces.append(SpawnBundle(model: station.model, position: (row, column), map: usedMaps))
                     anchor.addChild(station.model)
                 }
             }
@@ -515,29 +497,7 @@ class GameViewController: UIViewController {
         guard let placingPosition = selectedPlacing?.model.position, let anchor = selectedPlacing?.model.anchor as? AnchorEntity else { return }
         
         coins -= towerType.cost(lvl: towerLvl)
-        let tower: EmbeddedModel = {
-            switch towerLvl {
-            case .lvl1:
-                switch towerType {
-                case .turret: return unitTemplates[TowerType.turret.key(.lvl1)]!.embeddedModel(at: placingPosition)
-                case .rocket: return unitTemplates[TowerType.rocket.key(.lvl1)]!.embeddedModel(at: placingPosition)
-                case .barracks: return unitTemplates[TowerType.barracks.key(.lvl1)]!.embeddedModel(at: placingPosition)
-                }
-            case .lvl2:
-                switch towerType {
-                case .turret: return unitTemplates[TowerType.turret.key(.lvl2)]!.embeddedModel(at: placingPosition)
-                case .rocket: return unitTemplates[TowerType.rocket.key(.lvl2)]!.embeddedModel(at: placingPosition)
-                case .barracks: return unitTemplates[TowerType.barracks.key(.lvl2)]!.embeddedModel(at: placingPosition)
-                }
-            case .lvl3:
-                switch towerType {
-                case .turret: return unitTemplates[TowerType.turret.key(.lvl3)]!.embeddedModel(at: placingPosition)
-                case .rocket: return unitTemplates[TowerType.rocket.key(.lvl3)]!.embeddedModel(at: placingPosition)
-                case .barracks: return unitTemplates[TowerType.barracks.key(.lvl3)]!.embeddedModel(at: placingPosition)
-                }
-            }
-        }()
-        
+        let tower: EmbeddedModel = unitTemplates[towerType.key(towerLvl)]!.embeddedModel(at: placingPosition)
         placings.keys.forEach { id in
             if id == selectedPlacing?.model.id {
                 placings[id]?.towerId = tower.model.id
@@ -597,7 +557,7 @@ class GameViewController: UIViewController {
                     }
                 }
                 towerSubscriptions = [beganSubs, endSubs]
-                troops[troop.model.id] = ((troopHPbar.id, towerType.maxHP(lvl: towerLvl), towerType.maxHP(lvl: towerLvl)), tower.model.id, [])
+                troops[troop.model.id] = TroopBundle(hpBarId: troopHPbar.id,maxHP: towerType.maxHP(lvl: towerLvl), towerId: tower.model.id)
             }
             
         } else {
@@ -683,48 +643,47 @@ class GameViewController: UIViewController {
                     self.bullets[bullet.model.id]?.model.removeFromParent()
                     self.damageCreep(creepModel: creepModel, towerId: towerId, attack: towerType.attack(lvl: towerLvl))
                 })
-            self.bullets[bullet.model.id] = (bullet.model, animation,subscription)
+            self.bullets[bullet.model.id] = BulletBundle(model: bullet.model, animation: animation,subscription: subscription)
         }
     }
     
     func damageTroop(troopModel: ModelEntity, creepId: UInt64, attack: Float) {
-        guard let troopBundle = troops[troopModel.id], let (childIndex, child) = troopModel.children.enumerated().first(where: { $1.id == troops[troopModel.id]?.unit.hpBarId }) else { return }
-        troops[troopModel.id]?.unit.hp -= attack
-        if troopBundle.unit.hp < 0 {
+        guard let troopBundle = troops[troopModel.id], let (childIndex, child) = troopModel.children.enumerated().first(where: { $1.id == troops[troopModel.id]?.hpBarId }) else { return }
+        troops[troopModel.id]?.hp -= attack
+        if troopBundle.hp < 0 {
             creeps[creepId]?.animation?.resume()
             troopModel.removeFromParent()
             troops[troopModel.id]?.enemiesIds.removeAll()
             troops.removeValue(forKey: troopModel.id)
         }
-        let hpPercentage = troopBundle.unit.hp / troopBundle.unit.maxHP
+        let hpPercentage = troopBundle.hp / troopBundle.maxHP
         let hpBar = mapTemplates[Lifepoints.status(hp: hpPercentage).key]!.clone(recursive: true)
         hpBar.scale = [hpPercentage, 1.0, 1.0]
         troopModel.children[childIndex] = hpBar
         hpBar.position = child.position
         child.removeFromParent()
-        troops[troopModel.id]?.unit.hpBarId = hpBar.id
+        troops[troopModel.id]?.hpBarId = hpBar.id
     }
     
     func damageCreep(creepModel: ModelEntity, towerId: UInt64, attack: Float) {
-        guard let creepBundle = creeps[creepModel.id], let (childIndex, child) = creepModel.children.enumerated().first(where: { $1.id == creeps[creepModel.id]?.unit.hpBarId }) else { return }
-        creeps[creepModel.id]?.unit.hp -= attack
-        if creepBundle.unit.hp < 0 {
+        guard let creepBundle = creeps[creepModel.id], let (childIndex, child) = creepModel.children.enumerated().first(where: { $1.id == creeps[creepModel.id]?.hpBarId }) else { return }
+        creeps[creepModel.id]?.hp -= attack
+        if creepBundle.hp < 0 {
             coins += creepBundle.type.reward
             towers[towerId]?.enemiesIds.removeAll(where: { id in id == creepModel.id })
-            troops[towerId]?.enemiesIds.removeAll(where: { id in id == creepModel.id })
             creepModel.removeFromParent()
             creeps.removeValue(forKey: creepModel.id)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.checkMissionCompleted()
             }
         }
-        let hpPercentage = creepBundle.unit.hp / creepBundle.unit.maxHP
+        let hpPercentage = creepBundle.hp / creepBundle.maxHP
         let hpBar = mapTemplates[Lifepoints.status(hp: hpPercentage).key]!.clone(recursive: true)
         hpBar.scale = [hpPercentage, 1.0, 1.0]
         creepModel.children[childIndex] = hpBar
         hpBar.position = child.position
         child.removeFromParent()
-        creeps[creepModel.id]?.unit.hpBarId = hpBar.id
+        creeps[creepModel.id]?.hpBarId = hpBar.id
     }
 }
 
@@ -744,7 +703,8 @@ extension GameViewController: ARSessionDelegate {
                 if usedMaps < maps.count {
                     insertMap(anchor: terrainAnchor, map: maps[usedMaps])
                     usedMaps += 1
-                    maps.count == usedMaps ? reloadActionStrip(with: Action.ready.strip()) : reloadActionStrip(with: Action.undo.strip())
+                    maps.count == usedMaps ?
+                        reloadActionStrip(with: Action.ready.strip) : reloadActionStrip(with: Action.undo.strip)
                 }
                 
             } else {
@@ -760,12 +720,12 @@ extension GameViewController: ARSessionDelegate {
                 let entityBounds = glyph.visualBounds(relativeTo: model)
                 model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: entityBounds.extents).offsetBy(translation: entityBounds.center)])
                 arView.installGestures([.rotation, .translation] ,for: model)
+                //añadir rotation al anchor
             }
         }
     }
     func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
         for anchor in anchors {
-            
             if anchor.name == "Terrain" {
                 
             }
@@ -803,7 +763,7 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
         switch strip.action {
         case .none: break
         case .ready:
-            switch Action.ready.strip().options[indexPath.row] {
+            switch Action.ready.strip.options[indexPath.row] {
             case .undo:
                 undoPlacing()
                 sendAction(option: StripOption.undo)
@@ -817,11 +777,10 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
             sendAction(option: StripOption.undo)
         case .placing:
             let towerType = TowerType.allCases[indexPath.row]
-            if towerType.cost(lvl: .lvl1) <= coins {
-                insertTower(towerType: towerType, towerLvl: .lvl1)
-                sendTower(type: towerType.rawValue, lvl: TowerLevel.lvl1.rawValue)
-                reloadActionStrip(with: Action.tower.strip(for: towerType))
-            }
+            guard towerType.cost(lvl: .lvl1) <= coins else { return }
+            insertTower(towerType: towerType, towerLvl: .lvl1)
+            sendTower(type: towerType.rawValue, lvl: TowerLevel.lvl1.rawValue)
+            reloadActionStrip(with: Action.tower(type: towerType).strip)
         case .tower:
             guard let towerId = selectedPlacing?.towerId, let placingId = selectedPlacing?.model.id, let tower = towers[towerId] else { break }
             switch strip.options[indexPath.row] {
@@ -830,13 +789,13 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
                 towers.removeValue(forKey: towerId)
                 tower.model.removeFromParent()
                 insertTower(towerType: tower.type, towerLvl: tower.lvl.nextLevel)
-                reloadActionStrip(with: Action.tower.strip(for: tower.type))
+                reloadActionStrip(with: Action.tower(type: tower.type).strip)
             case .sell:
                 placings[placingId]?.towerId = nil
                 towers.removeValue(forKey: towerId)
                 tower.model.removeFromParent()
                 coins += Int(Float(tower.type.cost(lvl: tower.lvl)) * 0.5)
-                reloadActionStrip(with: Action.placing.strip())
+                reloadActionStrip(with: Action.placing.strip)
             default: break
             }
         }
@@ -900,18 +859,18 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
-        // ...
-        //        let sessionIDCommandString = "SessionID:"
-        //        if let commandString = String(data: data, encoding: .utf8), commandString.starts(with: sessionIDCommandString) {
-        //            let newSessionID = String(commandString[commandString.index(commandString.startIndex,
-        //                                                                        offsetBy: sessionIDCommandString.count)...])
-        //            // If this peer was using a different session ID before, remove all its associated anchors.
-        //            // This will remove the old participant anchor and its geometry from the scene.
-        //            if let oldSessionID = peerSessionIDs[peer] {
-        //                removeAllAnchorsOriginatingFromARSessionWithID(oldSessionID)
-        //            }
-        //
-        //            peerSessionIDs[peer] = newSessionID
-        //        }
+//         
+//                let sessionIDCommandString = "SessionID:"
+//                if let commandString = String(data: data, encoding: .utf8), commandString.starts(with: sessionIDCommandString) {
+//                    let newSessionID = String(commandString[commandString.index(commandString.startIndex,
+//                                                                                offsetBy: sessionIDCommandString.count)...])
+//                    // If this peer was using a different session ID before, remove all its associated anchors.
+//                    // This will remove the old participant anchor and its geometry from the scene.
+//                    if let oldSessionID = peerSessionIDs[peer] {
+//                        removeAllAnchorsOriginatingFromARSessionWithID(oldSessionID)
+//                    }
+//        
+//                    peerSessionIDs[peer] = newSessionID
+//                }
     }
 }
