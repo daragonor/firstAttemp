@@ -22,17 +22,19 @@ enum GameState {
 typealias ActionStripBundle = (action: Action, options: [StripOption])
 
 enum Action {
-    case none, placing, undo, ready, tower(type: TowerType)
+    case none, placing(hasStarted: Bool), undo, ready, tower(hasStarted: Bool, type: TowerType)
     var strip: ActionStripBundle {
         var options = [StripOption]()
         switch self {
         case .undo: options = [.undo]
         case .ready: options = [.undo, .start]
-        case .placing: options = [.turret, .launcher, .barracks]
-        case .tower(let type):
+        case .placing(let hasStarted):
+            options = [.turret, .launcher, .barracks]
+            if !hasStarted { options.insert(contentsOf: [.undo, .start], at: .zero) }
+        case .tower(let hasStarted, let type):
             switch type {
-            case .turret, .rocket: options = [.upgrade, .sell]
-            case .barracks: options = [.upgrade, .sell, .rotateLeft, .rotateRight]
+            case .turret, .rocket: options = hasStarted ? [.upgrade, .sell] : [.undo, .start]
+            case .barracks: options = hasStarted ?  [.upgrade, .sell, .rotateLeft, .rotateRight] : [.undo, .start, .rotateLeft, .rotateRight]
             }
         case .none: options = []
         }
@@ -379,7 +381,7 @@ class GameViewController: UIViewController {
         let tapLocation = sender.location(in: arView)
         let entities = arView.entities(at: tapLocation)
         guard let entity = entities.first else { return }
-        if hasStarted, let tappedPlacing = placings.first(where: { id, _ in entities.contains(where: {$0.id == id}) }) {
+        if let tappedPlacing = placings.first(where: { id, _ in entities.contains(where: {$0.id == id}) }) {
             if tappedPlacing.key == selectedPlacing?.model.id {
                 sendSelectedPlacing(position: (-1, -1))
                 selectedPlacing = nil
@@ -392,9 +394,9 @@ class GameViewController: UIViewController {
                 if let tappedTowerId = tappedPlacing.value.towerId {
                     guard let towerBundle = towers.first(where: { id, _ in id == tappedTowerId })?.value else { return }
                     towerBundle.accessory.isEnabled = true
-                    reloadActionStrip(with: Action.tower(type: towerBundle.type).strip)
+                    reloadActionStrip(with: Action.tower(hasStarted: hasStarted, type: towerBundle.type).strip)
                 } else {
-                    reloadActionStrip(with: Action.placing.strip)
+                    reloadActionStrip(with: Action.placing(hasStarted: hasStarted).strip)
                 }
             }
         } else {
@@ -577,7 +579,7 @@ class GameViewController: UIViewController {
                 case .turret:
                     guard let enemyID = self.towers[tower.model.id]?.enemiesIds.first, let creepModel = event.entityB as? ModelEntity, creepModel.id == enemyID else { return }
                     guard let _ = event.entityA as? ModelEntity else { return }
-                    //                self.rotateTower(towerId: towerModel.id, creep: creepModel)
+                    self.rotateTower(towerId: tower.model.id, creep: creepModel)
                     break
                 case .barracks, .rocket: break
                 }
@@ -602,7 +604,6 @@ class GameViewController: UIViewController {
     
     
     func rotateTower(towerId: UInt64, creep: ModelEntity){
-        print(creep.position)
         let tower = self.towers[towerId]!.model
         let vectorProduct = creep.position.x * tower.position.x + creep.position.y * tower.position.y + creep.position.z * tower.position.z
         let vectorAModule = sqrtf(powf(creep.position.x, 2.0) + powf(creep.position.y, 2.0) + powf(creep.position.z, 2.0))
@@ -776,11 +777,20 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
             undoPlacing()
             sendAction(option: StripOption.undo)
         case .placing:
-            let towerType = TowerType.allCases[indexPath.row]
-            guard towerType.cost(lvl: .lvl1) <= coins else { return }
-            insertTower(towerType: towerType, towerLvl: .lvl1)
-            sendTower(type: towerType.rawValue, lvl: TowerLevel.lvl1.rawValue)
-            reloadActionStrip(with: Action.tower(type: towerType).strip)
+            switch strip.options[indexPath.row]  {
+            case .start:
+                startMission()
+                sendAction(option: StripOption.start)
+            case .undo:
+                undoPlacing()
+                sendAction(option: StripOption.undo)
+            default:
+                let towerType = TowerType.allCases[indexPath.row]
+                guard towerType.cost(lvl: .lvl1) <= coins else { return }
+                insertTower(towerType: towerType, towerLvl: .lvl1)
+                sendTower(type: towerType.rawValue, lvl: TowerLevel.lvl1.rawValue)
+                reloadActionStrip(with: Action.tower(hasStarted: hasStarted, type: towerType).strip)
+            }
         case .tower:
             guard let towerId = selectedPlacing?.towerId, let placingId = selectedPlacing?.model.id, let tower = towers[towerId] else { break }
             switch strip.options[indexPath.row] {
@@ -789,13 +799,19 @@ extension GameViewController: UITableViewDelegate, UITableViewDataSource {
                 towers.removeValue(forKey: towerId)
                 tower.model.removeFromParent()
                 insertTower(towerType: tower.type, towerLvl: tower.lvl.nextLevel)
-                reloadActionStrip(with: Action.tower(type: tower.type).strip)
+                reloadActionStrip(with: Action.tower(hasStarted: hasStarted, type: tower.type).strip)
             case .sell:
                 placings[placingId]?.towerId = nil
                 towers.removeValue(forKey: towerId)
                 tower.model.removeFromParent()
                 coins += Int(Float(tower.type.cost(lvl: tower.lvl)) * 0.5)
-                reloadActionStrip(with: Action.placing.strip)
+                reloadActionStrip(with: Action.placing(hasStarted: hasStarted).strip)
+            case .start:
+                startMission()
+                sendAction(option: StripOption.start)
+            case .undo:
+                undoPlacing()
+                sendAction(option: StripOption.undo)
             default: break
             }
         }

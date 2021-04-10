@@ -72,7 +72,6 @@
 		19A2055B2498984F00C70054 /* hud_placing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = hud_placing.usdz; sourceTree = "<group>"; };
 		19A2055F2498993700C70054 /* selectionRing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = selectionRing.usdz; sourceTree = "<group>"; };
 		19A205612498999700C70054 /* here.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = here.usdz; sourceTree = "<group>"; };
-		19B0EDD3243851700045E263 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = Pods/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework; sourceTree = "<group>"; };
 		19C4135724E9D674003AE195 /* TowerBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerBundle.swift; sourceTree = "<group>"; };
 		19CA62C52454500D007F9198 /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
 		19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
@@ -161,7 +160,6 @@
 			children = (
 				1935BBAA24290F9500C764C1 /* First Attempt */,
 				1935BBA924290F9500C764C1 /* Products */,
-				7013098FE4898254999337E4 /* Pods */,
 				EB7395D52FBF922820E95978 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -250,13 +248,6 @@
 			path = paths;
 			sourceTree = "<group>";
 		};
-		7013098FE4898254999337E4 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		7C1BB382260F6167004E5C5C /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -274,7 +265,6 @@
 		EB7395D52FBF922820E95978 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				19B0EDD3243851700045E263 /* WebRTC.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -306,7 +296,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1130;
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Daniel Aragon";
 				TargetAttributes = {
 					1935BBA724290F9500C764C1 = {
@@ -442,6 +432,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -503,6 +494,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

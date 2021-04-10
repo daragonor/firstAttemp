@@ -11,6 +11,7 @@ import RealityKit
 import GameplayKit
 
 enum StripOption: String, CaseIterable {
+//    case refund
     case upgrade, sell, turret, launcher, barracks, rotateRight, rotateLeft, undo, start
     var key: String {
         return self.rawValue
