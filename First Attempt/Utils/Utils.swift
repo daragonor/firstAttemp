@@ -19,6 +19,11 @@ enum Axis {
     }
 }
 
+extension Optional {
+    var isNil: Bool {
+        self == nil
+    }
+}
 
 extension Entity {
     func embeddedModel(at position: SIMD3<Float>) -> ModelBundle {

@@ -21,6 +21,7 @@ class TowerBundle: ModelBundle {
         self.collisionSubs = collisionSubs
         super.init(bundle)
     }
+    var attackTimer: Timer?
     var type: TowerType
     var lvl: TowerLevel
     var accessory: Entity
