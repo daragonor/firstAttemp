@@ -51,6 +51,7 @@
 		7C1BB38F260FB20F004E5C5C /* CreepBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB38E260FB20F004E5C5C /* CreepBundle.swift */; };
 		7C1BB397260FB267004E5C5C /* PlacingBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB396260FB267004E5C5C /* PlacingBundle.swift */; };
 		7C1BB39C260FB2E3004E5C5C /* SpawnBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1BB39B260FB2E3004E5C5C /* SpawnBundle.swift */; };
+		7C1CC121262D232400BACB46 /* ModelBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1CC120262D232400BACB46 /* ModelBundle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +101,7 @@
 		7C1BB38E260FB20F004E5C5C /* CreepBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreepBundle.swift; sourceTree = "<group>"; };
 		7C1BB396260FB267004E5C5C /* PlacingBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacingBundle.swift; sourceTree = "<group>"; };
 		7C1BB39B260FB2E3004E5C5C /* SpawnBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpawnBundle.swift; sourceTree = "<group>"; };
+		7C1CC120262D232400BACB46 /* ModelBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelBundle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -258,6 +260,7 @@
 				7C1BB38E260FB20F004E5C5C /* CreepBundle.swift */,
 				7C1BB396260FB267004E5C5C /* PlacingBundle.swift */,
 				7C1BB39B260FB2E3004E5C5C /* SpawnBundle.swift */,
+				7C1CC120262D232400BACB46 /* ModelBundle.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 				192222C1245D0B63001364E9 /* GameViewController+MultipeerSession.swift in Sources */,
 				7C1BB38C260FB196004E5C5C /* UnitBundle.swift in Sources */,
 				7C1BB385260F9C6C004E5C5C /* BulletBundle.swift in Sources */,
+				7C1CC121262D232400BACB46 /* ModelBundle.swift in Sources */,
 				7C1BB397260FB267004E5C5C /* PlacingBundle.swift in Sources */,
 				19C4135824E9D674003AE195 /* TowerBundle.swift in Sources */,
 				7C1BB39C260FB2E3004E5C5C /* SpawnBundle.swift in Sources */,

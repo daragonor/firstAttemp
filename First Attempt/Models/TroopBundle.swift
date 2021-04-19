@@ -12,10 +12,10 @@ import RealityKit
 import Combine
 
 class TroopBundle: UnitBundle {
-    internal init(hpBarId: UInt64, maxHP: Float, towerId: UInt64, enemiesIds: [UInt64] = []) {
+    internal init(bundle: ModelBundle, hpBarId: UInt64, maxHP: Float, towerId: UInt64, enemiesIds: [UInt64] = []) {
         self.towerId = towerId
         self.enemiesIds = enemiesIds
-        super.init(hpBarId: hpBarId, hp: maxHP, maxHP: maxHP)
+        super.init(bundle: bundle, hpBarId: hpBarId, hp: maxHP, maxHP: maxHP)
     }
     
     var towerId: UInt64

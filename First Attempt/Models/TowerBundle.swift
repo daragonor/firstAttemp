@@ -12,17 +12,15 @@ import RealityKit
 import Combine
 
 
-class TowerBundle {
-    internal init(model: ModelEntity, type: TowerType, lvl: TowerLevel = .lvl1, accessory: Entity, collisionSubs: [Cancellable]) {
-        self.model = model
+class TowerBundle: ModelBundle {
+    internal init(bundle: ModelBundle, type: TowerType, lvl: TowerLevel = .lvl1, accessory: Entity, collisionSubs: [Cancellable]) {
         self.type = type
         self.lvl = lvl
         self.accessory = accessory
         self.enemiesIds = []
         self.collisionSubs = collisionSubs
+        super.init(bundle)
     }
-    
-    var model: ModelEntity
     var type: TowerType
     var lvl: TowerLevel
     var accessory: Entity

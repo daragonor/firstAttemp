@@ -11,14 +11,13 @@ import ARKit
 import RealityKit
 import Combine
 
-class BulletBundle {
-    internal init(model: ModelEntity, animation: AnimationPlaybackController, subscription: Cancellable?) {
-        self.model = model
+class BulletBundle: ModelBundle {
+    internal init(bundle: ModelBundle, animation: AnimationPlaybackController, subscription: Cancellable?) {
         self.animation = animation
         self.subscription = subscription
+        super.init(bundle)
     }
     
-    var model: ModelEntity
     var animation: AnimationPlaybackController
     var subscription: Cancellable?
 }

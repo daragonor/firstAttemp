@@ -11,11 +11,12 @@ import ARKit
 import RealityKit
 import Combine
 
-class UnitBundle {
-    internal init(hpBarId: UInt64, hp: Float, maxHP: Float) {
+class UnitBundle: ModelBundle {
+    internal init(bundle: ModelBundle, hpBarId: UInt64, hp: Float, maxHP: Float) {
         self.hpBarId = hpBarId
         self.hp = hp
         self.maxHP = maxHP
+        super.init(bundle)
     }    
     
     var hpBarId: UInt64

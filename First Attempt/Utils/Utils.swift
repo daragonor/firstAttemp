@@ -8,16 +8,28 @@
 
 import ARKit
 import RealityKit
+enum Axis {
+    case x, y, z
+    var matrix: SIMD3<Float> {
+        switch self {
+        case .x: return [1, 0, 0]
+        case .y: return [0, 1, 0]
+        case .z: return [0, 0, 1]
+        }
+    }
+}
+
 
 extension Entity {
-    func embeddedModel(at position: SIMD3<Float>) -> EmbeddedModel {
+    func embeddedModel(at position: SIMD3<Float>) -> ModelBundle {
         let model = ModelEntity()
         let entity = self.clone(recursive: true)
         model.addChild(entity)
         model.position = position
-        return (model, entity)
+        return ModelBundle(model: model, entity: entity)
     }
 }
+
 extension StringProtocol {
     var firstUppercased: String { return prefix(1).uppercased() + dropFirst() }
 }
