@@ -24,14 +24,8 @@ class ModelBundle {
     var model: ModelEntity
     
     func rotate(to target: ModelBundle) {
-        let ca = target.model.position.x - model.position.x
-        let co = target.model.position.z - model.position.z
-        print ("ca:\(ca), co:\(co)")
-        var angle = atan(ca/co)
-        if target.model.position.z < model.position.z {
-            angle = angle + .pi
-        }
-        entity.transform.rotation = simd_quatf(angle: angle, axis: Axis.y.matrix)
+        let rotation = model.angle(targetPosition: target.model.position)
+        entity.transform.rotation = rotation
     }
     
 }

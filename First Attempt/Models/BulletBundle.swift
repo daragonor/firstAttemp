@@ -12,12 +12,12 @@ import RealityKit
 import Combine
 
 class BulletBundle: ModelBundle {
-    internal init(bundle: ModelBundle, animation: AnimationPlaybackController, subscription: Cancellable?) {
+    internal init(bundle: ModelBundle, animation: AnimationPlaybackController? = nil) {
         self.animation = animation
-        self.subscription = subscription
+        self.subscriptions = []
         super.init(bundle)
     }
     
-    var animation: AnimationPlaybackController
-    var subscription: Cancellable?
+    var animation: AnimationPlaybackController?
+    var subscriptions: [Cancellable]
 }

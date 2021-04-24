@@ -5,9 +5,10 @@
 //  Created by Daniel Aragon on 5/1/20.
 //  Copyright © 2020 Daniel Aragon. All rights reserved.
 //
-
+import Foundation
 import ARKit
 import RealityKit
+
 enum Axis {
     case x, y, z
     var matrix: SIMD3<Float> {
@@ -25,6 +26,12 @@ extension Optional {
     }
 }
 
+extension AnimationPlaybackController {
+    func isPlaybackController(output: Scene.Publisher<AnimationEvents.PlaybackCompleted>.Output) -> Bool {
+        return self == output.playbackController
+    }
+}
+
 extension Entity {
     func embeddedModel(at position: SIMD3<Float>) -> ModelBundle {
         let model = ModelEntity()
@@ -32,6 +39,16 @@ extension Entity {
         model.addChild(entity)
         model.position = position
         return ModelBundle(model: model, entity: entity)
+    }
+    
+    func angle(targetPosition: SIMD3<Float>) -> simd_quatf {
+        let ca = targetPosition.x - position.x
+        let co = targetPosition.z - position.z
+        var angle = atan(ca/co)
+        if targetPosition.z < position.z {
+            angle = angle + .pi
+        }
+        return simd_quatf(angle: angle, axis: Axis.y.matrix)
     }
 }
 

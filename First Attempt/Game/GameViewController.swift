@@ -314,7 +314,6 @@ class GameViewController: UIViewController {
             let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                 guard count < 2 else { timer.invalidate() ; return }
                 count += 1
-                print(self.waveCount % CreepType.allCases.count)
                 let creepType = CreepType.allCases[self.waveCount % CreepType.allCases.count]
                 let creep: ModelBundle = self.unitTemplates[creepType.key]!.embeddedModel(at: spawn.model.transform.translation)
                 creep.model.position.y += 0.03
@@ -333,7 +332,6 @@ class GameViewController: UIViewController {
     }
     
     func deployUnit(_ creep: ModelEntity, type: CreepType, speed: Float, to index: Int = 0, on path: [OrientedCoordinate], baseHeight: Float? = nil, setScale: Float? = nil) {
-        
         var unitTransform = creep.transform
         let move = path[index]
         ///Set new move
@@ -346,7 +344,7 @@ class GameViewController: UIViewController {
         let animation = creep.move(to: unitTransform, relativeTo: creep.anchor, duration: TimeInterval(speed), timingFunction: .linear)
         creeps[creep.id]?.animation = animation
         let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
-            .filter { $0.playbackController == animation }
+            .filter(animation.isPlaybackController)
             .sink(receiveValue: { event in
                 if move.mapLegend == .goal {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -363,7 +361,6 @@ class GameViewController: UIViewController {
                 }
             })
         creeps[creep.id]?.subscription = subscription
-        
     }
     
     func undoPlacing() {
@@ -513,7 +510,7 @@ class GameViewController: UIViewController {
         let rangeAccessory = ModelEntity(mesh: .generateBox(size: SIMD3(x: diameter, y: 0.02, z: diameter), cornerRadius: 0.025), materials: [SimpleMaterial(color: UIColor.red.withAlphaComponent(0.05), isMetallic: false)])
         tower.model.addChild(rangeAccessory)
         rangeAccessory.position.y += 0.02
-        var towerSubscriptions = [Cancellable]()
+        var towerSubscribes = [Cancellable]()
         
         if towerType == .barracks {
             rangeAccessory.position.z += diameter
@@ -557,7 +554,7 @@ class GameViewController: UIViewController {
                         creepTimer.fire()
                     }
                 }
-                towerSubscriptions = [beganSubs, endSubs]
+                towerSubscribes = [beganSubs, endSubs]
                 troops[troop.model.id] = TroopBundle(bundle: troop, hpBarId: troopHPbar.id,maxHP: towerType.maxHP(lvl: towerLvl), towerId: tower.model.id)
             }
             
@@ -571,20 +568,19 @@ class GameViewController: UIViewController {
                 guard let tower = self.towers[event.entityA.id] else { return }
                 guard let creep = event.entityB as? ModelEntity else { return }
                 tower.enemiesIds.removeAll(where: { $0 == creep.id })
-                if tower.enemiesIds.isEmpty { tower.attackTimer?.invalidate() }
+//                if tower.enemiesIds.isEmpty { tower.attackTimer?.invalidate() }
             }
-            
-            let updateSubs = arView.scene.subscribe(to: CollisionEvents.Updated.self, on: tower.model) {
-                event in
-                switch towerType {
-                case .turret:
-                    guard let tower = self.towers[event.entityA.id] else { return }
-                    guard let creep = self.creeps[event.entityB.id] else { return }
-                    guard creep.model.id == tower.enemiesIds.first else { return }
-                    tower.rotate(to: creep)
-                case .barracks, .rocket: break
-                }
-            }
+//
+//            let updateSubs = arView.scene.subscribe(to: CollisionEvents.Updated.self, on: tower.model) {
+//                event in
+//                switch towerType {
+//                case .turret:
+//                    guard let tower = self.towers[event.entityA.id] else { return }
+//                    guard let creep = self.creeps[event.entityB.id] else { return }
+//                    guard creep.model.id == tower.enemiesIds.first else { return }
+//                case .barracks, .rocket: break
+//                }
+//            }
             
             let beganSubs = arView.scene.subscribe(to: CollisionEvents.Began.self, on: tower.model) {
                 event in
@@ -612,36 +608,78 @@ class GameViewController: UIViewController {
                 }
                 
             }
-            towerSubscriptions = [beganSubs, updateSubs, endSubs]
+            towerSubscribes = [beganSubs, endSubs]
         }
-        towers[tower.model.id] = TowerBundle(bundle: tower, type: towerType, lvl: towerLvl, accessory: rangeAccessory, collisionSubs: towerSubscriptions)
+        towers[tower.model.id] = TowerBundle(bundle: tower, type: towerType, lvl: towerLvl, accessory: rangeAccessory, subscribes: towerSubscribes)
     }
     
     func fireRocket(tower: TowerBundle, creep: CreepBundle, anchor: AnchorEntity, placingPosition: SIMD3<Float>) {
+        let bulletModel = self.mapTemplates[ModelType.bullet.key]!.embeddedModel(at: placingPosition)
+        bulletModel.model.transform.translation.y += 0.015
+        anchor.addChild(bulletModel.model)
+        let bullet = BulletBundle(bundle: bulletModel)
+        self.bullets[bulletModel.model.id] = bullet
+        let topHeight = ((creep.model.position.y - tower.model.position.y) / 2) + 0.1
+        deployRocket(in: 0.11, iterations: 10, bullet: bullet, tower: tower, creep: creep, topHeight: topHeight)
+    }
+    
+    func deployRocket(in speed: Float, iterations: Int, bullet: BulletBundle, tower: TowerBundle, creep: CreepBundle, topHeight: Float, counter: Int = 1) {
+        guard iterations != counter else {
+            self.damageCreep(creepModel: creep.model, towerId: tower.model.id, attack: tower.type.attack(lvl: tower.lvl))
+//            bullet.entity.removeFromParent()
+//            bullet.model.removeFromParent()
+//            bullet.subscriptions.forEach({$0.cancel()})
+//            self.bullets.removeValue(forKey: bullet.model.id)
+            return
+        }
+        var bulletTransform = bullet.model.transform
+        bulletTransform.translation += (creep.model.position - bullet.model.position) / Float(iterations - counter)
+        if counter < 5 {
+            bulletTransform.translation.y = bullet.model.position.y + (topHeight - bullet.model.position.y) / Float(counter)
+        } else {
+            bulletTransform.translation.y = bullet.model.position.y + (creep.model.position.y - bullet.model.position.y) / Float(counter)
+        }
+//        bulletTransform.rotation = simd_quatf(angle: move.angle + type.angleOffset, axis: [0, 1, 0])
+        ///Start moving
+        let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: TimeInterval(speed), timingFunction: .linear)
+        bullet.animation = animation
+        let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+            .filter { $0.playbackController == animation }
+            .sink(receiveValue: { [weak self] _ in
+                self?.deployRocket(in: speed - 0.01, iterations: iterations, bullet: bullet, tower: tower, creep: creep, topHeight: topHeight, counter: counter + 1)
+            })
+        bullet.subscriptions.append(subscription)
     }
     
     func fireBullet(tower: TowerBundle, creep: CreepBundle, anchor: AnchorEntity, placingPosition: SIMD3<Float>) {
-        
-        let bullet = mapTemplates[ModelType.bullet.key]!.embeddedModel(at: placingPosition)
-        bullet.model.transform.translation.y += 0.015
-        anchor.addChild(bullet.model)
-        var bulletTransform = bullet.model.transform
-        bulletTransform.translation = creep.model.position
-        bullet.rotate(to: creep)
-        let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.2, timingFunction: .linear)
-        let subscription = arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
-            .filter { $0.playbackController == animation }
-            .sink( receiveValue: { event in
-                self.bullets.forEach { id, bulletBundle in
-                    if bulletBundle.animation.isComplete {
-                        bulletBundle.subscription?.cancel()
-                        self.bullets.removeValue(forKey: id)
-                    }
-                }
-                self.bullets[bullet.model.id]?.model.removeFromParent()
-                self.damageCreep(creepModel: creep.model, towerId: tower.model.id, attack: tower.type.attack(lvl: tower.lvl))
-            })
-        self.bullets[bullet.model.id] = BulletBundle(bundle: bullet, animation: animation,subscription: subscription)
+        var towerTransform = tower.entity.transform
+        towerTransform.rotation = tower.model.angle(targetPosition: creep.model.position)
+        let towerAnimation = tower.entity.move(to: towerTransform, relativeTo: tower.model, duration: TimeInterval(0.1), timingFunction: .linear)
+        tower.subscribes.append(arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+            .filter { $0.playbackController == towerAnimation }
+            .sink(receiveValue: { [weak self] _ in
+            guard let self = self else { return }
+            let bulletBundle = self.mapTemplates[ModelType.bullet.key]!.embeddedModel(at: placingPosition)
+            let bullet = BulletBundle(bundle: bulletBundle)
+            bullet.model.transform.translation.y += 0.015
+            anchor.addChild(bullet.model)
+            var bulletTransform = bullet.model.transform
+            bulletTransform.translation = creep.model.position
+            bullet.rotate(to: creep)
+            let animation = bullet.model.move(to: bulletTransform, relativeTo: bullet.model.anchor, duration: 0.1, timingFunction: .linear)
+            let subscription = self.arView.scene.publisher(for: AnimationEvents.PlaybackCompleted.self)
+                .filter { $0.playbackController == animation }
+                .sink( receiveValue: { [weak self] event in
+                    guard let self = self else { return }
+                    self.damageCreep(creepModel: creep.model, towerId: tower.model.id, attack: tower.type.attack(lvl: tower.lvl))
+                    bullet.entity.removeFromParent()
+                    bullet.model.removeFromParent()
+                    bullet.subscriptions.forEach({$0.cancel()})
+                    self.bullets.removeValue(forKey: bullet.model.id)                    
+                })
+            self.bullets[bullet.model.id] = bullet
+            self.bullets[bullet.model.id]?.subscriptions.append(subscription)
+        }))
     }
     
     
@@ -756,7 +794,6 @@ extension GameViewController: ARSessionDelegate {
     }
 }
 extension GameViewController: UITableViewDelegate, UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch strip.action {
         case .none: break
