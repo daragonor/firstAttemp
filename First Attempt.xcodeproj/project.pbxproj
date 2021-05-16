@@ -26,10 +26,8 @@
 		19C4135824E9D674003AE195 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C4135724E9D674003AE195 /* Models.swift */; };
 		19CA62C62454500D007F9198 /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C52454500D007F9198 /* MultipeerSession.swift */; };
 		19CA62C824545074007F9198 /* GameViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */; };
-		19CDD42724B555D400551CE8 /* path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42624B555D400551CE8 /* path.usdz */; };
 		19CDD42924B559AD00551CE8 /* spawnPort.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42824B559AD00551CE8 /* spawnPort.usdz */; };
 		19CDD42D24B5839100551CE8 /* goal.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42C24B5839100551CE8 /* goal.usdz */; };
-		19CDD42F24B5A0E100551CE8 /* towerPlacing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD42E24B5A0E100551CE8 /* towerPlacing.usdz */; };
 		19CDD43124B5A9DD00551CE8 /* pathUpwards.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43024B5A9DD00551CE8 /* pathUpwards.usdz */; };
 		19CDD43B24B5B04000551CE8 /* barracksLvl2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43224B5B03D00551CE8 /* barracksLvl2.usdz */; };
 		19CDD43C24B5B04000551CE8 /* barracksLvl1.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19CDD43324B5B03D00551CE8 /* barracksLvl1.usdz */; };
@@ -45,6 +43,56 @@
 		19E2F5622496FC6300879050 /* bullet.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 19E2F5612496FC6300879050 /* bullet.usdz */; };
 		19E51B352478B37C00443998 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E51B342478B37C00443998 /* Map.swift */; };
 		19E51B372478B6F500443998 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 19E51B362478B6F500443998 /* config.json */; };
+		BA52D6E02647032A00557B07 /* lvl06_ground002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B32647030300557B07 /* lvl06_ground002.usdz */; };
+		BA52D6E12647032A00557B07 /* lvl01_ground003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B42647030D00557B07 /* lvl01_ground003.usdz */; };
+		BA52D6E22647032A00557B07 /* lvl01_ground004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B52647031300557B07 /* lvl01_ground004.usdz */; };
+		BA52D6E32647032A00557B07 /* lvl04_ground001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B62647031800557B07 /* lvl04_ground001.usdz */; };
+		BA52D6E42647032A00557B07 /* lvl05_ground005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B72647031800557B07 /* lvl05_ground005.usdz */; };
+		BA52D6E52647032A00557B07 /* lvl03_ground001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B82647031900557B07 /* lvl03_ground001.usdz */; };
+		BA52D6E62647032A00557B07 /* lvl02_ground001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6B92647031A00557B07 /* lvl02_ground001.usdz */; };
+		BA52D6E72647032A00557B07 /* lvl04_ground005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6BA2647031A00557B07 /* lvl04_ground005.usdz */; };
+		BA52D6E82647032A00557B07 /* lvl06_higherpath001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6BB2647031B00557B07 /* lvl06_higherpath001.usdz */; };
+		BA52D6E92647032A00557B07 /* lvl06_ground001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6BC2647031B00557B07 /* lvl06_ground001.usdz */; };
+		BA52D6EA2647032A00557B07 /* lvl04_ground004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6BD2647031B00557B07 /* lvl04_ground004.usdz */; };
+		BA52D6EB2647032A00557B07 /* lvl04_higherpath002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6BE2647031C00557B07 /* lvl04_higherpath002.usdz */; };
+		BA52D6EC2647032A00557B07 /* lvl05_higherpath003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6BF2647031C00557B07 /* lvl05_higherpath003.usdz */; };
+		BA52D6ED2647032A00557B07 /* lvl04_higherpath001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C02647031D00557B07 /* lvl04_higherpath001.usdz */; };
+		BA52D6EE2647032A00557B07 /* lvl04_higherpath003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C12647031D00557B07 /* lvl04_higherpath003.usdz */; };
+		BA52D6F02647032A00557B07 /* lvl01_ground002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C32647031E00557B07 /* lvl01_ground002.usdz */; };
+		BA52D6F32647032A00557B07 /* lvl05_higherpath004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C62647032000557B07 /* lvl05_higherpath004.usdz */; };
+		BA52D6F42647032A00557B07 /* lvl02_ground005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C72647032000557B07 /* lvl02_ground005.usdz */; };
+		BA52D6F52647032A00557B07 /* lvl05_ground001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C82647032000557B07 /* lvl05_ground001.usdz */; };
+		BA52D6F62647032A00557B07 /* lvl06_higherbase001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6C92647032100557B07 /* lvl06_higherbase001.usdz */; };
+		BA52D6F72647032A00557B07 /* lvl06_ground003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6CA2647032100557B07 /* lvl06_ground003.usdz */; };
+		BA52D6F82647032A00557B07 /* lvl01_ground001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6CB2647032200557B07 /* lvl01_ground001.usdz */; };
+		BA52D6F92647032A00557B07 /* lvl06_ground004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6CC2647032200557B07 /* lvl06_ground004.usdz */; };
+		BA52D6FA2647032A00557B07 /* lvl05_ground004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6CD2647032200557B07 /* lvl05_ground004.usdz */; };
+		BA52D6FB2647032A00557B07 /* lvl06_higherpath002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6CE2647032200557B07 /* lvl06_higherpath002.usdz */; };
+		BA52D6FC2647032A00557B07 /* lvl04_ground002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6CF2647032300557B07 /* lvl04_ground002.usdz */; };
+		BA52D6FD2647032A00557B07 /* lvl04_ground003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D02647032300557B07 /* lvl04_ground003.usdz */; };
+		BA52D6FE2647032A00557B07 /* lvl02_ground003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D12647032400557B07 /* lvl02_ground003.usdz */; };
+		BA52D6FF2647032A00557B07 /* lvl05_ground002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D22647032400557B07 /* lvl05_ground002.usdz */; };
+		BA52D7002647032A00557B07 /* lvl06_ground005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D32647032400557B07 /* lvl06_ground005.usdz */; };
+		BA52D7012647032A00557B07 /* lvl03_ground005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D42647032400557B07 /* lvl03_ground005.usdz */; };
+		BA52D7032647032A00557B07 /* lvl05_higherpath002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D62647032700557B07 /* lvl05_higherpath002.usdz */; };
+		BA52D7042647032A00557B07 /* lvl06_higherpath003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D72647032700557B07 /* lvl06_higherpath003.usdz */; };
+		BA52D7052647032A00557B07 /* lvl05_ground003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D82647032800557B07 /* lvl05_ground003.usdz */; };
+		BA52D7062647032A00557B07 /* lvl06_higherpath004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6D92647032800557B07 /* lvl06_higherpath004.usdz */; };
+		BA52D7072647032A00557B07 /* lvl03_ground002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6DA2647032800557B07 /* lvl03_ground002.usdz */; };
+		BA52D7082647032A00557B07 /* lvl02_ground002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6DB2647032900557B07 /* lvl02_ground002.usdz */; };
+		BA52D7092647032A00557B07 /* lvl03_ground004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6DC2647032900557B07 /* lvl03_ground004.usdz */; };
+		BA52D70A2647032A00557B07 /* lvl01_ground005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6DD2647032900557B07 /* lvl01_ground005.usdz */; };
+		BA52D70B2647032A00557B07 /* lvl03_ground003.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6DE2647032A00557B07 /* lvl03_ground003.usdz */; };
+		BA52D70C2647032A00557B07 /* lvl02_ground004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA52D6DF2647032A00557B07 /* lvl02_ground004.usdz */; };
+		BA6EFE0C263D4CDA00294730 /* lvl00_neutral002.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA6EFE0B263D4CDA00294730 /* lvl00_neutral002.usdz */; };
+		BA6EFE0F263DF39000294730 /* path.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BA6EFE0E263DF39000294730 /* path.usdz */; };
+		BAB59BFF264714AB008FA2FE /* towerPlacing.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAB59BFE264714AB008FA2FE /* towerPlacing.usdz */; };
+		BAB59C032648A7B2008FA2FE /* lvl04_higherpath004.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAB59C022648A7B2008FA2FE /* lvl04_higherpath004.usdz */; };
+		BAC13DFF262B502400EAD8B5 /* neutralFloorTemplate.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAC13DFE262B502400EAD8B5 /* neutralFloorTemplate.usdz */; };
+		BAE86015265095A8001CA7D3 /* lvl05_higherpath001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAE86013265095A8001CA7D3 /* lvl05_higherpath001.usdz */; };
+		BAE86016265095A8001CA7D3 /* lvl05_higherpath005.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAE86014265095A8001CA7D3 /* lvl05_higherpath005.usdz */; };
+		BAE8601B2650ACA0001CA7D3 /* lvl05_higherbase001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAE860192650AC9F001CA7D3 /* lvl05_higherbase001.usdz */; };
+		BAE8601C2650ACA0001CA7D3 /* lvl04_higherbase001.usdz in Resources */ = {isa = PBXBuildFile; fileRef = BAE8601A2650ACA0001CA7D3 /* lvl04_higherbase001.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,10 +118,8 @@
 		19C4135724E9D674003AE195 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		19CA62C52454500D007F9198 /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
 		19CA62C724545074007F9198 /* GameViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
-		19CDD42624B555D400551CE8 /* path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = path.usdz; sourceTree = "<group>"; };
 		19CDD42824B559AD00551CE8 /* spawnPort.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = spawnPort.usdz; sourceTree = "<group>"; };
 		19CDD42C24B5839100551CE8 /* goal.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = goal.usdz; sourceTree = "<group>"; };
-		19CDD42E24B5A0E100551CE8 /* towerPlacing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = towerPlacing.usdz; sourceTree = "<group>"; };
 		19CDD43024B5A9DD00551CE8 /* pathUpwards.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = pathUpwards.usdz; sourceTree = "<group>"; };
 		19CDD43224B5B03D00551CE8 /* barracksLvl2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracksLvl2.usdz; sourceTree = "<group>"; };
 		19CDD43324B5B03D00551CE8 /* barracksLvl1.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = barracksLvl1.usdz; sourceTree = "<group>"; };
@@ -89,6 +135,56 @@
 		19E2F5612496FC6300879050 /* bullet.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = bullet.usdz; sourceTree = "<group>"; };
 		19E51B342478B37C00443998 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		19E51B362478B6F500443998 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
+		BA52D6B32647030300557B07 /* lvl06_ground002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_ground002.usdz; sourceTree = "<group>"; };
+		BA52D6B42647030D00557B07 /* lvl01_ground003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl01_ground003.usdz; sourceTree = "<group>"; };
+		BA52D6B52647031300557B07 /* lvl01_ground004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl01_ground004.usdz; sourceTree = "<group>"; };
+		BA52D6B62647031800557B07 /* lvl04_ground001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_ground001.usdz; sourceTree = "<group>"; };
+		BA52D6B72647031800557B07 /* lvl05_ground005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_ground005.usdz; sourceTree = "<group>"; };
+		BA52D6B82647031900557B07 /* lvl03_ground001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl03_ground001.usdz; sourceTree = "<group>"; };
+		BA52D6B92647031A00557B07 /* lvl02_ground001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl02_ground001.usdz; sourceTree = "<group>"; };
+		BA52D6BA2647031A00557B07 /* lvl04_ground005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_ground005.usdz; sourceTree = "<group>"; };
+		BA52D6BB2647031B00557B07 /* lvl06_higherpath001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_higherpath001.usdz; sourceTree = "<group>"; };
+		BA52D6BC2647031B00557B07 /* lvl06_ground001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_ground001.usdz; sourceTree = "<group>"; };
+		BA52D6BD2647031B00557B07 /* lvl04_ground004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_ground004.usdz; sourceTree = "<group>"; };
+		BA52D6BE2647031C00557B07 /* lvl04_higherpath002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_higherpath002.usdz; sourceTree = "<group>"; };
+		BA52D6BF2647031C00557B07 /* lvl05_higherpath003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_higherpath003.usdz; sourceTree = "<group>"; };
+		BA52D6C02647031D00557B07 /* lvl04_higherpath001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_higherpath001.usdz; sourceTree = "<group>"; };
+		BA52D6C12647031D00557B07 /* lvl04_higherpath003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_higherpath003.usdz; sourceTree = "<group>"; };
+		BA52D6C32647031E00557B07 /* lvl01_ground002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl01_ground002.usdz; sourceTree = "<group>"; };
+		BA52D6C62647032000557B07 /* lvl05_higherpath004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_higherpath004.usdz; sourceTree = "<group>"; };
+		BA52D6C72647032000557B07 /* lvl02_ground005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl02_ground005.usdz; sourceTree = "<group>"; };
+		BA52D6C82647032000557B07 /* lvl05_ground001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_ground001.usdz; sourceTree = "<group>"; };
+		BA52D6C92647032100557B07 /* lvl06_higherbase001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_higherbase001.usdz; sourceTree = "<group>"; };
+		BA52D6CA2647032100557B07 /* lvl06_ground003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_ground003.usdz; sourceTree = "<group>"; };
+		BA52D6CB2647032200557B07 /* lvl01_ground001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl01_ground001.usdz; sourceTree = "<group>"; };
+		BA52D6CC2647032200557B07 /* lvl06_ground004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_ground004.usdz; sourceTree = "<group>"; };
+		BA52D6CD2647032200557B07 /* lvl05_ground004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_ground004.usdz; sourceTree = "<group>"; };
+		BA52D6CE2647032200557B07 /* lvl06_higherpath002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_higherpath002.usdz; sourceTree = "<group>"; };
+		BA52D6CF2647032300557B07 /* lvl04_ground002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_ground002.usdz; sourceTree = "<group>"; };
+		BA52D6D02647032300557B07 /* lvl04_ground003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_ground003.usdz; sourceTree = "<group>"; };
+		BA52D6D12647032400557B07 /* lvl02_ground003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl02_ground003.usdz; sourceTree = "<group>"; };
+		BA52D6D22647032400557B07 /* lvl05_ground002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_ground002.usdz; sourceTree = "<group>"; };
+		BA52D6D32647032400557B07 /* lvl06_ground005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_ground005.usdz; sourceTree = "<group>"; };
+		BA52D6D42647032400557B07 /* lvl03_ground005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl03_ground005.usdz; sourceTree = "<group>"; };
+		BA52D6D62647032700557B07 /* lvl05_higherpath002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_higherpath002.usdz; sourceTree = "<group>"; };
+		BA52D6D72647032700557B07 /* lvl06_higherpath003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_higherpath003.usdz; sourceTree = "<group>"; };
+		BA52D6D82647032800557B07 /* lvl05_ground003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_ground003.usdz; sourceTree = "<group>"; };
+		BA52D6D92647032800557B07 /* lvl06_higherpath004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl06_higherpath004.usdz; sourceTree = "<group>"; };
+		BA52D6DA2647032800557B07 /* lvl03_ground002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl03_ground002.usdz; sourceTree = "<group>"; };
+		BA52D6DB2647032900557B07 /* lvl02_ground002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl02_ground002.usdz; sourceTree = "<group>"; };
+		BA52D6DC2647032900557B07 /* lvl03_ground004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl03_ground004.usdz; sourceTree = "<group>"; };
+		BA52D6DD2647032900557B07 /* lvl01_ground005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl01_ground005.usdz; sourceTree = "<group>"; };
+		BA52D6DE2647032A00557B07 /* lvl03_ground003.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl03_ground003.usdz; sourceTree = "<group>"; };
+		BA52D6DF2647032A00557B07 /* lvl02_ground004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl02_ground004.usdz; sourceTree = "<group>"; };
+		BA6EFE0B263D4CDA00294730 /* lvl00_neutral002.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl00_neutral002.usdz; sourceTree = "<group>"; };
+		BA6EFE0E263DF39000294730 /* path.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = path.usdz; sourceTree = "<group>"; };
+		BAB59BFE264714AB008FA2FE /* towerPlacing.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = towerPlacing.usdz; sourceTree = "<group>"; };
+		BAB59C022648A7B2008FA2FE /* lvl04_higherpath004.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_higherpath004.usdz; sourceTree = "<group>"; };
+		BAC13DFE262B502400EAD8B5 /* neutralFloorTemplate.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = neutralFloorTemplate.usdz; sourceTree = "<group>"; };
+		BAE86013265095A8001CA7D3 /* lvl05_higherpath001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_higherpath001.usdz; sourceTree = "<group>"; };
+		BAE86014265095A8001CA7D3 /* lvl05_higherpath005.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_higherpath005.usdz; sourceTree = "<group>"; };
+		BAE860192650AC9F001CA7D3 /* lvl05_higherbase001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl05_higherbase001.usdz; sourceTree = "<group>"; };
+		BAE8601A2650ACA0001CA7D3 /* lvl04_higherbase001.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = lvl04_higherbase001.usdz; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +287,8 @@
 		19B61AF52491F9DB00980B59 /* 3DModels */ = {
 			isa = PBXGroup;
 			children = (
+				BA6EFE0A263D4CB600294730 /* neutrals */,
+				BA60C5B926341B3C00A7EC30 /* levels */,
 				19163583249A0A4300B8D6EF /* creeps */,
 				19E2F56D2497591000879050 /* paths */,
 				19E2F56C249758FB00879050 /* towers */,
@@ -202,7 +300,8 @@
 		19E2F5692497464300879050 /* map */ = {
 			isa = PBXGroup;
 			children = (
-				19CDD42E24B5A0E100551CE8 /* towerPlacing.usdz */,
+				BAB59BFE264714AB008FA2FE /* towerPlacing.usdz */,
+				BAC13DFE262B502400EAD8B5 /* neutralFloorTemplate.usdz */,
 				19CDD42C24B5839100551CE8 /* goal.usdz */,
 				19CDD42824B559AD00551CE8 /* spawnPort.usdz */,
 				19A205612498999700C70054 /* here.usdz */,
@@ -231,9 +330,9 @@
 		19E2F56D2497591000879050 /* paths */ = {
 			isa = PBXGroup;
 			children = (
+				BA6EFE0E263DF39000294730 /* path.usdz */,
 				19CDD44424B5B12600551CE8 /* pathDownwards.usdz */,
 				19CDD43024B5A9DD00551CE8 /* pathUpwards.usdz */,
-				19CDD42624B555D400551CE8 /* path.usdz */,
 			);
 			path = paths;
 			sourceTree = "<group>";
@@ -243,6 +342,67 @@
 			children = (
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		BA60C5B926341B3C00A7EC30 /* levels */ = {
+			isa = PBXGroup;
+			children = (
+				BAE8601A2650ACA0001CA7D3 /* lvl04_higherbase001.usdz */,
+				BAE860192650AC9F001CA7D3 /* lvl05_higherbase001.usdz */,
+				BA52D6CB2647032200557B07 /* lvl01_ground001.usdz */,
+				BA52D6C32647031E00557B07 /* lvl01_ground002.usdz */,
+				BA52D6B42647030D00557B07 /* lvl01_ground003.usdz */,
+				BA52D6B52647031300557B07 /* lvl01_ground004.usdz */,
+				BA52D6DD2647032900557B07 /* lvl01_ground005.usdz */,
+				BA52D6B92647031A00557B07 /* lvl02_ground001.usdz */,
+				BA52D6DB2647032900557B07 /* lvl02_ground002.usdz */,
+				BA52D6D12647032400557B07 /* lvl02_ground003.usdz */,
+				BA52D6DF2647032A00557B07 /* lvl02_ground004.usdz */,
+				BA52D6C72647032000557B07 /* lvl02_ground005.usdz */,
+				BA52D6B82647031900557B07 /* lvl03_ground001.usdz */,
+				BA52D6DA2647032800557B07 /* lvl03_ground002.usdz */,
+				BA52D6DE2647032A00557B07 /* lvl03_ground003.usdz */,
+				BA52D6DC2647032900557B07 /* lvl03_ground004.usdz */,
+				BA52D6D42647032400557B07 /* lvl03_ground005.usdz */,
+				BA52D6B62647031800557B07 /* lvl04_ground001.usdz */,
+				BA52D6CF2647032300557B07 /* lvl04_ground002.usdz */,
+				BA52D6D02647032300557B07 /* lvl04_ground003.usdz */,
+				BA52D6BD2647031B00557B07 /* lvl04_ground004.usdz */,
+				BA52D6BA2647031A00557B07 /* lvl04_ground005.usdz */,
+				BA52D6C02647031D00557B07 /* lvl04_higherpath001.usdz */,
+				BA52D6BE2647031C00557B07 /* lvl04_higherpath002.usdz */,
+				BA52D6C12647031D00557B07 /* lvl04_higherpath003.usdz */,
+				BAB59C022648A7B2008FA2FE /* lvl04_higherpath004.usdz */,
+				BA52D6C82647032000557B07 /* lvl05_ground001.usdz */,
+				BA52D6D22647032400557B07 /* lvl05_ground002.usdz */,
+				BA52D6D82647032800557B07 /* lvl05_ground003.usdz */,
+				BA52D6CD2647032200557B07 /* lvl05_ground004.usdz */,
+				BAE86013265095A8001CA7D3 /* lvl05_higherpath001.usdz */,
+				BAE86014265095A8001CA7D3 /* lvl05_higherpath005.usdz */,
+				BA52D6B72647031800557B07 /* lvl05_ground005.usdz */,
+				BA52D6D62647032700557B07 /* lvl05_higherpath002.usdz */,
+				BA52D6BF2647031C00557B07 /* lvl05_higherpath003.usdz */,
+				BA52D6C62647032000557B07 /* lvl05_higherpath004.usdz */,
+				BA52D6BC2647031B00557B07 /* lvl06_ground001.usdz */,
+				BA52D6B32647030300557B07 /* lvl06_ground002.usdz */,
+				BA52D6CA2647032100557B07 /* lvl06_ground003.usdz */,
+				BA52D6CC2647032200557B07 /* lvl06_ground004.usdz */,
+				BA52D6D32647032400557B07 /* lvl06_ground005.usdz */,
+				BA52D6C92647032100557B07 /* lvl06_higherbase001.usdz */,
+				BA52D6BB2647031B00557B07 /* lvl06_higherpath001.usdz */,
+				BA52D6CE2647032200557B07 /* lvl06_higherpath002.usdz */,
+				BA52D6D72647032700557B07 /* lvl06_higherpath003.usdz */,
+				BA52D6D92647032800557B07 /* lvl06_higherpath004.usdz */,
+			);
+			path = levels;
+			sourceTree = "<group>";
+		};
+		BA6EFE0A263D4CB600294730 /* neutrals */ = {
+			isa = PBXGroup;
+			children = (
+				BA6EFE0B263D4CDA00294730 /* lvl00_neutral002.usdz */,
+			);
+			path = neutrals;
 			sourceTree = "<group>";
 		};
 		EB7395D52FBF922820E95978 /* Frameworks */ = {
@@ -280,7 +440,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1130;
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Daniel Aragon";
 				TargetAttributes = {
 					1935BBA724290F9500C764C1 = {
@@ -311,34 +471,82 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA52D70C2647032A00557B07 /* lvl02_ground004.usdz in Resources */,
+				BA52D6FA2647032A00557B07 /* lvl05_ground004.usdz in Resources */,
 				19CDD44024B5B04000551CE8 /* turretLvl3.usdz in Resources */,
+				BA52D6FC2647032A00557B07 /* lvl04_ground002.usdz in Resources */,
 				1935BBB824290F9800C764C1 /* LaunchScreen.storyboard in Resources */,
+				BA52D6F32647032A00557B07 /* lvl05_higherpath004.usdz in Resources */,
+				BAE8601B2650ACA0001CA7D3 /* lvl05_higherbase001.usdz in Resources */,
+				BAB59BFF264714AB008FA2FE /* towerPlacing.usdz in Resources */,
 				19E51B372478B6F500443998 /* config.json in Resources */,
-				19CDD42F24B5A0E100551CE8 /* towerPlacing.usdz in Resources */,
+				BA52D6E92647032A00557B07 /* lvl06_ground001.usdz in Resources */,
+				BA52D6F02647032A00557B07 /* lvl01_ground002.usdz in Resources */,
+				BA52D7062647032A00557B07 /* lvl06_higherpath004.usdz in Resources */,
+				BA52D7092647032A00557B07 /* lvl03_ground004.usdz in Resources */,
 				19CDD43F24B5B04000551CE8 /* rocketLvl2.usdz in Resources */,
+				BA52D6E22647032A00557B07 /* lvl01_ground004.usdz in Resources */,
 				19CDD43C24B5B04000551CE8 /* barracksLvl1.usdz in Resources */,
+				BA6EFE0F263DF39000294730 /* path.usdz in Resources */,
 				19CDD43E24B5B04000551CE8 /* rocketLvl3.usdz in Resources */,
+				BA52D6E72647032A00557B07 /* lvl04_ground005.usdz in Resources */,
+				BA52D7072647032A00557B07 /* lvl03_ground002.usdz in Resources */,
+				BA52D7052647032A00557B07 /* lvl05_ground003.usdz in Resources */,
+				BA52D70A2647032A00557B07 /* lvl01_ground005.usdz in Resources */,
 				19A2055D2498984F00C70054 /* hud_placing.usdz in Resources */,
 				198A28B524B24469002DD151 /* flying.usdz in Resources */,
-				19CDD42724B555D400551CE8 /* path.usdz in Resources */,
+				BAC13DFF262B502400EAD8B5 /* neutralFloorTemplate.usdz in Resources */,
+				BA52D6FD2647032A00557B07 /* lvl04_ground003.usdz in Resources */,
 				19E2F5622496FC6300879050 /* bullet.usdz in Resources */,
+				BA52D70B2647032A00557B07 /* lvl03_ground003.usdz in Resources */,
+				BAE86016265095A8001CA7D3 /* lvl05_higherpath005.usdz in Resources */,
 				1935BBB524290F9800C764C1 /* Assets.xcassets in Resources */,
+				BA6EFE0C263D4CDA00294730 /* lvl00_neutral002.usdz in Resources */,
 				1935BBB324290F9500C764C1 /* Main.storyboard in Resources */,
+				BA52D7082647032A00557B07 /* lvl02_ground002.usdz in Resources */,
+				BA52D6F62647032A00557B07 /* lvl06_higherbase001.usdz in Resources */,
 				195C8041249DDB370075C4B7 /* circle_effect.usdz in Resources */,
+				BA52D6E02647032A00557B07 /* lvl06_ground002.usdz in Resources */,
+				BAE8601C2650ACA0001CA7D3 /* lvl04_higherbase001.usdz in Resources */,
+				BA52D6EE2647032A00557B07 /* lvl04_higherpath003.usdz in Resources */,
 				198A28B724B244F9002DD151 /* small.usdz in Resources */,
+				BA52D6E32647032A00557B07 /* lvl04_ground001.usdz in Resources */,
+				BA52D6ED2647032A00557B07 /* lvl04_higherpath001.usdz in Resources */,
+				BA52D6FF2647032A00557B07 /* lvl05_ground002.usdz in Resources */,
+				BA52D6E52647032A00557B07 /* lvl03_ground001.usdz in Resources */,
+				BA52D6F82647032A00557B07 /* lvl01_ground001.usdz in Resources */,
+				BA52D6EC2647032A00557B07 /* lvl05_higherpath003.usdz in Resources */,
 				19CDD43D24B5B04000551CE8 /* rocketLvl1.usdz in Resources */,
+				BA52D6F52647032A00557B07 /* lvl05_ground001.usdz in Resources */,
+				BA52D7002647032A00557B07 /* lvl06_ground005.usdz in Resources */,
 				19CDD43124B5A9DD00551CE8 /* pathUpwards.usdz in Resources */,
+				BA52D6E62647032A00557B07 /* lvl02_ground001.usdz in Resources */,
+				BA52D7032647032A00557B07 /* lvl05_higherpath002.usdz in Resources */,
 				19A205622498999700C70054 /* here.usdz in Resources */,
 				19A205602498993700C70054 /* selectionRing.usdz in Resources */,
 				19CDD42924B559AD00551CE8 /* spawnPort.usdz in Resources */,
+				BA52D6F92647032A00557B07 /* lvl06_ground004.usdz in Resources */,
+				BA52D6F72647032A00557B07 /* lvl06_ground003.usdz in Resources */,
+				BA52D6FB2647032A00557B07 /* lvl06_higherpath002.usdz in Resources */,
 				198A28BA24B27C85002DD151 /* heavy.usdz in Resources */,
+				BA52D6E42647032A00557B07 /* lvl05_ground005.usdz in Resources */,
+				BA52D6E12647032A00557B07 /* lvl01_ground003.usdz in Resources */,
 				19CDD43B24B5B04000551CE8 /* barracksLvl2.usdz in Resources */,
 				19CDD44224B5B04000551CE8 /* barracksLvl3.usdz in Resources */,
+				BA52D6F42647032A00557B07 /* lvl02_ground005.usdz in Resources */,
 				19CDD44524B5B12600551CE8 /* pathDownwards.usdz in Resources */,
+				BA52D6EB2647032A00557B07 /* lvl04_higherpath002.usdz in Resources */,
+				BAB59C032648A7B2008FA2FE /* lvl04_higherpath004.usdz in Resources */,
 				19CDD42D24B5839100551CE8 /* goal.usdz in Resources */,
+				BA52D6E82647032A00557B07 /* lvl06_higherpath001.usdz in Resources */,
+				BAE86015265095A8001CA7D3 /* lvl05_higherpath001.usdz in Resources */,
 				19CDD44324B5B04000551CE8 /* turretLvl1.usdz in Resources */,
 				19CDD44124B5B04000551CE8 /* turretLvl2.usdz in Resources */,
+				BA52D7012647032A00557B07 /* lvl03_ground005.usdz in Resources */,
+				BA52D7042647032A00557B07 /* lvl06_higherpath003.usdz in Resources */,
 				19363E652489AFA900698A72 /* regular.usdz in Resources */,
+				BA52D6FE2647032A00557B07 /* lvl02_ground003.usdz in Resources */,
+				BA52D6EA2647032A00557B07 /* lvl04_ground004.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,6 +618,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -435,7 +644,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -471,6 +680,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -490,7 +700,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -505,14 +715,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 438BTGM47G;
+				DEVELOPMENT_TEAM = 34LGX7BY89;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "First Attempt/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "upc.workshop.first-attempt";
+				PRODUCT_BUNDLE_IDENTIFIER = "upc.workshop.first-attempt1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -524,14 +734,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 438BTGM47G;
+				DEVELOPMENT_TEAM = 34LGX7BY89;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "First Attempt/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "upc.workshop.first-attempt";
+				PRODUCT_BUNDLE_IDENTIFIER = "upc.workshop.first-attempt1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

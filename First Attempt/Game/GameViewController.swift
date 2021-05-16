@@ -188,6 +188,8 @@ class GameViewController: UIViewController {
             modelNames += TowerType.allCases.map { $0.key(.lvl1) }
             modelNames += TowerType.allCases.map { $0.key(.lvl2) }
             modelNames += TowerType.allCases.map { $0.key(.lvl3) }
+            modelNames += LevelType.allCases.map { $0.key }
+            modelNames += NeutralType.allCases.map { $0.key }
 
             for name in modelNames {
                 loadingSubs.append(ModelEntity.loadAsync(named: name)
@@ -208,6 +210,12 @@ class GameViewController: UIViewController {
                         } else if let factor = CreepType(rawValue: name)?.scalingFactor {
                             entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
                             self.unitTemplates[name] = entity
+                        } else if let factor = LevelType(rawValue: name)?.scalingFactor {
+                            entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
+                            self.mapTemplates[name] = entity
+                        } else if let factor = NeutralType(rawValue: name)?.scalingFactor {
+                            entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
+                            self.mapTemplates[name] = entity
                         } else {
                             entity.setScale(SIMD3(repeating: TowerType.scalingFactor), relativeTo: nil)
                             self.unitTemplates[name] = entity
@@ -425,6 +433,9 @@ class GameViewController: UIViewController {
     func insertMap(anchor: AnchorEntity, map: MapModel) {
         let rows = map.matrix.count
         let columns = map.matrix.first!.count
+        var neutralCount = 0
+        var higherPathCount = 0
+        var lowerPathCount = 0
         for row in 0..<rows {
             for column in 0..<columns {
                 let rowDistance = Float(rows / 2) - gridDiameter
@@ -436,7 +447,7 @@ class GameViewController: UIViewController {
                 //                let floor = neutralFloorTemplate.embeddedModel(at: [x, 0.005, z])
                 //                anchor.addChild(floor.model)
                 switch mapType {
-                case .neutral: break
+//                case .neutral: break
                     //                    let chance = Int.random(in: 1...10)
                     //                    let rotation = Direction.baseMoves[Int.random(in: 0...3)].rotation()
                     //                    switch chance {
@@ -450,6 +461,61 @@ class GameViewController: UIViewController {
                     //                        anchor.addChild(floor.model)
                     //                    default: break
                 //                    }
+                case .neutral:
+                    switch mission {
+                        case 0:
+                            let ground = mapTemplates[neutral_Lvl01[neutralCount].key]!.embeddedModel(at: [x, 0.001, z])
+                            ground.entity.transform.rotation = simd_quatf(angle: neutral_Lvl01[neutralCount].rY.angle, axis: [0, 1, 0])
+                            neutralCount += 1
+                            anchor.addChild(ground.model)
+                            if neutralCount == neutral_Lvl01.count {
+                                neutralCount = 0
+                            }
+                        case 1:
+                            let ground = mapTemplates[neutral_Lvl02[neutralCount].key]!.embeddedModel(at: [x,0.001, z])
+                            ground.entity.transform.rotation = simd_quatf(angle: neutral_Lvl02[neutralCount].rY.angle, axis: [0, 1, 0])
+                            neutralCount += 1
+                            anchor.addChild(ground.model)
+                            if neutralCount == neutral_Lvl02.count {
+                                neutralCount = 0
+                            }
+                        case 2:
+                            let ground = mapTemplates[neutral_Lvl03[neutralCount].key]!.embeddedModel(at: [x,0.001, z])
+                            ground.entity.transform.rotation = simd_quatf(angle: neutral_Lvl03[neutralCount].rY.angle, axis: [0, 1, 0])
+                            neutralCount += 1
+                            anchor.addChild(ground.model)
+                            if neutralCount == neutral_Lvl03.count {
+                                neutralCount = 0
+                            }
+                        case 3:
+                            let ground = mapTemplates[neutral_Lvl04[neutralCount].key]!.embeddedModel(at: [x,0.001, z])
+                            ground.entity.transform.rotation = simd_quatf(angle: neutral_Lvl04[neutralCount].rY.angle, axis: [0, 1, 0])
+                            neutralCount += 1
+                            anchor.addChild(ground.model)
+                            if neutralCount == neutral_Lvl04.count {
+                                neutralCount = 0
+                            }
+                        case 4:
+                            let ground = mapTemplates[neutral_Lvl05[neutralCount].key]!.embeddedModel(at: [x,0.001, z])
+                            ground.entity.transform.rotation = simd_quatf(angle: neutral_Lvl05[neutralCount].rY.angle, axis: [0, 1, 0])
+                            neutralCount += 1
+                            anchor.addChild(ground.model)
+                            if neutralCount == neutral_Lvl05.count {
+                                neutralCount = 0
+                            }
+                        case 5:
+                            let ground = mapTemplates[neutral_Lvl06[neutralCount].key]!.embeddedModel(at: [x,0.001, z])
+                            ground.entity.transform.rotation = simd_quatf(angle: neutral_Lvl06[neutralCount].rY.angle, axis: [0, 1, 0])
+                            neutralCount += 1
+                            anchor.addChild(ground.model)
+                            if neutralCount == neutral_Lvl06.count {
+                                neutralCount = 0
+                            }
+                        default:
+                            let ground = mapTemplates[LevelType.lvl05_ground004.key]!.embeddedModel(at: [x, 0.001, z])
+                            anchor.addChild(ground.model)
+                    }
+                    break
                 case .zipLineIn, .zipLineOut:
                     break
                 case .goal:
@@ -465,9 +531,19 @@ class GameViewController: UIViewController {
                             if nextRow >= 0 && nextRow < rows,
                                 nextColumn >= 0 && nextColumn < columns {
                                 if  MapLegend.allCases[map.matrix[nextRow][nextColumn]] == .higherPath {
-                                    let floor = mapTemplates[ModelType.pathUpwards.key]!.embeddedModel(at: [x, 0.001, z])
-                                    floor.entity.transform.rotation = simd_quatf(angle: direction.angle, axis: [0, 1, 0])
-                                    return floor
+                                    switch mission {
+                                    case 3,4:
+                                        let floor = mapTemplates[LevelType.lvl04_higherpath004.key]!.embeddedModel(at: [x, 0.001, z])
+                                        floor.entity.transform.rotation = simd_quatf(angle: direction.angle, axis: [0, 1, 0])
+                                        return floor
+                                    default:
+                                        let floor = mapTemplates[LevelType.lvl06_higherpath004.key]!.embeddedModel(at: [x, 0.001, z])
+                                        floor.entity.transform.rotation = simd_quatf(angle: direction.angle, axis: [0, 1, 0])
+                                        return floor
+                                    }
+//                                    let floor = mapTemplates[ModelType.pathUpwards.key]!.embeddedModel(at: [x, 0.001, z])
+//                                    floor.entity.transform.rotation = simd_quatf(angle: direction.angle, axis: [0, 1, 0])
+//                                    return floor
                                 }
                             }
                         }
@@ -481,23 +557,61 @@ class GameViewController: UIViewController {
                             if nextRow >= 0 && nextRow < rows,
                                 nextColumn >= 0 && nextColumn < columns {
                                 if  MapLegend.allCases[map.matrix[nextRow][nextColumn]] == .lowerPath {
-                                    let floor = mapTemplates[ModelType.pathDownwards.key]!.embeddedModel(at: [x, 0.1, z])
-                                    floor.entity.transform.rotation = simd_quatf(angle: direction.angle + .pi, axis: [0, 1, 0])
-                                    return floor
+                                    switch mission {
+                                    case 3,4:
+                                        let floor = mapTemplates[LevelType.lvl04_higherpath003.key]!.embeddedModel(at: [x, 0.001, z])
+                                        floor.entity.transform.rotation = simd_quatf(angle: direction.angle + .pi, axis: [0, 1, 0])
+                                        return floor
+                                    default:
+                                        let floor = mapTemplates[LevelType.lvl06_higherpath003.key]!.embeddedModel(at: [x, 0.001, z])
+                                        floor.entity.transform.rotation = simd_quatf(angle: direction.angle + .pi, axis: [0, 1, 0])
+                                        return floor
+                                    }
+//                                    let floor = mapTemplates[ModelType.pathDownwards.key]!.embeddedModel(at: [x, 0.1, z])
+                                    
                                 }
                             }
                         }
-                        return mapTemplates[ModelType.path.key]!.embeddedModel(at: [x, 0.1, z])
+//                        return mapTemplates[ModelType.path.key]!.embeddedModel(at: [x, 0.1, z])
+                        print("higherPathCount")
+                        print(higherPathCount)
+                        switch mission {
+                            case 3:
+                                let higherPath = mapTemplates[higherPath_Lvl04[higherPathCount].key]!.embeddedModel(at: [x, 0.001, z])
+                                higherPath.entity.transform.rotation = simd_quatf(angle: higherPath_Lvl04[higherPathCount].rY.angle, axis: [0, 1, 0])
+                                higherPathCount += 1
+                                return higherPath
+                            case 4:
+                                let higherPath = mapTemplates[higherPath_Lvl05[higherPathCount].key]!.embeddedModel(at: [x, 0.001, z])
+                                higherPath.entity.transform.rotation = simd_quatf(angle: higherPath_Lvl05[higherPathCount].rY.angle, axis: [0, 1, 0])
+                                higherPathCount += 1
+                                return higherPath
+                            case 5:
+                                let higherPath = mapTemplates[higherPath_Lvl06[higherPathCount].key]!.embeddedModel(at: [x, 0.001, z])
+                                higherPath.entity.transform.rotation = simd_quatf(angle: higherPath_Lvl06[higherPathCount].rY.angle, axis: [0, 1, 0])
+                                higherPathCount += 1
+                                return higherPath
+                            default:
+                                return mapTemplates[LevelType.lvl04_higherpath001.key]!.embeddedModel(at: [x,0.001, z])
+                        }
                     }
                     anchor.addChild(floor.model)
                 case .lowerPlacing:
-                    let placing = mapTemplates[ModelType.towerPlacing.key]!.embeddedModel(at: [x, 0.005, z])
+                    let placing = mapTemplates[ModelType.towerPlacing.key]!.embeddedModel(at: [x, 0.001, z])
                     let bounds = placing.entity.visualBounds(relativeTo: placing.model)
                     placing.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
                     anchor.addChild(placing.model)
                     placings[placing.model.id] = (placing.model, (row,column), nil)
                 case .higherPlacing:
-                    let placing = mapTemplates[ModelType.towerPlacing.key]!.embeddedModel(at: [x, 0.102, z])
+                    let higherPlacingKey = { () -> String in 
+                        switch mission {
+                        case 3: return LevelType.lvl04_higherbase001.key
+                        case 4: return LevelType.lvl05_higherbase001.key
+                        case 5: return LevelType.lvl06_higherbase001.key
+                        default: return LevelType.lvl04_higherbase001.key
+                        }
+                    }()
+                    let placing = mapTemplates[higherPlacingKey]!.embeddedModel(at: [x, 0.001, z])
                     let bounds = placing.entity.visualBounds(relativeTo: placing.model)
                     placing.model.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: bounds.extents).offsetBy(translation: bounds.center)])
                     anchor.addChild(placing.model)
