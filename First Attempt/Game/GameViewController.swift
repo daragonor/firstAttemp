@@ -175,7 +175,6 @@ class GameViewController: UIViewController {
             modelNames += TowerType.allCases.map { $0.key(.lvl1) }
             modelNames += TowerType.allCases.map { $0.key(.lvl2) }
             modelNames += TowerType.allCases.map { $0.key(.lvl3) }
-<<<<<<< HEAD
             modelNames += LevelType.allCases.map { $0.key }
             modelNames += NeutralType.allCases.map { $0.key }
 
@@ -209,35 +208,6 @@ class GameViewController: UIViewController {
                             self.unitTemplates[name] = entity
                         }
                     })
-=======
-            
-            for name in modelNames {
-                loadingSubs.append(
-                    ModelEntity.loadAsync(named: name)
-                        .sink(receiveCompletion: { print ("completion: \($0)") },
-                              receiveValue: { entity in
-                                self.loadedModels += 1
-                                if self.loadedModels == modelNames.count {
-                                    for lifepoint in Lifepoints.allCases {
-                                        self.mapTemplates[lifepoint.key] = ModelEntity(mesh: .generateBox(size: SIMD3(x: 0.003, y: 0.0005, z: 0.0005), cornerRadius: 0.0002), materials: [SimpleMaterial(color: lifepoint.color, isMetallic: false)])
-                                    }
-                                    self.hideLoadingAssets()
-                                    self.loadAnchorConfiguration()
-                                }
-                                
-                                if let factor = ModelType(rawValue: name)?.scalingFactor {
-                                    entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
-                                    self.mapTemplates[name] = entity
-                                } else if let factor = CreepType(rawValue: name)?.scalingFactor {
-                                    entity.setScale(SIMD3(repeating: factor), relativeTo: nil)
-                                    self.unitTemplates[name] = entity
-                                } else {
-                                    entity.setScale(SIMD3(repeating: TowerType.scalingFactor), relativeTo: nil)
-                                    self.unitTemplates[name] = entity
-                                }
-                              })
->>>>>>> 3d4faea0fe027e52814616c71f2b712724505219
-                )
             }
         } else  {
             self.loadAnchorConfiguration()
@@ -849,7 +819,7 @@ class GameViewController: UIViewController {
         child.removeFromParent()
         creeps[creepModel.id]?.hpBarId = hpBar.id
     }
-}
+    
 
 extension GameViewController: ARSessionDelegate {
     
