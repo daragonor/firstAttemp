@@ -34,7 +34,7 @@ class MenuViewController: UIViewController {
     }
     
     var resize: ((CGFloat) -> Void)?
-    var startMission: ((Int) -> Void)?
+    var loadMission: ((Int) -> Void)?
     var showMenu: (() -> Void)?
 
     var state: MenuState = .menu
@@ -123,7 +123,7 @@ extension MenuViewController: UITableViewDataSource, UITableViewDelegate {
             }
             tableView.reloadData()
         case .missions:
-            startMission?(indexPath.row)
+            loadMission?(indexPath.row)
         case .lobby:
             break
         case .settings:
