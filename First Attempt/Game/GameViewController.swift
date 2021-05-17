@@ -454,36 +454,6 @@ class GameViewController: UIViewController {
                 //                let floor = neutralFloorTemplate.embeddedModel(at: [x, 0.005, z])
                 //                anchor.addChild(floor.model)
                 switch mapType {
-<<<<<<< HEAD
-//                case .neutral: break
-                    //                    let chance = Int.random(in: 1...10)
-                    //                    let rotation = Direction.baseMoves[Int.random(in: 0...3)].rotation()
-                    //                    switch chance {
-                    //                    case 7...8:
-                    //                        let floor = neutralTankTemplate.embeddedModel(at: [x, 0.003, z])
-                    //                        floor.model.transform.rotation = rotation
-                    //                        anchor.addChild(floor.model)
-                    //                    case 10:
-                    //                        let floor = neutralBarrelTemplate.embeddedModel(at: [x, 0.003, z])
-                    //                        floor.model.transform.rotation = rotation
-                    //                        anchor.addChild(floor.model)
-                    //                    default: break
-=======
-                case .neutral: break
-                //                    let chance = Int.random(in: 1...10)
-                //                    let rotation = Direction.baseMoves[Int.random(in: 0...3)].rotation()
-                //                    switch chance {
-                //                    case 7...8:
-                //                        let floor = neutralTankTemplate.embeddedModel(at: [x, 0.003, z])
-                //                        floor.model.transform.rotation = rotation
-                //                        anchor.addChild(floor.model)
-                //                    case 10:
-                //                        let floor = neutralBarrelTemplate.embeddedModel(at: [x, 0.003, z])
-                //                        floor.model.transform.rotation = rotation
-                //                        anchor.addChild(floor.model)
-                //                    default: break
->>>>>>> 3d4faea0fe027e52814616c71f2b712724505219
-                //                    }
                 case .neutral:
                     switch mission {
                         case 0:
